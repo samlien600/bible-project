@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>救贖的系譜：從亞當到耶穌</title>
+    <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --text-color: #2c3e50;
+            --accent-color: #8e44ad; /* 紫色代表皇室與尊貴 */
+            --line-color: #bdc3c7;
+            --highlight-color: #e67e22;
+            --dim-text: #d0d3d4;     /* 淡化時的文字顏色 */
+            --dim-border: #ecf0f1;   /* 淡化時的邊框顏色 */
+            --card-bg: #ffffff;
+            --stage-btn-bg: #ecf0f1;
+            --stage-btn-active: #2c3e50;
+            --stage-btn-text-active: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Stage Navigation */
+        .stage-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+            white-space: nowrap;
+            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .stage-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: var(--stage-btn-bg);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .stage-btn:hover {
+            background: #dfe6e9;
+        }
+
+        .stage-btn.active {
+            background: var(--stage-btn-active);
+            color: var(--stage-btn-text-active);
+            border-color: var(--stage-btn-active);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Tree Area */
+        .tree-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* REMOVED: .timeline-line absolute positioning */
+        /* Instead we use .line-segment */
+
+        .line-segment {
+            width: 2px;
+            height: 40px; /* 連接線長度 */
+            background: transparent;
+            border-left-width: 2px;
+            border-left-color: var(--line-color);
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .line-segment.solid {
+            border-left-style: solid;
+        }
+
+        .line-segment.dashed {
+            border-left-style: dashed;
+            /* 增加一點間距讓虛線更明顯 */
+            height: 50px; 
+            opacity: 0.6;
+        }
+
+        /* Node Styles */
+        .node {
+            position: relative;
+            background: var(--card-bg);
+            border: 2px solid var(--line-color);
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            /* Removed large margins, let line segment handle spacing */
+            margin: 0; 
+            width: 240px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 1;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: var(--accent-color);
+        }
+
+        .node .name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: block;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .node .meaning {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-style: italic;
+            display: block;
+            transition: color 0.3s;
+        }
+        
+        .node .ref-tag {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            margin-top: 4px;
+            display: block;
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+        /* Connection Dots - Keep these as anchors */
+        .node::before {
+            content: '';
+            position: absolute;
+            top: -6px; /* Adjust for border */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: var(--line-color);
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .node:first-child::before { display: none; }
+
+        .node::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; /* Adjust for border */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: var(--line-color);
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .node:last-child::after { display: none; }
+
+        /* Dynamic States */
+        .node.dimmed {
+            border-color: var(--dim-border);
+            box-shadow: none;
+            transform: scale(0.98);
+        }
+        
+        .node.dimmed .name { color: var(--dim-text); }
+        .node.dimmed .meaning { color: #e5e7e9; }
+        .node.dimmed .ref-tag { color: #e5e7e9; background: transparent; }
+        .node.dimmed::before, .node.dimmed::after { background-color: var(--dim-border); }
+
+        /* Line States */
+        .line-segment.dimmed {
+            border-left-color: var(--dim-border);
+            opacity: 0.3;
+        }
+
+        .node.highlight {
+            border-color: var(--highlight-color);
+            background-color: #fff8e1;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(230, 126, 34, 0.3);
+            z-index: 2;
+        }
+
+        .line-segment.highlight {
+            border-left-color: var(--highlight-color);
+            border-left-width: 3px;
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .node.active {
+            border-color: var(--accent-color);
+            background-color: #f3e5f5;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);
+            z-index: 3;
+        }
+        
+        .node.highlight::before, .node.highlight::after,
+        .node.active::before, .node.active::after {
+            background-color: var(--highlight-color);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            width: 350px;
+            background: white;
+            border-left: 1px solid #ddd;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+            transition: transform 0.3s ease;
+            z-index: 20;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .info-content h2 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .info-content .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            font-size: 1rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-section h3::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1em;
+            background: var(--accent-color);
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .plan-box {
+            background: #f0f7fa;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+        
+        .bible-verse-box {
+            background: #f9f9f9;
+            border-left: 4px solid #95a5a6;
+            padding: 0.8rem;
+            font-style: italic;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .bible-ref {
+            display: block;
+            text-align: right;
+            font-weight: bold;
+            font-style: normal;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            color: #2c3e50;
+        }
+
+        .why-jesus {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+        
+        .close-panel {
+            display: none; /* Mobile only */
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none; /* Shown when filtering */
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .info-panel {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                transform: translateX(100%);
+            }
+
+            .info-panel.open {
+                transform: translateX(0);
+            }
+            
+            .close-panel {
+                display: block;
+            }
+
+            .tree-container {
+                padding-bottom: 80px; /* Space for reset button */
+            }
+            
+            header h1 { font-size: 1.2rem; }
+            header p { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>救贖的系譜：從亞當到耶穌</h1>
+    <p>探索神在歷史中的救贖計劃，以及為什麼耶穌是人類唯一的盼望。</p>
+</header>
+
+<nav class="stage-nav">
+    <button class="stage-btn active" onclick="resetView()">全覽</button>
+    <button class="stage-btn" onclick="filterStage('creation')">1. 創造與墮落</button>
+    <button class="stage-btn" onclick="filterStage('promise')">2. 應許與列祖</button>
+    <button class="stage-btn" onclick="filterStage('kingdom')">3. 律法與王國</button>
+    <button class="stage-btn" onclick="filterStage('exile')">4. 被擄與沈默</button>
+    <button class="stage-btn" onclick="filterStage('messiah')">5. 彌賽亞降臨</button>
+</nav>
+
+<div class="container">
+    <div class="tree-container" id="treeRoot">
+        <!-- Nodes will be inserted here by JavaScript -->
+    </div>
+
+    <aside class="info-panel" id="infoPanel">
+        <button class="close-panel" onclick="closePanel()">×</button>
+        <div class="info-content" id="infoContent">
+            <h2>歡迎使用救贖家譜</h2>
+            <p class="subtitle">點擊左側人物或上方階段按鈕開始探索。</p>
+            
+            <div class="info-section">
+                <h3>關於本圖表</h3>
+                <p>本圖表展示了從人類始祖亞當到耶穌基督的家譜。</p>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                    <span style="display:inline-block; width: 20px; border-top: 2px solid #bdc3c7; vertical-align: middle;"></span> 實線：直系一代 (父生子)<br>
+                    <span style="display:inline-block; width: 20px; border-top: 2px dashed #bdc3c7; vertical-align: middle;"></span> 虛線：多代間隔 (後代)
+                </p>
+            </div>
+
+            <div class="info-section">
+                <h3>為什麼需要耶穌？</h3>
+                <div class="why-jesus">
+                    <p>整個人類歷史都在講述一個故事：神創造完美的人，人因罪與神隔絕，而神主動展開漫長的救贖計劃。家譜中的每一個名字，都是這條救贖金線上的一環，最終指向那一位能解決罪的問題、重建神人關係的——耶穌基督。</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<button class="reset-btn" id="resetBtn" onclick="resetView()">重置視圖</button>
+
+<script>
+    // Data Structure with Bible Verses
+    // Added isDirect: false explicitly for skipped generations logic
+    const genealogyData = [
+        {
+            id: 1,
+            name: "亞當 (Adam)",
+            meaning: "人 / 紅土",
+            father: null,
+            stage: "creation",
+            isDirect: true,
+            desc: "人類的始祖，按著神的形象被造，但因悖逆而將罪帶入世界。",
+            ref: "創世記 1:27, 3:15",
+            verse: "神就照著自己的形象造人... 我又要叫你和女人彼此為仇；你的後裔和女人的後裔也彼此為仇。女人的後裔要傷你的頭，你要傷他的腳跟。",
+            redemption: "神應許『女人的後裔』要傷蛇的頭。这是最早的福音預言（Proto-evangelium）。",
+            why: "亞當的失敗（原罪）將死亡帶入世界，因此需要『末後的亞當』（耶穌）帶來生命。"
+        },
+        {
+            id: 2,
+            name: "塞特 (Seth)",
+            meaning: "償還 / 代替",
+            father: 1,
+            stage: "creation",
+            isDirect: true,
+            desc: "亞當的第三個兒子，代替被該隱殺害的亞伯。",
+            ref: "創世記 4:25-26",
+            verse: "亞當又與妻子同房，她就生了一個兒子，起名叫塞特，意思說：「神另給我立了一個兒子代替亞伯...」 那時候，人才求告耶和華的名。",
+            redemption: "神保存了敬虔的後裔，求告耶和華的名從此時開始。",
+            why: "在充滿暴力的世界中，神保留了一條通往救贖的血脈。"
+        },
+        {
+            id: 3,
+            name: "挪亞 (Noah)",
+            meaning: "安息 / 安慰",
+            father: 2,
+            isDirect: false, // 多代間隔
+            stage: "creation",
+            desc: "在罪惡滿盈的世代中與神同行，建造方舟。",
+            ref: "創世記 6:8, 9:9",
+            verse: "惟有挪亞在耶和華眼前蒙恩... 我與你們和你們的後裔立約。",
+            redemption: "方舟預表了基督的救恩——在神的審判中唯一的避難所。",
+            why: "神透過洪水審判罪惡，但透過挪亞與受造界立約，展現恩典與存留。"
+        },
+        {
+            id: 4,
+            name: "閃 (Shem)",
+            meaning: "名聲",
+            father: 3,
+            stage: "creation",
+            isDirect: true,
+            desc: "挪亞的兒子，希伯來人的祖先。",
+            ref: "創世記 9:26",
+            verse: "耶和華是應當稱頌的，願他作閃的神... 願神使雅弗擴張，使他住在閃的帳棚裡。",
+            redemption: "挪亞預言『耶和華是應當稱頌的，願他作閃的神』，救恩將透過閃族而出。",
+            why: "區分出神選民的脈絡。"
+        },
+        {
+            id: 5,
+            name: "亞伯拉罕 (Abraham)",
+            meaning: "多國之父",
+            father: 4,
+            isDirect: false, // 多代間隔 (閃 -> 亞法撒 -> ... -> 他拉 -> 亞伯拉罕)
+            stage: "promise",
+            desc: "信心之父，神呼召他離開本地本族。",
+            ref: "創世記 12:3",
+            verse: "為你祝福的，我必賜福與他；那咒詛你的，我必咒詛他。地上的萬族都要因你得福。",
+            redemption: "亞伯拉罕之約：神應許『地上的萬族都要因你得福』。這是救恩普及萬邦的基礎。",
+            why: "神開始具體揀選一個民族來承載祂的道，並預備彌賽亞的降生。"
+        },
+        {
+            id: 6,
+            name: "以撒 (Isaac)",
+            meaning: "喜笑",
+            father: 5,
+            isDirect: true,
+            stage: "promise",
+            desc: "應許之子，亞伯拉罕百歲時所生。",
+            ref: "創世記 21:12",
+            verse: "神對亞伯拉罕說... 因為從以撒生的，才要稱為你的後裔。",
+            redemption: "亞伯拉罕獻以撒，預表了父神將獨生子耶穌獻上。",
+            why: "救恩不是靠人的血氣（如以實瑪利），而是靠神的應許。"
+        },
+        {
+            id: 7,
+            name: "雅各 (Jacob)",
+            meaning: "抓住 / 以色列",
+            father: 6,
+            isDirect: true,
+            stage: "promise",
+            desc: "以色列十二支派的父親。",
+            ref: "創世記 28:14",
+            verse: "你的後裔必像地上的塵沙那樣多... 地上萬族必因你和你的後裔得福。",
+            redemption: "神再次確認聖約。他在毘努伊勒與神摔跤，生命被改變。",
+            why: "顯示神的揀選在乎恩典，而非人的行為。"
+        },
+        {
+            id: 8,
+            name: "猶大 (Judah)",
+            meaning: "讚美",
+            father: 7,
+            isDirect: true,
+            stage: "promise",
+            desc: "雅各第四子，君王支派的祖先。",
+            ref: "創世記 49:10",
+            verse: "圭必不離猶大，杖必不離他兩腳之間，直等細羅來到，萬民都必歸順。",
+            redemption: "雅各預言：『圭必不離猶大...直等細羅（賜平安者）來到』。",
+            why: "確立了彌賽亞將出自猶大支派（獅子）。"
+        },
+        {
+            id: 9,
+            name: "法勒斯 (Perez)",
+            meaning: "突破",
+            father: 8,
+            isDirect: true,
+            stage: "promise",
+            desc: "猶大與他瑪所生。",
+            ref: "路得記 4:18-19",
+            verse: "法勒斯的後代記在下面：法勒斯生希斯崙...",
+            redemption: "即使在混亂與不道德的家庭背景中，神仍掌管歷史，延續彌賽亞的譜系。",
+            why: "顯示耶穌進入人類罪惡的歷史中，帶來潔淨。"
+        },
+        {
+            id: 10,
+            name: "波阿斯 (Boaz)",
+            meaning: "力量在他裡面",
+            father: 9,
+            isDirect: false, // 多代間隔 (法勒斯 ... 波阿斯)
+            stage: "kingdom",
+            desc: "路得記中的大財主，娶了外邦女子路得。",
+            ref: "路得記 4:14",
+            verse: "婦人們對拿俄米說：「耶和華是應當稱頌的！因為今日沒有撇下你，使你無至近的親屬。」",
+            redemption: "至近的親屬（Kinsman-Redeemer），預表基督贖回我們這些外邦罪人。",
+            why: "打破民族界線，將外邦人納入救恩計劃。"
+        },
+        {
+            id: 11,
+            name: "俄備得 (Obed)",
+            meaning: "僕人",
+            father: 10,
+            isDirect: true,
+            stage: "kingdom",
+            desc: "路得之子，大衛的祖父。",
+            ref: "路得記 4:17",
+            verse: "鄰舍的婦人給孩子起名，說：「拿俄米得孩子了！」就給他起名叫俄備得。這俄備得是耶西的父，耶西是大衛的父。",
+            redemption: "承接應許的關鍵一代。",
+            why: "神眷顧平凡人的信心。"
+        },
+        {
+            id: 12,
+            name: "耶西 (Jesse)",
+            meaning: "神的禮物",
+            father: 11,
+            isDirect: true,
+            stage: "kingdom",
+            desc: "大衛的父親，伯利恆人。",
+            ref: "以賽亞書 11:1",
+            verse: "從耶西的本必發一條，從他根生的枝子必結果實。",
+            redemption: "以賽亞預言：『從耶西的本必發一條』，指彌賽亞。",
+            why: "為榮耀的王國做預備。"
+        },
+        {
+            id: 13,
+            name: "大衛 (David)",
+            meaning: "被愛的",
+            father: 12,
+            isDirect: true,
+            stage: "kingdom",
+            desc: "以色列最偉大的君王，合神心意的人。",
+            ref: "撒母耳記下 7:12-13",
+            verse: "我必使你的後裔接續你的位... 我必堅定他的國位，直到永遠。",
+            redemption: "大衛之約：神應許他的後裔將永遠坐在寶座上。耶穌被稱為『大衛的子孫』。",
+            why: "耶穌是真正的君王，成全大衛未能建立的永恆國度。"
+        },
+        {
+            id: 14,
+            name: "所羅門 (Solomon)",
+            meaning: "和平",
+            father: 13,
+            isDirect: true,
+            stage: "kingdom",
+            desc: "智慧之王，建造聖殿。",
+            ref: "歷代志上 22:9-10",
+            verse: "你要生一個兒子，他必作太平的人... 他必為我的名建造殿宇。",
+            redemption: "榮耀的國度預表基督千禧年的統治。",
+            why: "即使最有智慧的人也失敗了（拜偶像），證明人類需要一位完美的君王。"
+        },
+        {
+            id: 15,
+            name: "羅波安 (Rehohoam)",
+            meaning: "使民變寬",
+            father: 14,
+            isDirect: true,
+            stage: "kingdom",
+            desc: "王國分裂時期的王。",
+            ref: "列王紀上 11:43",
+            verse: "所羅門與他列祖同睡... 他兒子羅波安接續他作王。",
+            redemption: "儘管國家分裂，神為大衛的緣故保留了猶大支派的燈光。",
+            why: "人的政治失敗凸顯神信實的護理。"
+        },
+        {
+            id: 16,
+            name: "希西家 (Hezekiah)",
+            meaning: "耶和華是我的力量",
+            father: 15,
+            isDirect: false, // 多代間隔 (羅波安 ... 希西家)
+            stage: "kingdom",
+            desc: "中興名君，依靠耶和華。",
+            ref: "列王紀下 18:5",
+            verse: "希西家倚靠耶和華─以色列的神，在他前後的猶大列王中沒有一個及他的。",
+            redemption: "在危難中經歷神的拯救，預表對神的信靠。",
+            why: "顯示悔改能帶來神的轉意。"
+        },
+        {
+            id: 17,
+            name: "約西亞 (Josiah)",
+            meaning: "耶和華醫治",
+            father: 16,
+            isDirect: false, // 多代間隔 (希西家 -> 瑪拿西 -> 亞們 -> 約西亞)
+            stage: "kingdom",
+            desc: "最後一位賢王，發現律法書並改革。",
+            ref: "列王紀下 23:25",
+            verse: "在約西亞以前沒有王像他盡心、盡性、盡力地歸向耶和華，遵行摩西的一切律法...",
+            redemption: "回歸神的話語。",
+            why: "律法的改革雖好，卻無法改變百姓石心，需要耶穌賜下新心（新約）。"
+        },
+        {
+            id: 18,
+            name: "耶哥尼雅 (Jeconiah)",
+            meaning: "耶和華確立",
+            father: 17,
+            isDirect: false, // 約西亞 -> 約雅敬 -> 耶哥尼雅
+            stage: "exile",
+            desc: "被擄到巴比倫的君王。",
+            ref: "馬太福音 1:11",
+            verse: "百姓被遷到巴比倫的時候，約西亞生耶哥尼雅和他的弟兄。",
+            redemption: "耶利米預言被擄70年。看似絕望，神卻在巴比倫保存餘種。",
+            why: "罪帶來審判與被擄，人類需要從罪的奴役中被釋放。"
+        },
+        {
+            id: 19,
+            name: "所羅巴伯 (Zerubbabel)",
+            meaning: "巴比倫的種",
+            father: 18,
+            isDirect: true, // 撒拉鐵之子(孫)
+            stage: "exile",
+            desc: "帶領百姓回歸，重建聖殿。",
+            ref: "哈該書 2:23",
+            verse: "萬軍之耶和華說：我僕人...所羅巴伯啊，到那日，我必以你為印，因我揀選了你。",
+            redemption: "神說是『不靠勢力、不靠才能，乃是靠我的靈方能成事』。",
+            why: "重建物質的殿只是影兒，耶穌要來建造屬靈的聖殿（教會）。"
+        },
+        {
+            id: 20,
+            name: "雅各 (Jacob - NT)",
+            meaning: "抓住",
+            father: 19,
+            isDirect: false, // 所羅巴伯 ... 雅各 (這段在馬太福音有跳代或代表性譜系)
+            stage: "exile",
+            desc: "耶穌養父約瑟的父親（馬太福音記載）。",
+            ref: "馬太福音 1:15-16",
+            verse: "以利忽生以利亞撒... 雅各生約瑟，就是馬利亞的丈夫。",
+            redemption: "沈默時期（兩約之間），神仍在預備人心。",
+            why: "漫長的等待讓人渴望彌賽亞的來到。"
+        },
+        {
+            id: 21,
+            name: "約瑟 (Joseph)",
+            meaning: "增添",
+            father: 20,
+            isDirect: true,
+            stage: "messiah",
+            desc: "馬利亞的丈夫，耶穌法律上的父親。",
+            ref: "馬太福音 1:20",
+            verse: "大衛的子孫約瑟，不要怕！只管娶過你的妻子馬利亞來，因她所懷的孕是從聖靈來的。",
+            redemption: "順服神使者的指示，保護了嬰孩耶穌。",
+            why: "賦予耶穌大衛王室的合法繼承權。"
+        },
+        {
+            id: 22,
+            name: "耶穌 (Jesus)",
+            meaning: "耶和華拯救",
+            father: 21,
+            isDirect: true,
+            stage: "messiah",
+            desc: "道成肉身的神，人類的救主。",
+            ref: "馬太福音 1:21",
+            verse: "她將要生一個兒子，你要給他起名叫耶穌，因他要將自己的百姓從罪惡裡救出來。",
+            redemption: "十字架的代贖與復活。完成了創世以來所有的預表與應許。",
+            why: "他是道路、真理、生命。除他以外，別無拯救。他修復了亞當破壞的關係，成全了律法的義，建立了永恆的國度。"
+        }
+    ];
+
+    // UI State
+    let activeNodeId = null;
+    let currentFilterStage = null;
+
+    // DOM Elements
+    const treeRoot = document.getElementById('treeRoot');
+    const infoPanel = document.getElementById('infoPanel');
+    const infoContent = document.getElementById('infoContent');
+    const resetBtn = document.getElementById('resetBtn');
+    const stageBtns = document.querySelectorAll('.stage-btn');
+
+    // Initialization
+    function init() {
+        renderTree();
+    }
+
+    // Render the genealogy tree
+    function renderTree() {
+        treeRoot.innerHTML = ''; // Clear existing
+        
+        genealogyData.forEach((person, index) => {
+            // 1. Render connection line from previous node (if not first)
+            if (index > 0) {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'line-segment';
+                lineDiv.id = `line-${person.id}`; // ID based on the CHILD (this person)
+                lineDiv.dataset.childId = person.id;
+                lineDiv.dataset.fatherId = person.father;
+                
+                // If isDirect is explicitly false, it's dashed. Otherwise default to solid.
+                // Check strictly for false, as undefined or true means direct.
+                if (person.isDirect === false) {
+                    lineDiv.classList.add('dashed');
+                } else {
+                    lineDiv.classList.add('solid');
+                }
+                
+                treeRoot.appendChild(lineDiv);
+            }
+
+            // 2. Render Node
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.id = `node-${person.id}`;
+            node.dataset.id = person.id;
+            node.dataset.stage = person.stage;
+            
+            let html = `<span class="name">${person.name}</span>`;
+            if (person.meaning) {
+                html += `<span class="meaning">${person.meaning}</span>`;
+            }
+            if (person.ref) {
+                const shortRef = person.ref.split(' ')[0] + ' ' + person.ref.split(' ')[1].split(/[,-]/)[0];
+                html += `<span class="ref-tag">${shortRef}</span>`;
+            }
+            
+            if (person.name.includes("耶穌")) {
+                node.style.borderColor = '#e74c3c';
+                node.style.borderWidth = '3px';
+            }
+
+            node.innerHTML = html;
+            node.onclick = (e) => {
+                e.stopPropagation();
+                focusPerson(person.id);
+            };
+
+            treeRoot.appendChild(node);
+        });
+    }
+
+    // Function to handle filtering by stage
+    function filterStage(stage) {
+        currentFilterStage = stage;
+        activeNodeId = null;
+        
+        // Update buttons
+        stageBtns.forEach(btn => btn.classList.remove('active'));
+        const activeBtn = Array.from(stageBtns).find(b => b.getAttribute('onclick').includes(stage));
+        if (activeBtn) activeBtn.classList.add('active');
+
+        // Update nodes visuals
+        const nodes = document.querySelectorAll('.node');
+        const lines = document.querySelectorAll('.line-segment');
+        
+        let firstVisibleId = null;
+
+        // 1. Handle Nodes
+        nodes.forEach(node => {
+            const nodeStage = node.dataset.stage;
+            node.classList.remove('highlight', 'active');
+            
+            if (nodeStage === stage) {
+                node.classList.remove('dimmed');
+                if (!firstVisibleId) firstVisibleId = node.dataset.id;
+            } else {
+                node.classList.add('dimmed');
+            }
+        });
+
+        // 2. Handle Lines
+        // Logic: A line should be visible/highlighted only if BOTH connected nodes are visible
+        // Or, simpler for "stage" view: if the line belongs to a node in this stage.
+        // Since the data is linear and sorted by time, usually lines are within stages or connecting stages.
+        // Let's just dim lines where the CHILD is not in the stage (the line leads TO the child).
+        lines.forEach(line => {
+           const childNode = document.getElementById(`node-${line.dataset.childId}`);
+           const fatherNode = document.getElementById(`node-${line.dataset.fatherId}`);
+           
+           // If both nodes are in the current stage, keep line normal.
+           // Actually, if the child is in the stage, the line leading to it is relevant.
+           if (childNode && childNode.dataset.stage === stage) {
+               line.classList.remove('dimmed');
+           } else {
+               line.classList.add('dimmed');
+           }
+        });
+
+        resetBtn.style.display = 'block';
+
+        if (firstVisibleId) {
+            const target = document.getElementById(`node-${firstVisibleId}`);
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        showStageInfo(stage);
+    }
+
+    // Function to focus on a specific person
+    function focusPerson(id) {
+        activeNodeId = id;
+        currentFilterStage = null; 
+
+        stageBtns.forEach(btn => btn.classList.remove('active'));
+        
+        const person = genealogyData.find(p => p.id === id);
+        if (!person) return;
+
+        const fatherId = person.father;
+        const child = genealogyData.find(p => p.father === id);
+        const childId = child ? child.id : null;
+
+        const nodes = document.querySelectorAll('.node');
+        const lines = document.querySelectorAll('.line-segment');
+
+        // Reset all first
+        nodes.forEach(n => n.classList.remove('active', 'highlight', 'dimmed'));
+        lines.forEach(l => l.classList.remove('highlight', 'dimmed'));
+
+        // Apply states to Nodes
+        nodes.forEach(node => {
+            const nodeId = parseInt(node.dataset.id);
+            if (nodeId === id) {
+                node.classList.add('active');
+            } else if (nodeId === fatherId || nodeId === childId) {
+                node.classList.add('highlight');
+            } else {
+                node.classList.add('dimmed');
+            }
+        });
+
+        // Apply states to Lines
+        lines.forEach(line => {
+            const lineChildId = parseInt(line.dataset.childId);
+            
+            // Highlight line if it connects Father -> Me (lineChildId === Me)
+            // Highlight line if it connects Me -> Child (lineChildId === Child)
+            if (lineChildId === id) {
+                line.classList.add('highlight'); // Connection coming into me
+            } else if (lineChildId === childId) {
+                line.classList.add('highlight'); // Connection going out of me
+            } else {
+                line.classList.add('dimmed');
+            }
+        });
+
+        showPersonInfo(person);
+        resetBtn.style.display = 'block';
+        
+        if (window.innerWidth <= 768) {
+            infoPanel.classList.add('open');
+        }
+    }
+
+    // Reset view to default
+    function resetView() {
+        activeNodeId = null;
+        currentFilterStage = null;
+        
+        const nodes = document.querySelectorAll('.node');
+        const lines = document.querySelectorAll('.line-segment');
+
+        nodes.forEach(node => {
+            node.classList.remove('active', 'highlight', 'dimmed');
+        });
+        
+        lines.forEach(line => {
+            line.classList.remove('highlight', 'dimmed');
+        });
+
+        stageBtns.forEach(btn => btn.classList.remove('active'));
+        stageBtns[0].classList.add('active');
+        
+        resetBtn.style.display = 'none';
+        
+        infoContent.innerHTML = `
+            <h2>歡迎使用救贖家譜</h2>
+            <p class="subtitle">點擊左側人物或上方階段按鈕開始探索。</p>
+            <div class="info-section">
+                <h3>關於本圖表</h3>
+                <p>本圖表展示了從人類始祖亞當到耶穌基督的家譜。</p>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                    <span style="display:inline-block; width: 20px; border-top: 2px solid #bdc3c7; vertical-align: middle;"></span> 實線：直系一代<br>
+                    <span style="display:inline-block; width: 20px; border-top: 2px dashed #bdc3c7; vertical-align: middle;"></span> 虛線：多代間隔
+                </p>
+            </div>
+             <div class="info-section">
+                <h3>為什麼需要耶穌？</h3>
+                <div class="why-jesus">
+                    <p>整個人類歷史都在講述一個故事：神創造完美的人，人因罪與神隔絕，而神主動展開漫長的救贖計劃。家譜中的每一個名字，都是這條救贖金線上的一環，最終指向那一位能解決罪的問題、重建神人關係的——耶穌基督。</p>
+                </div>
+            </div>
+        `;
+        
+        infoPanel.classList.remove('open');
+        treeRoot.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Person Details
+    function showPersonInfo(person) {
+        infoContent.innerHTML = `
+            <h2>${person.name}</h2>
+            <p class="subtitle">含義：${person.meaning}</p>
+            
+            <div class="info-section">
+                <h3>聖經記載</h3>
+                <div class="bible-verse-box">
+                    "${person.verse}"
+                    <span class="bible-ref">—— ${person.ref}</span>
+                </div>
+                <p style="margin-top:0.5rem">${person.desc}</p>
+            </div>
+            
+            <div class="info-section">
+                <h3>救贖計劃的角色</h3>
+                <div class="plan-box">
+                    ${person.redemption}
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>為什麼這指向耶穌？</h3>
+                <div class="why-jesus">
+                    ${person.why}
+                </div>
+            </div>
+        `;
+    }
+
+    // Render Stage Details
+    function showStageInfo(stage) {
+        let title, desc, theology;
+        
+        switch(stage) {
+            case 'creation':
+                title = "1. 創造與墮落";
+                desc = "從亞當到挪亞。人類被造完美，但因罪墮落。";
+                theology = "這個階段顯明了人的全然敗壞以及神公義的審判（洪水），但也顯明了神主動的恩典（皮衣、方舟）。為什麼需要耶穌？因為『首先的亞當』失敗了，我們需要一位完全順服神的人來扭轉局面。";
+                break;
+            case 'promise':
+                title = "2. 應許與列祖";
+                desc = "從亞伯拉罕到猶大。神揀選一個家族。";
+                theology = "神主動與人立約。救恩不是靠人的努力，而是靠神的應許。為什麼需要耶穌？因為他是亞伯拉罕的那個『後裔』，萬國要因他得福。";
+                break;
+            case 'kingdom':
+                title = "3. 律法與王國";
+                desc = "從大衛到約西亞。以色列王國的興衰。";
+                theology = "神設立君王制度來預表祂的統治。但地上的君王多數失敗，導致國家滅亡。為什麼需要耶穌？因為我們需要一位公義、永恆、不失敗的君王來治理我們的心。";
+                break;
+            case 'exile':
+                title = "4. 被擄與沈默";
+                desc = "從被擄巴比倫到耶穌降生前。";
+                theology = "罪帶來了奴役和流離失所。這是一段等待和黑暗的時期。為什麼需要耶穌？因為人類無法自救脫離罪的權勢，需要一位救贖者（Goel）將我們買贖回來。";
+                break;
+            case 'messiah':
+                title = "5. 彌賽亞降臨";
+                desc = "約瑟、馬利亞與耶穌。";
+                theology = "道成肉身。神親自進入人類歷史。";
+                why = "耶穌是整個家譜的終點與高潮。";
+                break;
+        }
+
+        infoContent.innerHTML = `
+            <h2>${title}</h2>
+            <p class="subtitle">歷史階段概覽</p>
+            
+            <div class="info-section">
+                <h3>階段背景</h3>
+                <p>${desc}</p>
+            </div>
+            
+            <div class="info-section">
+                <h3>救贖意義</h3>
+                <div class="plan-box">
+                    ${theology}
+                </div>
+            </div>
+        `;
+        
+        if (window.innerWidth <= 768) {
+            infoPanel.classList.add('open');
+        }
+    }
+
+    function closePanel() {
+        infoPanel.classList.remove('open');
+    }
+
+    // Start
+    init();
+
+</script>
+
+</body>
+</html>
