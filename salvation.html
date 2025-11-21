@@ -116,9 +116,6 @@
             scroll-behavior: smooth;
         }
 
-        /* REMOVED: .timeline-line absolute positioning */
-        /* Instead we use .line-segment */
-
         .line-segment {
             width: 2px;
             height: 40px; /* 連接線長度 */
@@ -148,7 +145,6 @@
             border: 2px solid var(--line-color);
             border-radius: 8px;
             padding: 0.8rem 1.2rem;
-            /* Removed large margins, let line segment handle spacing */
             margin: 0; 
             width: 240px;
             text-align: center;
@@ -163,6 +159,16 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-color: var(--accent-color);
+        }
+
+        .node .year {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
         }
 
         .node .name {
@@ -192,11 +198,11 @@
             display: inline-block;
         }
 
-        /* Connection Dots - Keep these as anchors */
+        /* Connection Dots */
         .node::before {
             content: '';
             position: absolute;
-            top: -6px; /* Adjust for border */
+            top: -6px;
             left: 50%;
             transform: translateX(-50%);
             width: 10px;
@@ -211,7 +217,7 @@
         .node::after {
             content: '';
             position: absolute;
-            bottom: -6px; /* Adjust for border */
+            bottom: -6px;
             left: 50%;
             transform: translateX(-50%);
             width: 10px;
@@ -231,6 +237,7 @@
         }
         
         .node.dimmed .name { color: var(--dim-text); }
+        .node.dimmed .year { color: #e0e0e0; } /* 淡化年代 */
         .node.dimmed .meaning { color: #e5e7e9; }
         .node.dimmed .ref-tag { color: #e5e7e9; background: transparent; }
         .node.dimmed::before, .node.dimmed::after { background-color: var(--dim-border); }
@@ -465,12 +472,12 @@
 <button class="reset-btn" id="resetBtn" onclick="resetView()">重置視圖</button>
 
 <script>
-    // Data Structure with Bible Verses
-    // Added isDirect: false explicitly for skipped generations logic
+    // Data Structure with Years
     const genealogyData = [
         {
             id: 1,
             name: "亞當 (Adam)",
+            year: "約 4000 BC",
             meaning: "人 / 紅土",
             father: null,
             stage: "creation",
@@ -484,6 +491,7 @@
         {
             id: 2,
             name: "塞特 (Seth)",
+            year: "約 3870 BC",
             meaning: "償還 / 代替",
             father: 1,
             stage: "creation",
@@ -497,6 +505,7 @@
         {
             id: 3,
             name: "挪亞 (Noah)",
+            year: "約 2948 BC",
             meaning: "安息 / 安慰",
             father: 2,
             isDirect: false, // 多代間隔
@@ -510,6 +519,7 @@
         {
             id: 4,
             name: "閃 (Shem)",
+            year: "約 2446 BC",
             meaning: "名聲",
             father: 3,
             stage: "creation",
@@ -523,9 +533,10 @@
         {
             id: 5,
             name: "亞伯拉罕 (Abraham)",
+            year: "約 2166 BC",
             meaning: "多國之父",
             father: 4,
-            isDirect: false, // 多代間隔 (閃 -> 亞法撒 -> ... -> 他拉 -> 亞伯拉罕)
+            isDirect: false, // 多代間隔
             stage: "promise",
             desc: "信心之父，神呼召他離開本地本族。",
             ref: "創世記 12:3",
@@ -536,6 +547,7 @@
         {
             id: 6,
             name: "以撒 (Isaac)",
+            year: "約 2066 BC",
             meaning: "喜笑",
             father: 5,
             isDirect: true,
@@ -549,6 +561,7 @@
         {
             id: 7,
             name: "雅各 (Jacob)",
+            year: "約 2006 BC",
             meaning: "抓住 / 以色列",
             father: 6,
             isDirect: true,
@@ -562,6 +575,7 @@
         {
             id: 8,
             name: "猶大 (Judah)",
+            year: "約 1950 BC",
             meaning: "讚美",
             father: 7,
             isDirect: true,
@@ -575,6 +589,7 @@
         {
             id: 9,
             name: "法勒斯 (Perez)",
+            year: "約 1880 BC",
             meaning: "突破",
             father: 8,
             isDirect: true,
@@ -588,11 +603,12 @@
         {
             id: 10,
             name: "波阿斯 (Boaz)",
+            year: "約 1150 BC",
             meaning: "力量在他裡面",
             father: 9,
-            isDirect: false, // 多代間隔 (法勒斯 ... 波阿斯)
+            isDirect: false,
             stage: "kingdom",
-            desc: "路得記中的大財主，娶了外邦女子路得。",
+            desc: "路得記中的大財主，娶了外邦女子路得。士師時期。",
             ref: "路得記 4:14",
             verse: "婦人們對拿俄米說：「耶和華是應當稱頌的！因為今日沒有撇下你，使你無至近的親屬。」",
             redemption: "至近的親屬（Kinsman-Redeemer），預表基督贖回我們這些外邦罪人。",
@@ -601,6 +617,7 @@
         {
             id: 11,
             name: "俄備得 (Obed)",
+            year: "約 1100 BC",
             meaning: "僕人",
             father: 10,
             isDirect: true,
@@ -614,6 +631,7 @@
         {
             id: 12,
             name: "耶西 (Jesse)",
+            year: "約 1050 BC",
             meaning: "神的禮物",
             father: 11,
             isDirect: true,
@@ -627,6 +645,7 @@
         {
             id: 13,
             name: "大衛 (David)",
+            year: "約 1040 BC",
             meaning: "被愛的",
             father: 12,
             isDirect: true,
@@ -640,6 +659,7 @@
         {
             id: 14,
             name: "所羅門 (Solomon)",
+            year: "約 1000 BC",
             meaning: "和平",
             father: 13,
             isDirect: true,
@@ -653,6 +673,7 @@
         {
             id: 15,
             name: "羅波安 (Rehohoam)",
+            year: "約 970 BC",
             meaning: "使民變寬",
             father: 14,
             isDirect: true,
@@ -666,9 +687,10 @@
         {
             id: 16,
             name: "希西家 (Hezekiah)",
+            year: "約 740 BC",
             meaning: "耶和華是我的力量",
             father: 15,
-            isDirect: false, // 多代間隔 (羅波安 ... 希西家)
+            isDirect: false, // 多代間隔
             stage: "kingdom",
             desc: "中興名君，依靠耶和華。",
             ref: "列王紀下 18:5",
@@ -679,9 +701,10 @@
         {
             id: 17,
             name: "約西亞 (Josiah)",
+            year: "約 640 BC",
             meaning: "耶和華醫治",
             father: 16,
-            isDirect: false, // 多代間隔 (希西家 -> 瑪拿西 -> 亞們 -> 約西亞)
+            isDirect: false, // 多代間隔
             stage: "kingdom",
             desc: "最後一位賢王，發現律法書並改革。",
             ref: "列王紀下 23:25",
@@ -692,6 +715,7 @@
         {
             id: 18,
             name: "耶哥尼雅 (Jeconiah)",
+            year: "約 615 BC",
             meaning: "耶和華確立",
             father: 17,
             isDirect: false, // 約西亞 -> 約雅敬 -> 耶哥尼雅
@@ -705,9 +729,10 @@
         {
             id: 19,
             name: "所羅巴伯 (Zerubbabel)",
+            year: "約 560 BC",
             meaning: "巴比倫的種",
             father: 18,
-            isDirect: true, // 撒拉鐵之子(孫)
+            isDirect: true, 
             stage: "exile",
             desc: "帶領百姓回歸，重建聖殿。",
             ref: "哈該書 2:23",
@@ -718,9 +743,10 @@
         {
             id: 20,
             name: "雅各 (Jacob - NT)",
+            year: "約 50 BC",
             meaning: "抓住",
             father: 19,
-            isDirect: false, // 所羅巴伯 ... 雅各 (這段在馬太福音有跳代或代表性譜系)
+            isDirect: false, // 所羅巴伯 ... 雅各
             stage: "exile",
             desc: "耶穌養父約瑟的父親（馬太福音記載）。",
             ref: "馬太福音 1:15-16",
@@ -731,6 +757,7 @@
         {
             id: 21,
             name: "約瑟 (Joseph)",
+            year: "約 30 BC",
             meaning: "增添",
             father: 20,
             isDirect: true,
@@ -744,6 +771,7 @@
         {
             id: 22,
             name: "耶穌 (Jesus)",
+            year: "約 4 BC",
             meaning: "耶和華拯救",
             father: 21,
             isDirect: true,
@@ -785,8 +813,6 @@
                 lineDiv.dataset.childId = person.id;
                 lineDiv.dataset.fatherId = person.father;
                 
-                // If isDirect is explicitly false, it's dashed. Otherwise default to solid.
-                // Check strictly for false, as undefined or true means direct.
                 if (person.isDirect === false) {
                     lineDiv.classList.add('dashed');
                 } else {
@@ -803,7 +829,9 @@
             node.dataset.id = person.id;
             node.dataset.stage = person.stage;
             
-            let html = `<span class="name">${person.name}</span>`;
+            // Add Year element
+            let html = `<span class="year">${person.year}</span>`;
+            html += `<span class="name">${person.name}</span>`;
             if (person.meaning) {
                 html += `<span class="meaning">${person.meaning}</span>`;
             }
@@ -857,16 +885,9 @@
         });
 
         // 2. Handle Lines
-        // Logic: A line should be visible/highlighted only if BOTH connected nodes are visible
-        // Or, simpler for "stage" view: if the line belongs to a node in this stage.
-        // Since the data is linear and sorted by time, usually lines are within stages or connecting stages.
-        // Let's just dim lines where the CHILD is not in the stage (the line leads TO the child).
         lines.forEach(line => {
            const childNode = document.getElementById(`node-${line.dataset.childId}`);
-           const fatherNode = document.getElementById(`node-${line.dataset.fatherId}`);
            
-           // If both nodes are in the current stage, keep line normal.
-           // Actually, if the child is in the stage, the line leading to it is relevant.
            if (childNode && childNode.dataset.stage === stage) {
                line.classList.remove('dimmed');
            } else {
@@ -921,12 +942,10 @@
         lines.forEach(line => {
             const lineChildId = parseInt(line.dataset.childId);
             
-            // Highlight line if it connects Father -> Me (lineChildId === Me)
-            // Highlight line if it connects Me -> Child (lineChildId === Child)
             if (lineChildId === id) {
-                line.classList.add('highlight'); // Connection coming into me
+                line.classList.add('highlight'); 
             } else if (lineChildId === childId) {
-                line.classList.add('highlight'); // Connection going out of me
+                line.classList.add('highlight');
             } else {
                 line.classList.add('dimmed');
             }
@@ -988,7 +1007,7 @@
     function showPersonInfo(person) {
         infoContent.innerHTML = `
             <h2>${person.name}</h2>
-            <p class="subtitle">含義：${person.meaning}</p>
+            <p class="subtitle">年代：${person.year} | 含義：${person.meaning}</p>
             
             <div class="info-section">
                 <h3>聖經記載</h3>
