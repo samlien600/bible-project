@@ -180,16 +180,16 @@
     <!-- Main Content -->
     <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
         
-        <!-- Left: Map Area -->
-        <div class="w-full md:w-1/2 p-2 md:p-4 flex flex-col bg-[#eaddcf] relative z-0">
+        <!-- Left: Map Area (Mobile: 50% height, Desktop: Full height but 50% width) -->
+        <div class="w-full h-1/2 md:h-auto md:w-1/2 p-2 md:p-4 flex flex-col bg-[#eaddcf] relative z-0">
             <h2 class="text-lg font-bold text-center mb-2 text-yellow-900 uppercase tracking-widest border-b-2 border-yellow-800 pb-1 w-max mx-auto">以色列地理行旅</h2>
             <div class="map-wrapper-outer">
                 <div id="map"></div>
             </div>
         </div>
 
-        <!-- Right: Narrative Area -->
-        <div class="w-full md:w-1/2 p-6 overflow-y-auto relative bg-texture">
+        <!-- Right: Narrative Area (Mobile: 50% height, Desktop: Full height but 50% width) -->
+        <div class="w-full h-1/2 md:h-auto md:w-1/2 p-6 overflow-y-auto relative bg-texture">
             
             <div id="event-content" class="fade-in max-w-3xl mx-auto pb-20">
                 <!-- Content injected via JS -->
@@ -323,7 +323,7 @@
               characters: ["耶利哥瞎子"] },
             { id: 30, title: "撒該", location: "耶利哥城", coords: [31.8560, 35.4600], chapter: "路加福音 19:1-10", 
               narrative: "進了耶利哥，有一個人名叫撒該，作稅吏長，是個財主。他要看看我，因為人多，身量又矮，就跑到前頭，爬上桑樹。我看見了他那顆渴望的心，儘管被世俗包裹，卻依然跳動。\n\n我到了那裡，抬頭一看，對他說：『撒該，快下來！今天我必住在你家裡。』這句話震驚了眾人，也融化了撒該的心。他歡歡喜喜地接待我。面對眾人的議論，撒該站著對我說：『主啊，我把所有的一半給窮人；我若訛詐了誰，就還他四倍。』我宣告：『今天救恩到了這家...人子來，為要尋找、拯救失喪的人。』救恩，就是生命的翻轉。", 
-              characters: ["撒該"] },
+              characters: ["撒該", "群眾"] },
             { id: 31, title: "榮耀進城", location: "橄欖山", coords: [31.7780, 35.2450], chapter: "路加福音 19:28-40", 
               narrative: "我騎著驢駒，從橄欖山下來。眾門徒因所見過的一切異能，都歡樂起來，大聲讚美神說：『奉主名來的王是應當稱頌的！在天上有和平，在至高之處有榮耀！』\n\n眾人把衣服鋪在路上。幾個法利賽人對我說：『夫子，責備你的門徒吧！』我告訴他們：『若是他們閉口不說，這些石頭必要呼叫起來。』這是神定的日子，君王柔和地進了祂的城。但我看見這城，就為它哭泣，因為它不知道眷顧它的時候。榮耀的背後，是即將來臨的審判與毀滅，我的心為耶路撒冷破碎。", 
               characters: ["門徒群眾", "法利賽人"] },
@@ -347,10 +347,10 @@
               characters: ["彼拉多", "希律安提帕", "巴拉巴"] },
             { id: 38, title: "受難", location: "各各他", coords: [31.7790, 35.2300], chapter: "路加福音 23:26-49", 
               narrative: "到了骷髏地，他們在那裡釘我十字架。在劇痛中，我卻禱告：『父啊！赦免他們，因為他們所做的，他們不曉得。』這是我對世界最後的溫柔。\n\n同釘的強盜一個譏誚我，另一個卻求我紀念。我應許他：『我實在告訴你，今日你要同我在樂園裡了。』那時約有午正，遍地都黑暗了，日頭變黑，殿裡的幔子從當中裂為兩半。我大聲喊著：『父啊！我將我的靈魂交在你手裡！』氣就斷了。百夫長看見，歸榮耀與神說：『這真是個義人！』成了，救贖的大功成了。", 
-              characters: ["悔改的強盜", "古利奈人西門"] },
+              characters: ["悔改的強盜", "百夫長", "古利奈人西門"] },
             { id: 39, title: "復活", location: "空墳墓", coords: [31.7840, 35.2300], chapter: "路加福音 24:1-12", 
               narrative: "七日的頭一日，黎明的時候，婦女們帶著香膏來到墳墓，發現石頭已經滾開了，進去卻不見我的身體。死亡不能拘禁生命的主。\n\n正在猜疑之間，有兩個人身穿畢挺衣服站在旁邊，對驚怕的婦女說：『為什麼在死人中找活人呢？他不在這裡，已經復活了！』她們回去把這一切事告訴十一使徒。彼得跑去墳墓，低頭往裡看，只見細麻布獨在一處，就回去了，心裡希奇所成的事。新的時代開始了，光明已戰勝黑暗。", 
-              characters: ["抹大拉的馬利亞", "約亞拿", "天使"] },
+              characters: ["抹大拉的馬利亞", "約亞拿", "婦女們", "天使"] },
             { id: 40, title: "以馬忤斯", location: "以馬忤斯路", coords: [31.8390, 34.9790], chapter: "路加福音 24:13-35", 
               narrative: "同一天，兩個門徒往以馬忤斯去，臉上帶著愁容，談論最近發生的事。我親近他們，與他們同行，只是他們的眼睛迷糊了，不認識我。我問他們在談論什麼，他們訴說了對『先知耶穌』的失望。\n\n我責備他們信得太遲鈍，於是從摩西和眾先知起，凡經上所指著自己的話，都給他們講解明白了。說明基督必須受害，然後進入榮耀。到了坐席的時候，我拿起餅來，祝謝了，擘開，遞給他們。他們的眼睛明亮了，這才認出是我。我便從他們面前消失了。他們彼此說：『在路上，他和我們說話，給我們講解聖經的時候，我們的心豈不是火熱的嗎？』", 
               characters: ["革流巴", "另一個門徒"] },
@@ -474,6 +474,10 @@
 
             // Create Markers but DO NOT add them to map yet
             events.forEach((evt, idx) => {
+                // Ensure we have valid coordinates for the 43rd event (Heart)
+                // We can reuse the coordinates of the previous event or center it.
+                // The coords are already set in the array.
+                
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div class='marker-container' id='marker-${idx}'>
