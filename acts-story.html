@@ -127,7 +127,7 @@
 
         .scroll-hide::-webkit-scrollbar { display: none; }
 
-        /* --- Holy Spirit Fire Effect --- */
+        /* --- Holy Spirit Fire Effect (For Modal) --- */
         @keyframes holyFireGlow {
             0% {
                 box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 69, 0, 0.3);
@@ -147,6 +147,31 @@
             animation: holyFireGlow 2.5s infinite ease-in-out;
             border-width: 3px !important;
             transition: all 0.5s ease;
+        }
+
+        /* --- Button Breathing Effect (For "You" Button & Start Button) --- */
+        @keyframes buttonBreathe {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+                transform: scale(1);
+                border-color: #ffd700;
+            }
+            50% {
+                box-shadow: 0 0 20px 5px rgba(255, 69, 0, 0.6);
+                transform: scale(1.03);
+                border-color: #ff4500;
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+                transform: scale(1);
+                border-color: #ffd700;
+            }
+        }
+
+        .witness-you-btn {
+            animation: buttonBreathe 2s infinite ease-in-out !important;
+            z-index: 10;
+            background: linear-gradient(to right, #781818, #9a2222) !important;
         }
     </style>
 </head>
@@ -216,7 +241,7 @@
             <h2 class="text-2xl md:text-3xl chinese-title-font font-bold text-[#781818] mb-4 tracking-widest">歡迎踏上福音旅程</h2>
             
             <div class="space-y-4 text-[#43342e] font-serif text-base md:text-lg leading-relaxed text-justify w-full">
-                <p class="text-center font-bold">如何使用《使徒行傳》互動地圖</p>
+                <p class="text-center font-bold">👋 歡迎使用《使徒行傳》互動地圖</p>
                 
                 <ul class="list-none space-y-3">
                     <li class="flex items-start gap-2">
@@ -238,7 +263,7 @@
                 </ul>
             </div>
 
-            <button onclick="closeWelcomeModal()" class="mt-8 nav-btn px-8 py-3 rounded-full text-lg md:text-xl shadow-lg hover:scale-105 transition-transform flex items-center gap-2">
+            <button onclick="closeWelcomeModal()" class="mt-8 nav-btn px-8 py-3 rounded-full text-lg md:text-xl shadow-lg hover:scale-105 transition-transform flex items-center gap-2 witness-you-btn">
                 開始旅程 <i data-lucide="arrow-right" class="w-5 h-5"></i>
             </button>
         </div>
@@ -2617,11 +2642,11 @@
                             "location": "地中海",
                             "ref": "使徒行傳 27:1-44",
                             "coords": [
-                              34.929,
-                              24.788
+                              34.900,
+                              23.550
                             ],
                             "zoom": 9,
-                            "luke": "保羅被押往羅馬，雖在佳澳曾勸阻啟航，但百夫長信從掌舵的。船遇狂風「友拉革羅」，多日不見天日，得救指望全無。保羅領受神使者安慰，預言全船獲救。最終船在馬耳他擱淺破壞，全船二百七十六人依保羅所言，無一人喪命，神蹟般全數上岸。",
+                            "luke": "保羅被押往羅馬，雖在佳澳曾勸阻啟航，但百夫長卻更信從船長與船主的判斷。船遇狂風「友拉革羅」，多日不見天日，得救指望全無。保羅領受了從神使者而來的安慰，預言全船獲救。最終船在馬耳他擱淺破壞，全船二百七十六人依保羅所言，無一人喪命，神蹟般全數上岸。",
                             "chars": [
                               {
                                 "name": "百夫長猶流",
@@ -2795,8 +2820,13 @@
             container.classList.add('fade-enter');
             
             setTimeout(() => {
-                const buttonsHtml = data.chars.map((char, idx) => `
-                    <button onclick="openBioModal(${idx})" class="w-full group relative overflow-hidden rounded border-2 border-[#781818] bg-[#781818] text-[#f3e9d2] py-2 md:py-3 shadow-md hover:shadow-lg transition-all duration-300 mb-2 last:mb-0">
+                const buttonsHtml = data.chars.map((char, idx) => {
+                    // Check if this is the special "You" character in event 75
+                    const isYou = (data.id === 75 && char.name === '你');
+                    const specialClass = isYou ? 'witness-you-btn' : '';
+                    
+                    return `
+                    <button onclick="openBioModal(${idx})" class="${specialClass} w-full group relative overflow-hidden rounded border-2 border-[#781818] bg-[#781818] text-[#f3e9d2] py-2 md:py-3 shadow-md hover:shadow-lg transition-all duration-300 mb-2 last:mb-0">
                         <div class="absolute inset-0 bg-[#962222] transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                         <div class="relative flex items-center justify-center gap-2">
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#f3e9d2] text-[#781818] flex items-center justify-center font-bold chinese-title-font text-base md:text-lg border border-[#781818]">
@@ -2805,7 +2835,7 @@
                             <span class="font-bold tracking-widest text-sm md:text-base">見證：${char.name}</span>
                         </div>
                     </button>
-                `).join('');
+                `}).join('');
 
                 container.innerHTML = `
                     <div class="flex justify-between items-end border-b border-[#8b6b5d] pb-1 mb-2">
@@ -2975,7 +3005,8 @@
                 // No need to set flag anymore
             }, 500);
         }
-
+		
+		
         // 新增：計算不重覆見證人功能的函數
         function countUniqueWitnesses() {
             const uniqueNames = new Set();
@@ -2994,10 +3025,6 @@
                     });
                 }
             });
-
-            console.log(`%c📊 統計報告：`, "color: #781818; font-size: 16px; font-weight: bold;");
-            console.log(`%c共有 ${uniqueNames.size} 位不重覆的見證人`, "color: #b45309; font-size: 14px; font-weight: bold;");
-            console.log("名單如下：", uniqueRoles.join(", "));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
