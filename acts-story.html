@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>使徒行傳：從耶路撒冷直到地極的福音旅程</title>
     
     <!-- Tailwind CSS -->
@@ -26,6 +26,12 @@
             color: #43342e;
         }
         
+        /* 修正手機版視窗高度問題，使用 dvh 避免被網址列遮擋 */
+        .mobile-h-screen {
+            height: 100vh; /* Fallback */
+            height: 100dvh;
+        }
+
         /* Parchment Texture */
         .parchment-bg {
             background-color: #f3e9d2;
@@ -123,12 +129,13 @@
     </style>
 </head>
 <!-- Layout: Mobile Column (Map Top, Story Bottom), Desktop Row (Story Left, Map Right) -->
-<body class="h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[#2c2420]">
+<!-- 修正：將 h-screen 改為 mobile-h-screen 以適應手機瀏覽器 -->
+<body class="mobile-h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[#2c2420]">
 
     <!-- Right Panel: Real Map -->
-    <!-- Mobile: Order 1 (Top), Height 50% -->
+    <!-- Mobile: Order 1 (Top), Height 45% (稍微縮小地圖，留更多空間給文字) -->
     <!-- Desktop: Order 2 (Right), Height Full -->
-    <main class="order-1 md:order-2 w-full h-1/2 md:h-full md:flex-1 relative bg-[#e5e5e5] border-b-4 md:border-b-0 border-[#3e302a]">
+    <main class="order-1 md:order-2 w-full h-[45%] md:h-full md:flex-1 relative bg-[#e5e5e5] border-b-4 md:border-b-0 border-[#3e302a]">
         <div id="map" class="w-full h-full z-10" style="background: #eaddcf;"></div>
         
         <!-- Map Overlay Info (Desktop Only) -->
@@ -143,9 +150,9 @@
     </main>
 
     <!-- Left Panel: The Book -->
-    <!-- Mobile: Order 2 (Bottom), Height 50% -->
+    <!-- Mobile: Order 2 (Bottom), Height 55% -->
     <!-- Desktop: Order 1 (Left), Height Full -->
-    <aside class="order-2 md:order-1 w-full md:w-[500px] flex-shrink-0 h-1/2 md:h-full flex flex-col parchment-bg border-t-4 md:border-t-0 md:border-r-4 border-[#3e302a] shadow-2xl z-20 relative">
+    <aside class="order-2 md:order-1 w-full md:w-[500px] flex-shrink-0 h-[55%] md:h-full flex flex-col parchment-bg border-t-4 md:border-t-0 md:border-r-4 border-[#3e302a] shadow-2xl z-20 relative">
         
         <!-- Decorative Border Frame (Inner) -->
         <div class="absolute inset-1 border border-[#8b6b5d] pointer-events-none opacity-30 rounded"></div>
@@ -153,7 +160,7 @@
         <!-- Header -->
         <div class="pt-3 md:pt-5 px-6 pb-2 md:pb-3 text-center z-10 shrink-0">
             <h1 class="text-2xl md:text-4xl chinese-title-font font-bold text-[#781818] tracking-widest drop-shadow-sm mb-1">使徒行傳</h1>
-            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極 —</p>
+            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極的福音旅程 —</p>
             <div class="divider"></div>
         </div>
 
@@ -166,17 +173,18 @@
         </div>
 
         <!-- Navigation Controls (Bottom Fixed) -->
-        <div class="px-4 md:px-6 py-2 md:py-4 bg-[#eaddcf]/95 backdrop-blur-sm border-t border-[#8b6b5d]/30 z-20 flex justify-between items-center shrink-0">
-            <button id="btn-prev" onclick="changePage(-1)" class="nav-btn px-3 py-1.5 md:px-4 md:py-2 rounded flex items-center gap-2 text-sm md:text-base shadow-sm">
-                <i data-lucide="chevron-left" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="hidden md:inline">上一章</span><span class="md:hidden">上</span>
+        <!-- 修正：增加 pb-safe 以避開 iOS Home Indicator，並稍微增加底部填充 -->
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-[#eaddcf] border-t border-[#8b6b5d]/30 z-30 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
+            <button id="btn-prev" onclick="changePage(-1)" class="nav-btn px-4 py-2 md:px-4 md:py-2 rounded flex items-center gap-2 text-sm md:text-base shadow-sm">
+                <i data-lucide="chevron-left" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="inline">上一章</span>
             </button>
             
             <div class="text-[#781818] font-bold roman-font text-lg md:text-xl tracking-widest" id="page-indicator">
                 1 / 75
             </div>
 
-            <button id="btn-next" onclick="changePage(1)" class="nav-btn px-3 py-1.5 md:px-4 md:py-2 rounded flex items-center gap-2 text-sm md:text-base shadow-sm">
-                <span class="hidden md:inline">下一章</span><span class="md:hidden">下</span> <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5"></i>
+            <button id="btn-next" onclick="changePage(1)" class="nav-btn px-4 py-2 md:px-4 md:py-2 rounded flex items-center gap-2 text-sm md:text-base shadow-sm">
+                <span class="inline">下一章</span> <i data-lucide="chevron-right" class="w-4 h-4 md:w-5 md:h-5"></i>
             </button>
         </div>
     </aside>
@@ -215,6 +223,7 @@
 
     <script>
         // --- Data: The Acts of the Apostles (75 Events - Complete Final Version) ---
+        // [NOTE] Please ensure you fill this array with the full data from acts_data.json
         const actsData = [
                           {
                             "id": 1,
@@ -2668,11 +2677,6 @@
                           }
                         ];
         
-        // --- 這裡將自動補全完整的 75 個事件數據，請確保使用前文 acts_data.json 的內容覆蓋此處 ---
-        // 為了讓這個檔案真正能用，我將在瀏覽器端載入時，如果您有 acts_data.json，它會更好。
-        // 但作為單一檔案，我強烈建議您將之前生成的 acts_data.json 內容完整複製並取代上面的 actsData 陣列。
-        // 目前這裡只保留頭尾示範，請務必替換。
-
         let map, markers = [], polylinePoints = [], routeLine;
         let currentIndex = 0;
 
@@ -2689,9 +2693,10 @@
             }).addTo(map);
 
             // Prepare points from actsData
-            // Note: In a real scenario, ensure actsData is fully populated
             actsData.forEach(event => {
-                if(event.coords && event.coords.length === 2) {
+                // Check for valid coordinates
+                if(event.coords && Array.isArray(event.coords) && event.coords.length === 2 && 
+                   !isNaN(event.coords[0]) && !isNaN(event.coords[1])) {
                     polylinePoints.push(event.coords);
                 }
             });
@@ -2712,13 +2717,18 @@
                     iconAnchor: [12, 12]
                 });
 
-                const marker = L.marker(event.coords, { icon: icon });
-                
-                marker.on('click', () => {
-                    currentIndex = index;
-                    renderCurrentPage();
-                });
-                markers.push(marker);
+                // Safe check for coordinates before creating marker
+                if (event.coords && Array.isArray(event.coords) && event.coords.length === 2 && 
+                    !isNaN(event.coords[0]) && !isNaN(event.coords[1])) {
+                    
+                    const marker = L.marker(event.coords, { icon: icon });
+                    
+                    marker.on('click', () => {
+                        currentIndex = index;
+                        renderCurrentPage();
+                    });
+                    markers.push(marker);
+                }
             });
         }
 
@@ -2814,10 +2824,22 @@
                 routeLine.setLatLngs(currentPath);
             }
 
-            // Fly to location
-            if (map && data.coords) {
-                map.invalidateSize(); 
-                map.flyTo(data.coords, data.zoom, { duration: 1.0, easeLinearity: 0.25 });
+            // Fly to location with Safe Checks
+            // FIX: Added robust checks to prevent "Invalid LatLng object: (NaN, NaN)" error
+            if (map && data.coords && Array.isArray(data.coords) && 
+                data.coords.length === 2 && 
+                !isNaN(Number(data.coords[0])) && !isNaN(Number(data.coords[1]))) {
+                
+                try {
+                    map.invalidateSize(); 
+                    const mapSize = map.getSize();
+                    // Only fly if map is initialized properly to avoid other potential errors
+                    if (mapSize.x > 0 || mapSize.y > 0) {
+                        map.flyTo(data.coords, data.zoom, { duration: 1.0, easeLinearity: 0.25 });
+                    }
+                } catch (e) {
+                    console.warn("Leaflet flyTo error suppressed:", e);
+                }
             }
         }
 
