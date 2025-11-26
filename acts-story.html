@@ -151,12 +151,9 @@
     </style>
 </head>
 <!-- Layout: Mobile Column (Map Top, Story Bottom), Desktop Row (Story Left, Map Right) -->
-<!-- 修正：將 h-screen 改為 mobile-h-screen 以適應手機瀏覽器 -->
 <body class="mobile-h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[#2c2420]">
 
     <!-- Right Panel: Real Map -->
-    <!-- Mobile: Order 1 (Top), Height 45% (稍微縮小地圖，留更多空間給文字) -->
-    <!-- Desktop: Order 2 (Right), Height Full -->
     <main class="order-1 md:order-2 w-full h-[45%] md:h-full md:flex-1 relative bg-[#e5e5e5] border-b-4 md:border-b-0 border-[#3e302a]">
         <div id="map" class="w-full h-full z-10" style="background: #eaddcf;"></div>
         
@@ -172,8 +169,6 @@
     </main>
 
     <!-- Left Panel: The Book -->
-    <!-- Mobile: Order 2 (Bottom), Height 55% -->
-    <!-- Desktop: Order 1 (Left), Height Full -->
     <aside class="order-2 md:order-1 w-full md:w-[500px] flex-shrink-0 h-[55%] md:h-full flex flex-col parchment-bg border-t-4 md:border-t-0 md:border-r-4 border-[#3e302a] shadow-2xl z-20 relative">
         
         <!-- Decorative Border Frame (Inner) -->
@@ -182,7 +177,7 @@
         <!-- Header -->
         <div class="pt-3 md:pt-5 px-6 pb-2 md:pb-3 text-center z-10 shrink-0">
             <h1 class="text-2xl md:text-4xl chinese-title-font font-bold text-[#781818] tracking-widest drop-shadow-sm mb-1">使徒行傳</h1>
-            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極 —</p>
+            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極的福音旅程 —</p>
             <div class="divider"></div>
         </div>
 
@@ -195,7 +190,6 @@
         </div>
 
         <!-- Navigation Controls (Bottom Fixed) -->
-        <!-- 修正：增加 pb-safe 以避開 iOS Home Indicator，並稍微增加底部填充 -->
         <div class="px-4 md:px-6 py-3 md:py-4 bg-[#eaddcf] border-t border-[#8b6b5d]/30 z-30 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
             <button id="btn-prev" onclick="changePage(-1)" class="nav-btn px-4 py-2 md:px-4 md:py-2 rounded flex items-center gap-2 text-sm md:text-base shadow-sm">
                 <i data-lucide="chevron-left" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="inline">上一章</span>
@@ -212,7 +206,8 @@
     </aside>
 
     <!-- Character Modal (Pop-up) -->
-    <div id="char-modal" class="fixed inset-0 z-[1000] bg-black/80 hidden flex items-center justify-center backdrop-blur-sm p-4 transition-opacity duration-300 opacity-0">
+    <!-- 新增了 onclick 事件，點擊背景區域時關閉 -->
+    <div id="char-modal" onclick="if(event.target === this) closeModal()" class="fixed inset-0 z-[1000] bg-black/80 hidden flex items-center justify-center backdrop-blur-sm p-4 transition-opacity duration-300 opacity-0">
         <div class="parchment-bg w-full max-w-2xl max-h-[90vh] flex flex-col rounded-lg shadow-2xl transform scale-95 transition-transform duration-300 border-2 border-[#3e302a] relative" id="modal-content">
             
             <!-- Close Button -->
@@ -246,6 +241,7 @@
     <script>
         // --- Data: The Acts of the Apostles (75 Events - Complete Final Version) ---
         // [NOTE] Please ensure you fill this array with the full data from acts_data.json
+        // 確保將完整的 acts_data.json 內容填入此處
         const actsData = [
                           {
                             "id": 1,
@@ -2937,6 +2933,10 @@
                     });
                 }
             });
+
+            console.log(`%c📊 統計報告：`, "color: #781818; font-size: 16px; font-weight: bold;");
+            console.log(`%c共有 ${uniqueNames.size} 位不重覆的見證人`, "color: #b45309; font-size: 14px; font-weight: bold;");
+            console.log("名單如下：", uniqueRoles.join(", "));
         }
 
         document.addEventListener('DOMContentLoaded', () => {
