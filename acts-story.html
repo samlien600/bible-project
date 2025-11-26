@@ -126,6 +126,28 @@
         }
 
         .scroll-hide::-webkit-scrollbar { display: none; }
+
+        /* --- Holy Spirit Fire Effect --- */
+        @keyframes holyFireGlow {
+            0% {
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 69, 0, 0.3);
+                border-color: #ffd700;
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 69, 0, 0.6);
+                border-color: #ff4500;
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 69, 0, 0.3);
+                border-color: #ffd700;
+            }
+        }
+
+        .holy-fire-effect {
+            animation: holyFireGlow 2.5s infinite ease-in-out;
+            border-width: 3px !important;
+            transition: all 0.5s ease;
+        }
     </style>
 </head>
 <!-- Layout: Mobile Column (Map Top, Story Bottom), Desktop Row (Story Left, Map Right) -->
@@ -160,7 +182,7 @@
         <!-- Header -->
         <div class="pt-3 md:pt-5 px-6 pb-2 md:pb-3 text-center z-10 shrink-0">
             <h1 class="text-2xl md:text-4xl chinese-title-font font-bold text-[#781818] tracking-widest drop-shadow-sm mb-1">使徒行傳</h1>
-            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極的福音旅程 —</p>
+            <p class="text-xs md:text-sm font-serif italic text-[#6d564d] tracking-widest uppercase">— 從耶路撒冷直到地極 —</p>
             <div class="divider"></div>
         </div>
 
@@ -2671,7 +2693,7 @@
                                 "role": "下一章的主角",
                                 "avatar": "你",
                                 "quote": "我願意相信，願主再來。",
-                                "bio": "我讀過了彼得的勇敢、司提反的犧牲、保羅的堅持。我跟隨地圖走過了古羅馬的街道，穿越了風暴與監獄。我看見了一群平凡人如何被聖靈翻轉，改變了世界。現在，這福音的火把傳到了我的面前。這不是結束，而是新篇章的開始。聖靈仍在尋找器皿，歷史仍在等待回應。我是否願意像他們一樣，獻上自己？天國的門開著，耶穌正在叩門。這是我的時刻，我的選擇，我的使徒行傳。\n如果你願意回應，請做這個禱告：\n「親愛的主耶穌，我承認我是個罪人，需要祢的救恩。感謝祢為我死在十字架上，赦免我的罪。我現在願意打開心門，接受祢作我的救主和生命的主。求祢管理我的一生，帶領我進入教會受洗，歸入祢的名下，一生跟隨祢。奉主耶穌的名禱告，阿們。」"
+                                "bio": "我讀過了彼得的勇敢、司提反的犧牲、保羅的堅持。我跟隨地圖走過了古羅馬的街道，穿越了風暴與監獄。我看見了一群平凡人如何被聖靈翻轉，改變了世界。現在，這福音的火把傳到了我的面前。這不是結束，而是新篇章的開始。我是否願意像他們一樣，獻上自己？天國的門開著，耶穌正在叩門。這是我的時刻，我的選擇，我的使徒行傳。\n如果你願意回應，請做這個禱告：\n「親愛的主耶穌，我承認我是個罪人，需要祢的救恩。感謝祢為我死在十字架上，赦免我的罪。我現在願意打開心門，接受祢作我的救主和生命的主。求祢管理我的一生，帶領我進入教會受洗，歸入祢的名下，一生跟隨祢。奉主耶穌的名禱告，阿們。」"
                               }
                             ]
                           }
@@ -2853,6 +2875,8 @@
 
         function openBioModal(charIndex) {
             const data = actsData[currentIndex].chars[charIndex];
+            const eventData = actsData[currentIndex]; // Get event data to check ID
+            
             document.getElementById('modal-name').innerText = data.name;
             document.getElementById('modal-role').innerText = data.role;
             document.getElementById('modal-quote').innerText = `"${data.quote}"`;
@@ -2862,22 +2886,59 @@
             document.getElementById('modal-bio').innerHTML = bioText;
 
             const modal = document.getElementById('char-modal');
+            const modalContent = document.getElementById('modal-content');
+
+            // 聖靈火焰特效邏輯
+            // 檢查是否為第 75 個事件 (id 75) 且 角色名稱為 "你"
+            if (eventData.id === 75 && data.name === '你') {
+                modalContent.classList.add('holy-fire-effect');
+            } else {
+                modalContent.classList.remove('holy-fire-effect');
+            }
+
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
-                document.getElementById('modal-content').classList.remove('scale-95');
-                document.getElementById('modal-content').classList.add('scale-100');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
             }, 10);
         }
 
         function closeModal() {
             const modal = document.getElementById('char-modal');
+            const modalContent = document.getElementById('modal-content');
+            
             modal.classList.add('opacity-0');
-            document.getElementById('modal-content').classList.remove('scale-100');
-            document.getElementById('modal-content').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            // 關閉時移除特效，以免影響下一次開啟
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modalContent.classList.remove('holy-fire-effect');
+            }, 300);
         }
         
+        // 新增：計算不重覆見證人功能的函數
+        function countUniqueWitnesses() {
+            const uniqueNames = new Set();
+            const uniqueRoles = [];
+
+            actsData.forEach(event => {
+                if (event.chars && Array.isArray(event.chars)) {
+                    event.chars.forEach(char => {
+                        if (char.name && char.name.trim() !== "") {
+                            // 使用 Set 來過濾重覆的名字
+                            if (!uniqueNames.has(char.name)) {
+                                uniqueNames.add(char.name);
+                                uniqueRoles.push(`${char.name} (${char.role})`);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
@@ -2886,6 +2947,8 @@
                 map.whenReady(() => {
                     setTimeout(() => {
                         renderCurrentPage();
+                        // 執行計算
+                        countUniqueWitnesses();
                     }, 100);
                 });
             }, 300);
