@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>心靈急救箱 | Soul First Aid</title>
     
     <!-- 引入 Tailwind CSS -->
@@ -54,6 +54,7 @@
         body {
             background-color: #F2F0E9;
             color: #2C2825;
+            -webkit-font-smoothing: antialiased; /* 讓字體在手機上更清晰 */
         }
         /* 古典裝飾線條 */
         .separator-line {
@@ -86,6 +87,7 @@
         .category-tab {
             position: relative;
             transition: all 0.3s ease;
+            white-space: nowrap; /* 防止手機上換行 */
         }
         .category-tab.active {
             color: #2C2825;
@@ -108,116 +110,120 @@
 </head>
 <body class="bg-paper text-ink font-serif min-h-screen relative overflow-x-hidden selection:bg-gold selection:text-white bg-texture">
 
-    <!-- Intro Modal (新增的使用指南) -->
-    <div id="intro-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 transition-opacity duration-700 ease-out">
-        <!-- Backdrop: 點擊背景關閉 (onclick="closeIntro()") -->
-        <div class="absolute inset-0 bg-[#2C2825]/80 backdrop-blur-[2px] cursor-pointer" onclick="closeIntro()"></div>
+    <!-- Intro Modal (使用指南) -->
+    <div id="intro-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6 transition-opacity duration-700 ease-out">
+        <!-- Backdrop: 點擊背景關閉 -->
+        <div class="absolute inset-0 bg-[#2C2825]/85 backdrop-blur-[3px] cursor-pointer" onclick="closeIntro()"></div>
         
-        <!-- Modal Content -->
-        <div class="bg-[#F2F0E9] relative z-10 max-w-lg w-full p-8 md:p-12 shadow-2xl border border-[#A88B60]/30 animate-fade-in">
-            <!-- Decorative Corners -->
-            <div class="absolute top-3 left-3 w-6 h-6 border-l-2 border-t-2 border-[#A88B60]/40"></div>
-            <div class="absolute top-3 right-3 w-6 h-6 border-r-2 border-t-2 border-[#A88B60]/40"></div>
-            <div class="absolute bottom-3 left-3 w-6 h-6 border-l-2 border-b-2 border-[#A88B60]/40"></div>
-            <div class="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-[#A88B60]/40"></div>
+        <!-- Modal Content: 增加 max-h 與 overflow 以適應小手機 -->
+        <div class="bg-[#F2F0E9] relative z-10 max-w-lg w-full shadow-2xl border border-[#A88B60]/30 animate-fade-in flex flex-col max-h-[90vh] mx-4 rounded-sm">
+            
+            <!-- 可滾動區域 -->
+            <div class="overflow-y-auto p-6 md:p-12">
+                <!-- Decorative Corners -->
+                <div class="absolute top-3 left-3 w-4 h-4 md:w-6 md:h-6 border-l-2 border-t-2 border-[#A88B60]/40 pointer-events-none"></div>
+                <div class="absolute top-3 right-3 w-4 h-4 md:w-6 md:h-6 border-r-2 border-t-2 border-[#A88B60]/40 pointer-events-none"></div>
+                <div class="absolute bottom-3 left-3 w-4 h-4 md:w-6 md:h-6 border-l-2 border-b-2 border-[#A88B60]/40 pointer-events-none"></div>
+                <div class="absolute bottom-3 right-3 w-4 h-4 md:w-6 md:h-6 border-r-2 border-b-2 border-[#A88B60]/40 pointer-events-none"></div>
 
-            <div class="text-center mb-8">
-                <div class="inline-block p-3 border border-[#A88B60]/20 rounded-full mb-4">
-                    <i data-lucide="book-open" class="w-6 h-6 text-[#A88B60]"></i>
+                <div class="text-center mb-6 md:mb-8 mt-2">
+                    <div class="inline-block p-3 border border-[#A88B60]/20 rounded-full mb-3 md:mb-4">
+                        <i data-lucide="book-open" class="w-5 h-5 md:w-6 md:h-6 text-[#A88B60]"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-serif text-[#2C2825] mb-2 tracking-wide">使用指南</h2>
+                    <p class="text-[10px] font-display tracking-[0.3em] text-[#A88B60] uppercase mb-4 md:mb-6">User Guide</p>
+                    
+                    <p class="text-[#2C2825]/70 font-serif text-sm leading-6 md:leading-7 px-2 text-justify md:text-center">
+                        這是一個結合聖經智慧與心靈慰藉的急救站。<br class="hidden md:block">
+                        在這裡，我們將現代常見的情緒困擾，轉化為屬天的祝福。
+                        無論您正面臨什麼風暴，都能在此找到安歇的港灣。
+                    </p>
                 </div>
-                <h2 class="text-3xl font-serif text-[#2C2825] mb-2 tracking-wide">使用指南</h2>
-                <p class="text-[10px] font-display tracking-[0.3em] text-[#A88B60] uppercase mb-6">User Guide</p>
-                
-                <!-- 新增：網站說明 -->
-                <p class="text-[#2C2825]/70 font-serif text-sm leading-7 px-4">
-                    這是一個結合聖經智慧與心靈慰藉的急救站。<br>
-                    在這裡，我們將現代常見的情緒困擾，轉化為屬天的祝福。
-                    無論您正面臨什麼風暴，都能在此找到安歇的港灣。
-                </p>
-            </div>
 
-            <div class="space-y-6 text-[#2C2825]/80 font-serif leading-relaxed mb-10 px-2 border-t border-b border-[#A88B60]/10 py-6">
-                <div class="flex gap-5 group items-start">
-                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">01</span>
-                    <div>
-                        <h3 class="font-bold text-[#2C2825] text-base mb-1">覺察情緒</h3>
-                        <p class="text-sm font-light leading-6">誠實面對內心真實狀態，在下方分類中尋找共鳴，無需隱藏。</p>
+                <div class="space-y-6 text-[#2C2825]/80 font-serif leading-relaxed mb-8 px-1 md:px-2 border-t border-b border-[#A88B60]/10 py-6">
+                    <div class="flex gap-4 md:gap-5 group items-start">
+                        <span class="text-[#A88B60] font-display italic text-xl md:text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">01</span>
+                        <div>
+                            <h3 class="font-bold text-[#2C2825] text-base mb-1">覺察情緒</h3>
+                            <p class="text-sm font-light leading-6">誠實面對內心真實狀態，在下方分類中尋找共鳴，無需隱藏。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 md:gap-5 group items-start">
+                        <span class="text-[#A88B60] font-display italic text-xl md:text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">02</span>
+                        <div>
+                            <h3 class="font-bold text-[#2C2825] text-base mb-1">領受話語</h3>
+                            <p class="text-sm font-light leading-6">透過聖經經文與屬靈洞見，轉化眼光，獲得屬天安慰。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 md:gap-5 group items-start">
+                        <span class="text-[#A88B60] font-display italic text-xl md:text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">03</span>
+                        <div>
+                            <h3 class="font-bold text-[#2C2825] text-base mb-1">禱告交託</h3>
+                            <p class="text-sm font-light leading-6">跟隨引導禱告詞，將重擔卸給神，重獲心靈的安息。</p>
+                        </div>
                     </div>
                 </div>
-                <div class="flex gap-5 group items-start">
-                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">02</span>
-                    <div>
-                        <h3 class="font-bold text-[#2C2825] text-base mb-1">領受話語</h3>
-                        <p class="text-sm font-light leading-6">透過聖經經文與屬靈洞見，轉化眼光，獲得屬天安慰。</p>
-                    </div>
-                </div>
-                <div class="flex gap-5 group items-start">
-                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">03</span>
-                    <div>
-                        <h3 class="font-bold text-[#2C2825] text-base mb-1">禱告交託</h3>
-                        <p class="text-sm font-light leading-6">跟隨引導禱告詞，將重擔卸給神，重獲心靈的安息。</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="text-center">
-                <button onclick="closeIntro()" class="relative overflow-hidden group px-12 py-3 bg-[#2C2825] text-[#F2F0E9] hover:bg-[#A88B60] transition-colors duration-500 ease-out shadow-lg">
-                    <span class="relative z-10 text-xs tracking-[0.2em] font-medium uppercase">Enter</span>
-                    <!-- Button Decor -->
-                    <div class="absolute inset-0 border border-white/20 opacity-0 group-hover:opacity-100 group-hover:scale-95 transition-all duration-500"></div>
-                </button>
+                <div class="text-center mb-2">
+                    <button onclick="closeIntro()" class="relative overflow-hidden group px-10 py-3 bg-[#2C2825] text-[#F2F0E9] hover:bg-[#A88B60] transition-colors duration-500 ease-out shadow-lg w-full md:w-auto rounded-sm">
+                        <span class="relative z-10 text-xs tracking-[0.2em] font-medium uppercase">Enter</span>
+                        <!-- Button Decor -->
+                        <div class="absolute inset-0 border border-white/20 opacity-0 group-hover:opacity-100 group-hover:scale-95 transition-all duration-500"></div>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 邊框裝飾 (Frame) -->
-    <div class="fixed inset-0 pointer-events-none z-50 p-3 md:p-6">
+    <!-- 邊框裝飾 (Frame) - 調整為不遮擋手機內容 -->
+    <div class="fixed inset-0 pointer-events-none z-50 p-3 md:p-6 hidden md:block">
         <div class="w-full h-full border border-gold/30 rounded-sm"></div>
         <div class="absolute top-4 left-4 md:top-7 md:left-7 w-[calc(100%-2rem)] h-[calc(100%-2rem)] md:w-[calc(100%-3.5rem)] md:h-[calc(100%-3.5rem)] border border-gold/20 rounded-sm"></div>
     </div>
+    <!-- 手機版簡化邊框，避免誤觸 -->
+    <div class="fixed inset-0 pointer-events-none z-50 p-2 md:hidden">
+        <div class="w-full h-full border border-gold/20 rounded-sm"></div>
+    </div>
 
-    <div class="max-w-5xl mx-auto px-6 py-16 md:py-24 relative z-10">
+    <div class="max-w-5xl mx-auto px-5 py-12 md:px-6 md:py-24 relative z-10">
         
-        <!-- Guide Button (New) -->
-        <button onclick="openIntro()" class="absolute top-4 right-6 md:top-8 md:right-8 text-ink/40 hover:text-gold transition-colors duration-300 flex items-center gap-2 group z-50" aria-label="開啟使用指南">
-            <span class="text-xs font-serif tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">Guide</span>
-            <div class="p-2 border border-transparent group-hover:border-gold/30 rounded-full transition-all duration-300">
+        <!-- Guide Button: 調整位置避免太靠邊 -->
+        <button onclick="openIntro()" class="absolute top-2 right-4 md:top-8 md:right-8 text-ink/40 hover:text-gold transition-colors duration-300 flex items-center gap-2 group z-50 p-2" aria-label="開啟使用指南">
+            <span class="text-xs font-serif tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block">Guide</span>
+            <div class="p-2 border border-transparent group-hover:border-gold/30 rounded-full transition-all duration-300 bg-paper/80 backdrop-blur-sm shadow-sm md:shadow-none">
                 <i data-lucide="help-circle" class="w-5 h-5"></i>
             </div>
         </button>
 
-        <!-- Header: 古典排版 -->
-        <header class="text-center mb-16 animate-fade-in">
-            <!-- 耶穌象徵元素：十字架與神聖光暈 -->
-            <div class="relative inline-flex items-center justify-center mb-8">
-                <!-- 光暈背景 -->
+        <!-- Header -->
+        <header class="text-center mb-12 md:mb-16 animate-fade-in mt-6 md:mt-0">
+            <div class="relative inline-flex items-center justify-center mb-6 md:mb-8">
                 <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full scale-110"></div>
-                <!-- 圓形徽章 -->
-                <div class="relative z-10 p-5 border border-gold/40 rounded-full bg-paper shadow-sm">
-                    <i data-lucide="cross" class="w-10 h-10 text-gold" stroke-width="1.2"></i>
+                <div class="relative z-10 p-4 md:p-5 border border-gold/40 rounded-full bg-paper shadow-sm">
+                    <i data-lucide="cross" class="w-8 h-8 md:w-10 md:h-10 text-gold" stroke-width="1.2"></i>
                 </div>
             </div>
 
-            <h1 class="text-5xl md:text-7xl font-display font-medium text-ink mb-4 tracking-tight">
+            <h1 class="text-4xl md:text-7xl font-display font-medium text-ink mb-4 tracking-tight">
                 Soul First Aid
             </h1>
             <div class="flex items-center justify-center gap-4 mb-6">
-                <span class="h-[1px] w-12 bg-gold"></span>
-                <span class="text-lg md:text-xl font-medium tracking-[0.3em] text-ink/80 uppercase">心靈急救箱</span>
-                <span class="h-[1px] w-12 bg-gold"></span>
+                <span class="h-[1px] w-8 md:w-12 bg-gold"></span>
+                <span class="text-base md:text-xl font-medium tracking-[0.3em] text-ink/80 uppercase">心靈急救箱</span>
+                <span class="h-[1px] w-8 md:w-12 bg-gold"></span>
             </div>
-            <p class="text-ink/60 max-w-lg mx-auto leading-relaxed text-sm md:text-base italic font-light">
+            <p class="text-ink/60 max-w-lg mx-auto leading-relaxed text-sm md:text-base italic font-light px-4">
                 "Come to me, all you who are weary and burdened, and I will give you rest."
             </p>
         </header>
 
-        <!-- Category Filter -->
-        <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12 animate-fade-in text-sm md:text-base tracking-widest text-ink/50 uppercase" id="category-filters">
-            <button onclick="filterCategory('all')" class="category-tab active" data-cat="all">全部顯示</button>
-            <button onclick="filterCategory('storms')" class="category-tab" data-cat="storms">情緒風暴</button>
-            <button onclick="filterCategory('relations')" class="category-tab" data-cat="relations">關係與自我</button>
-            <button onclick="filterCategory('spiritual')" class="category-tab" data-cat="spiritual">靈性與迷惘</button>
-            <button onclick="filterCategory('sin')" class="category-tab" data-cat="sin">罪與試探</button>
+        <!-- Category Filter: 增加水平滾動以適應小螢幕 -->
+        <div class="flex overflow-x-auto md:flex-wrap justify-start md:justify-center gap-6 md:gap-10 mb-10 md:mb-12 animate-fade-in text-sm md:text-base tracking-widest text-ink/50 uppercase px-4 pb-2 scrollbar-hide" id="category-filters" style="-webkit-overflow-scrolling: touch;">
+            <button onclick="filterCategory('all')" class="category-tab active flex-shrink-0" data-cat="all">全部顯示</button>
+            <button onclick="filterCategory('storms')" class="category-tab flex-shrink-0" data-cat="storms">情緒風暴</button>
+            <button onclick="filterCategory('relations')" class="category-tab flex-shrink-0" data-cat="relations">關係與自我</button>
+            <button onclick="filterCategory('spiritual')" class="category-tab flex-shrink-0" data-cat="spiritual">靈性與迷惘</button>
+            <button onclick="filterCategory('sin')" class="category-tab flex-shrink-0" data-cat="sin">罪與試探</button>
         </div>
 
         <!-- Main Content -->
@@ -226,7 +232,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="mt-24 text-center animate-fade-in opacity-0" style="animation-delay: 0.5s;">
+        <footer class="mt-16 md:mt-24 text-center animate-fade-in opacity-0" style="animation-delay: 0.5s;">
             <div class="w-8 h-8 mx-auto mb-4 border border-gold/40 rotate-45 flex items-center justify-center">
                 <div class="w-6 h-6 border border-gold/20 bg-paper"></div>
             </div>
@@ -243,24 +249,20 @@
         // 關閉使用指南 Modal
         function closeIntro() {
             const modal = document.getElementById('intro-modal');
-            modal.style.opacity = '0'; // 淡出效果
+            modal.style.opacity = '0'; 
             setTimeout(() => {
-                modal.style.display = 'none'; // 移除元素
-            }, 700); // 配合 CSS duration-700
+                modal.style.display = 'none'; 
+            }, 700); 
         }
 
-        // 開啟使用指南 Modal (新增)
+        // 開啟使用指南 Modal
         function openIntro() {
             const modal = document.getElementById('intro-modal');
             modal.style.display = 'flex';
-            // Force reflow to enable transition
             void modal.offsetWidth; 
             modal.style.opacity = '1';
         }
 
-        // 擴充至 24 種情緒並加入 category
-        // Categories: storms (情緒風暴), relations (關係與自我), spiritual (靈性與迷惘), sin (罪與試探)
-        // 經文更新：使用 CUNP-神版 (和合本 神版)
         const emotions = [
             // --- 情緒風暴 (Storms) ---
             {
@@ -670,25 +672,25 @@
                     <!-- 優化後的返回按鈕 -->
                     <button 
                         onclick="goBack()"
-                        class="mb-10 mx-auto flex items-center justify-center gap-3 px-8 py-3 bg-paper-light border border-gold/40 rounded-full shadow-sm text-gold hover:bg-gold hover:text-white hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        class="mb-8 md:mb-10 mx-auto flex items-center justify-center gap-3 px-8 py-3 bg-paper-light border border-gold/40 rounded-full shadow-sm text-gold hover:bg-gold hover:text-white hover:shadow-md transition-all duration-300 group cursor-pointer"
                         aria-label="返回列表"
                     >
                         <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
                         <span class="text-sm font-serif tracking-widest font-medium">返回列表</span>
                     </button>
 
-                    <div class="bg-paper-light relative p-8 md:p-16 shadow-[0_10px_40px_-10px_rgba(44,40,37,0.05)] border border-[#E5E0D8]">
+                    <div class="bg-paper-light relative p-6 md:p-16 shadow-[0_10px_40px_-10px_rgba(44,40,37,0.05)] border border-[#E5E0D8] rounded-sm">
                         
                         <!-- 書頁邊角裝飾 -->
-                        <div class="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-gold/20 m-4"></div>
-                        <div class="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-gold/20 m-4"></div>
-                        <div class="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-gold/20 m-4"></div>
-                        <div class="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-gold/20 m-4"></div>
+                        <div class="absolute top-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-t-2 border-gold/20 m-2 md:m-4"></div>
+                        <div class="absolute top-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-t-2 border-gold/20 m-2 md:m-4"></div>
+                        <div class="absolute bottom-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-b-2 border-gold/20 m-2 md:m-4"></div>
+                        <div class="absolute bottom-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-b-2 border-gold/20 m-2 md:m-4"></div>
 
                         <!-- 內容標題 -->
-                        <div class="text-center mb-12">
-                            <div class="inline-flex items-center justify-center p-3 mb-6 rounded-full border border-gold/30 text-gold bg-paper">
-                                <i data-lucide="${emotion.iconName}" class="w-8 h-8" stroke-width="1.2"></i>
+                        <div class="text-center mb-10 md:mb-12 pt-4 md:pt-0">
+                            <div class="inline-flex items-center justify-center p-3 mb-4 md:mb-6 rounded-full border border-gold/30 text-gold bg-paper">
+                                <i data-lucide="${emotion.iconName}" class="w-6 h-6 md:w-8 md:h-8" stroke-width="1.2"></i>
                             </div>
                             <h2 class="text-3xl md:text-4xl font-serif text-ink mb-2">
                                 ${emotion.title}
@@ -698,14 +700,14 @@
                             </p>
                         </div>
 
-                        <div class="space-y-12 relative z-10 px-2 md:px-8">
+                        <div class="space-y-10 md:space-y-12 relative z-10 px-2 md:px-8">
                             
                             <!-- 經文 (Verse) -->
                             <div class="text-center">
-                                <blockquote class="font-serif text-xl md:text-2xl leading-loose italic text-ink/90 relative inline-block">
-                                    <span class="text-4xl text-gold/30 absolute -top-4 -left-6 font-display">"</span>
+                                <blockquote class="font-serif text-xl md:text-2xl leading-loose italic text-ink/90 relative inline-block px-4 md:px-0">
+                                    <span class="text-4xl text-gold/30 absolute -top-4 -left-2 md:-left-6 font-display">"</span>
                                     ${emotion.verse}
-                                    <span class="text-4xl text-gold/30 absolute -bottom-8 -right-6 font-display">"</span>
+                                    <span class="text-4xl text-gold/30 absolute -bottom-8 -right-2 md:-right-6 font-display">"</span>
                                 </blockquote>
                                 <div class="mt-8 flex items-center justify-center gap-3 opacity-60">
                                     <span class="h-[1px] w-8 bg-ink/30"></span>
@@ -720,7 +722,7 @@
                             </div>
 
                             <!-- 靈修筆記 (Insight) -->
-                            <div class="text-justify leading-9 text-ink/80 font-serif md:text-lg px-2 md:px-4">
+                            <div class="text-justify leading-9 text-ink/80 font-serif text-base md:text-lg px-0 md:px-4">
                                 <span class="float-left text-4xl font-display text-gold mr-3 mt-[-6px] leading-none">
                                     ${emotion.insight.charAt(0)}
                                 </span>
@@ -728,7 +730,7 @@
                             </div>
 
                             <!-- 禱告 (Prayer) -->
-                            <div class="bg-paper border border-gold/20 p-8 mt-8 text-center relative mx-2 md:mx-0">
+                            <div class="bg-paper border border-gold/20 p-6 md:p-8 mt-8 text-center relative mx-0">
                                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-paper px-4 text-gold text-xs tracking-widest uppercase">
                                     Prayer
                                 </div>
@@ -747,7 +749,6 @@
             }
 
             lucide.createIcons();
-            // 注意：這裡移除了全局的 window.scrollTo(0, 0)，改由各個函數自己控制
         }
 
         function selectEmotion(id) {
@@ -757,14 +758,12 @@
             selectedEmotionId = id;
             renderView();
             
-            // 2. 智慧滾動到內容頂端（保留 Header 不被完全切掉，留一點 buffer）
+            // 2. 智慧滾動到內容頂端
             const contentDiv = document.getElementById('app-content');
-            // 計算相對於視窗的絕對位置
-            const headerOffset = 80; // 留給頂部的緩衝空間
+            const headerOffset = 80; 
             const elementPosition = contentDiv.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            // 只有當使用者已經滑得比內容起點還深時，才需要往回滾動
             if (window.scrollY > offsetPosition) {
                  window.scrollTo({
                      top: offsetPosition,
@@ -777,7 +776,7 @@
             selectedEmotionId = null;
             renderView();
             
-            // 3. 恢復到之前的滾動位置，使用 auto (瞬間) 讓體驗更連貫
+            // 3. 恢復到之前的滾動位置
             window.scrollTo({
                 top: lastScrollY,
                 behavior: "auto"
