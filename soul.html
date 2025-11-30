@@ -672,16 +672,7 @@
 
                 let html = `
                 <div class="max-w-3xl mx-auto animate-fade-in relative">
-                    <!-- 優化後的返回按鈕 -->
-                    <button 
-                        onclick="goBack()"
-                        class="mb-8 md:mb-10 mx-auto flex items-center justify-center gap-3 px-8 py-3 bg-paper-light border border-gold/40 rounded-full shadow-sm text-gold hover:bg-gold hover:text-white hover:shadow-md transition-all duration-300 group cursor-pointer"
-                        aria-label="返回列表"
-                    >
-                        <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
-                        <span class="text-sm font-serif tracking-widest font-medium">返回列表</span>
-                    </button>
-
+                    
                     <div class="bg-paper-light relative p-6 md:p-16 shadow-[0_10px_40px_-10px_rgba(44,40,37,0.05)] border border-[#E5E0D8] rounded-sm">
                         
                         <!-- 書頁邊角裝飾 -->
@@ -744,6 +735,16 @@
 
                         </div>
                     </div>
+
+                    <!-- 優化後的返回按鈕 (移至下方) -->
+                    <button 
+                        onclick="goBack()"
+                        class="mt-10 mx-auto flex items-center justify-center gap-3 px-8 py-3 bg-paper-light border border-gold/40 rounded-full shadow-sm text-gold hover:bg-gold hover:text-white hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        aria-label="返回列表"
+                    >
+                        <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+                        <span class="text-sm font-serif tracking-widest font-medium">返回列表</span>
+                    </button>
                 </div>`;
                 container.innerHTML = html;
                 
@@ -790,5 +791,4 @@
 
     </script>
 </body>
-</html>
 </html>
