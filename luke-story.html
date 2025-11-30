@@ -207,6 +207,50 @@
         </div>
     </div>
 
+    <!-- Intro Modal (Welcome) -->
+    <div id="intro-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-500">
+        <div class="bg-[#fffbf0] w-full max-w-2xl rounded-lg shadow-2xl border-4 double border-yellow-800 relative overflow-hidden transform transition-transform duration-500 scale-100">
+            <!-- Decorative Header -->
+            <div class="bg-gradient-to-r from-yellow-900 via-red-900 to-yellow-900 h-3 w-full"></div>
+            
+            <div class="p-8 md:p-10 text-center">
+                <div class="mb-6">
+                    <h2 class="text-4xl font-bold text-yellow-900 tracking-widest mb-2 font-serif">人子腳蹤</h2>
+                    <p class="text-xl text-stone-600 italic border-b border-stone-300 pb-4 inline-block px-8">路加福音沈浸式體驗</p>
+                </div>
+
+                <div class="text-stone-800 space-y-6 text-lg leading-relaxed mb-8">
+                    <p>歡迎來到這趟穿越兩千年的旅程。這不僅僅是一張地圖，更是一封來自加利利的情書。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left text-base mt-8">
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">🗺️</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">地理行旅</h3>
+                            <p class="text-stone-700 text-sm text-justify">跟隨真實的地理座標，從北部的加利利一步步走向南方的耶路撒冷，親歷受難與復活的腳蹤。</p>
+                        </div>
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">👣</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">第一人稱</h3>
+                            <p class="text-stone-700 text-sm text-justify">打破傳統敘事，以耶穌的「第一人稱視角」重述 42 個關鍵事件，聽見祂內心的慈憐與掙扎。</p>
+                        </div>
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">👥</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">人物深度</h3>
+                            <p class="text-stone-700 text-sm text-justify">點擊事件下方的角色按鈕，閱讀他們不為人知的心路歷程，看見小人物眼中的救主。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startJourney()" class="group relative px-8 py-4 bg-red-900 text-amber-100 font-bold text-xl rounded shadow-lg hover:bg-red-800 transition-all hover:scale-105 active:scale-95">
+                    <span class="relative z-10 flex items-center gap-2">
+                        開始旅程 <span class="group-hover:translate-x-1 transition-transform">⟶</span>
+                    </span>
+                    <div class="absolute inset-0 border-2 border-yellow-500/30 rounded scale-95 group-hover:scale-100 transition-transform"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Character Bio Modal -->
     <div id="bio-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-[#fffbf0] w-full max-w-md rounded-lg shadow-2xl border-2 border-yellow-800 relative overflow-hidden transform transition-all scale-95 opacity-0" id="bio-content-wrapper">
@@ -474,10 +518,6 @@
 
             // Create Markers but DO NOT add them to map yet
             events.forEach((evt, idx) => {
-                // Ensure we have valid coordinates for the 43rd event (Heart)
-                // We can reuse the coordinates of the previous event or center it.
-                // The coords are already set in the array.
-                
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div class='marker-container' id='marker-${idx}'>
@@ -670,6 +710,17 @@
             setTimeout(() => {
                 document.getElementById('bio-modal').classList.add('hidden');
             }, 200);
+        }
+
+        function startJourney() {
+            const modal = document.getElementById('intro-modal');
+            const content = modal.firstElementChild;
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 500);
         }
 
         document.getElementById('bio-modal').addEventListener('click', function(e) {

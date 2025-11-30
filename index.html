@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <!-- 加入此行以解決圖片無法載入的問題 -->
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遇見耶穌 | 在喧囂中找回平靜</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* Animations */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.5, 0, 0, 1), transform 1s cubic-bezier(0.5, 0, 0, 1);
+            will-change: opacity, transform;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Card Flip Effect */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 320px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-5px);
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .flip-card-front {
+            background-color: white;
+            color: #333;
+            border: 1px solid #e5e7eb;
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Parallax Background */
+        .parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* 更新禱告背景圖片為更穩定的連結 */
+        .prayer-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1493612276216-9c59019558f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+        }
+
+        /* Canvas for Particles */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f2d74e;
+            animation: fall linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        /* Back to Top Button */
+        #back-to-top {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        #back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Button Shine Effect */
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+        .animate-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+        }
+        
+        /* Heart Beat */
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .animate-beat {
+            animation: heartbeat 1.5s infinite ease-in-out;
+        }
+
+        /* Link Breathe Effect */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .animate-breathe {
+            display: inline-block;
+            animation: breathe 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <span class="serif text-xl font-bold text-indigo-900 tracking-wider hover:text-indigo-600 transition">LIGHT</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#questions" class="hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition relative group">
+                            現代人的困境
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                        </a>
+                        <a href="#jesus" class="hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition relative group">
+                            祂是誰
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                        </a>
+                        <a href="#history" class="hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium transition relative group">
+                            歷史證據
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                        </a>
+                        <a href="#prayer" class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition shadow-lg hover:shadow-indigo-500/30 transform hover:-translate-y-0.5">開始對話</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Particles -->
+    <!-- Updated background image to a very reliable busy city long exposure shot -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden parallax" style="background-image: url('https://images.unsplash.com/photo-1465447142348-e9952c393450?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-gray-50/90"></div>
+        
+        <!-- Canvas for particle effect -->
+        <canvas id="hero-canvas"></canvas>
+
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-16">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-lg tracking-tight fade-in-section">
+                為什麼每天這麼忙<br/><span class="text-indigo-200">心卻還是空空的？</span>
+            </h1>
+            <p class="text-lg md:text-2xl text-white/90 mb-10 font-light fade-in-section" style="transition-delay: 0.2s">
+                在滑不完的動態和回不完的訊息裡，<br>我們是否遺失了最重要的東西？
+            </p>
+            <div class="fade-in-section" style="transition-delay: 0.4s">
+                <a href="#questions" class="inline-block border-2 border-white text-white hover:bg-white hover:text-indigo-900 px-8 py-3 rounded-full text-lg transition duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+                    尋找安息 <i class="fas fa-arrow-down ml-2 animate-bounce"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: The Human Condition (Interactive Cards) -->
+    <section id="questions" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-section">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">這些感覺，你也許不陌生</h2>
+                <p class="text-xl text-gray-600">點擊下方的卡片，聽聽耶穌對現代生活的溫柔回應。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1: Achievement Anxiety -->
+                <div class="flip-card fade-in-section" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="far fa-tired text-4xl text-gray-400 mb-4 group-hover:scale-110 transition"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">成就感的焦慮</h3>
+                            <p class="mt-2 text-gray-500">「升遷了、加薪了，IG照片也很完美，但快樂好像只維持了三天。」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-water text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌了解你：</h3>
+                            <p class="italic text-lg">「凡喝這水的還要再渴；人若喝我所賜的水就永遠不渴。」</p>
+                            <p class="mt-4 text-sm opacity-75">世界給的滿足是暫時的，唯有祂能填滿心底的空缺。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 約翰福音 4:13-14</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Pressure -->
+                <div class="flip-card fade-in-section" style="transition-delay: 0.1s" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-weight-hanging text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">被期待壓垮</h3>
+                            <p class="mt-2 text-gray-500">「房貸、工作、家人的期待...我覺得自己好像快要撐不住了。」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-hands text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌邀請你：</h3>
+                            <p class="italic text-lg">「凡勞苦擔重擔的人可以到我這裏來，我就使你們得安息。」</p>
+                            <p class="mt-4 text-sm opacity-75">你可以卸下偽裝的堅強，在祂面前做回孩子。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 馬太福音 11:28</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Loneliness -->
+                <div class="flip-card fade-in-section" style="transition-delay: 0.2s" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-mobile-alt text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">連線中的孤單</h3>
+                            <p class="mt-2 text-gray-500">「通訊錄幾百人，社群好友上千，但夜深人靜時，卻找不到一個能說心裡話的人。」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-heart text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌應許你：</h3>
+                            <p class="italic text-lg">「...我就常與你們同在，直到世界的末了。」</p>
+                            <p class="mt-4 text-sm opacity-75">祂是那位全天候在線，永遠秒讀秒回、永不離棄的朋友。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 馬太福音 28:20</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Future Anxiety -->
+                <div class="flip-card fade-in-section" style="transition-delay: 0.3s" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-hourglass-half text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">對未來的擔心</h3>
+                            <p class="mt-2 text-gray-500">「經濟不景氣、AI 取代工作...世界變化太快，明天到底會怎樣？」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-dove text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌安慰你：</h3>
+                            <p class="italic text-lg">「不要為明天憂慮...一天的難處一天當就夠了。」</p>
+                            <p class="mt-4 text-sm opacity-75">你的未來不在這變動的世界手中，而在那位愛你的神手中。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 馬太福音 6:34</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Fear of Death -->
+                <div class="flip-card fade-in-section" style="transition-delay: 0.4s" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-leaf text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">對死亡的恐懼</h3>
+                            <p class="mt-2 text-gray-500">「想到生命的終點可能是一片黑暗或虛無，心裡就充滿了不安與恐慌。」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-sun text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌賜盼望：</h3>
+                            <p class="italic text-lg">「復活在我，生命也在我。信我的人雖然死了，也必復活。」</p>
+                            <p class="mt-4 text-sm opacity-75">死亡不是句點，而是一扇門。祂已戰勝死亡，為你預備了永恆的家。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 約翰福音 11:25</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Broken Relationships -->
+                <div class="flip-card fade-in-section" style="transition-delay: 0.5s" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fas fa-user-injured text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">無法原諒的傷</h3>
+                            <p class="mt-2 text-gray-500">「那些被背叛、被傷害的記憶，像刺一樣扎在心裡，想忘也忘不掉。」</p>
+                            <p class="mt-4 text-xs text-indigo-500 uppercase tracking-widest animate-pulse">點擊查看回應</p>
+                        </div>
+                        <div class="flip-card-back">
+                            <i class="fas fa-band-aid text-3xl mb-3 text-indigo-200"></i>
+                            <h3 class="text-xl font-bold mb-2">耶穌醫治你：</h3>
+                            <p class="italic text-lg">「...父啊，赦免他們！因為他們所做的，他們不曉得...」</p>
+                            <p class="mt-4 text-sm opacity-75">祂受過最重的傷，所以能懂你的痛；祂的愛能釋放你得自由。</p>
+                            <p class="mt-2 text-xs text-white/60 font-serif">- 路加福音 23:34</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Who is Jesus (Redesigned: No Image, Full Width) -->
+    <section id="jesus" class="py-24 bg-white overflow-hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="fade-in-section text-center">
+                <h2 class="text-indigo-600 font-bold tracking-wide uppercase text-sm mb-2">超越時空的相遇</h2>
+                <h3 class="text-4xl font-bold text-gray-900 mb-8">為什麼祂與現代人有關？</h3>
+                <p class="text-xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
+                    耶穌不只是一個歷史人物，祂親自走進了人類最混亂的現實。在祂那個時代，政治動盪、貧富差距巨大，人們同樣充滿焦慮與迷惘。而在今日這個資訊爆炸卻心靈貧乏的時代，祂的同在比以往任何時候都更真實。
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                    <!-- Point 1 -->
+                    <div class="bg-gray-50 p-6 rounded-xl hover:shadow-lg transition duration-300 border border-gray-100 transform hover:-translate-y-1">
+                        <div class="flex-shrink-0 mb-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 text-xl">
+                                <i class="fas fa-user-friends"></i>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">祂懂你的「不得不」</h4>
+                        <p class="text-gray-500 leading-relaxed">祂經歷過貧窮、被誤解、被最親近的朋友背叛。當你在職場感到委屈、在家庭感到無助時，祂完全感同身受，並能賜下安慰。</p>
+                    </div>
+
+                    <!-- Point 2 -->
+                    <div class="bg-gray-50 p-6 rounded-xl hover:shadow-lg transition duration-300 border border-gray-100 transform hover:-translate-y-1">
+                        <div class="flex-shrink-0 mb-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 text-xl">
+                                <i class="fas fa-star"></i>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">打破現狀的能力</h4>
+                        <p class="text-gray-500 leading-relaxed">祂不只給心靈雞湯，祂是上帝的兒子，擁有改變生命的實質大能。祂能將絕望變為盼望，修復破碎的關係，賜給你重新開始的力量。</p>
+                    </div>
+
+                    <!-- Point 3 (New for Modern Context) -->
+                    <div class="bg-gray-50 p-6 rounded-xl hover:shadow-lg transition duration-300 border border-gray-100 transform hover:-translate-y-1">
+                        <div class="flex-shrink-0 mb-4">
+                            <span class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 text-xl">
+                                <i class="fas fa-fingerprint"></i>
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">找回真實的價值</h4>
+                        <p class="text-gray-500 leading-relaxed">在這個用「成就」和「流量」衡量價值的世界，耶穌告訴你：你被愛不是因為你做了什麼，而是因為你是誰。祂能從無止盡的比較中釋放你。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2.5: Historical Evidence -->
+    <section id="history" class="py-20 bg-indigo-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 fade-in-section">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">這不只是傳說，這是歷史</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    如果耶穌只是神話，祂無法改變你的生命。但歷史學家告訴我們，祂真實存在過。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Evidence Card 1: Historicity -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg fade-in-section border-t-4 border-indigo-600 h-full hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-landmark text-2xl text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">史學家的鐵證</h3>
+                    </div>
+                    <div class="text-gray-600 mb-4 leading-relaxed">
+                        <p class="mb-4">不同於宗教傳說，耶穌的生平有非基督徒史料佐證：</p>
+                        <ul class="list-disc pl-5 space-y-2 mb-4">
+                            <li>
+                                <strong>塔西佗 (Tacitus)：</strong>這位羅馬帝國最偉大的歷史學家，在其著作《編年史》中明確記載：「基督...在提庇留統治時期，被總督本丟彼拉多處決。」這證實了耶穌受難的具體歷史時刻。
+                            </li>
+                            <li>
+                                <strong>約瑟夫 (Josephus)：</strong>第一世紀的猶太史學家，在《猶太古史》中也記錄了耶穌是一位「智者」，並提及他的兄弟雅各。
+                            </li>
+                        </ul>
+                        <p>這些來自「敵對」或「中立」陣營的文獻，反而成為耶穌真實存在的最強鐵證。</p>
+                    </div>
+                </div>
+
+                <!-- Evidence Card 2: Modern Values -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg fade-in-section border-t-4 border-indigo-600 h-full hover:shadow-2xl transition duration-300 transform hover:-translate-y-1" style="transition-delay: 0.2s">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-globe text-2xl text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">塑造現代世界的基石</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">
+                        現代社會視為理所當然的價值，其實源自耶穌革命性的教導：
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="text-gray-800">天賦人權與平等：</strong>
+                                <p class="text-sm text-gray-500">在人被視為工具的羅馬時代，是耶穌教導「每個人在上帝眼中都無比珍貴」，打破了階級與性別的藩籬。</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="text-gray-800">醫療與慈善體系：</strong>
+                                <p class="text-sm text-gray-500">因著耶穌教導「做在最小的弟兄身上」，初代教會建立了歷史上第一批向公眾開放的醫院與孤兒院。</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <strong class="text-gray-800">現代大學與知識普及：</strong>
+                                <p class="text-sm text-gray-500">現代大學體系（University）是由中世紀教會創立的（如牛津、劍橋）。且為了讓人人能閱讀真理，信仰群體推動了史上第一次平民掃盲運動，打破知識被貴族壟斷的局面。</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: The Gospel (The Bridge) -->
+    <section id="gospel" class="py-24 bg-slate-900 text-white relative">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 animate-pulse"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 fade-in-section">我們像是「斷線」的風箏</h2>
+            
+            <div class="space-y-12">
+                <div class="fade-in-section bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-red-400 transition duration-500">
+                    <h3 class="text-2xl font-semibold text-red-400 mb-4"><i class="fas fa-wifi mr-2"></i> 狀態：連線中斷 (Disconnected)</h3>
+                    <p class="text-lg text-gray-300 leading-relaxed">
+                        我們被造，原本是為了與生命的源頭——上帝連結。但我們選擇了靠自己，切斷了這個連結。聖經稱這為「罪」。
+                        這不只是做壞事，更像是手機失去了訊號，無論裝了多少App（金錢、地位、娛樂），依然無法填補電量耗盡的焦慮。
+                    </p>
+                </div>
+
+                <div class="fade-in-section">
+                    <i class="fas fa-arrow-down text-4xl text-gray-500 animate-bounce"></i>
+                </div>
+
+                <div class="fade-in-section bg-gradient-to-r from-indigo-900 to-slate-800 p-8 rounded-2xl border border-indigo-500/50 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition duration-500">
+                    <h3 class="text-2xl font-semibold text-indigo-300 mb-4"><i class="fas fa-signal mr-2"></i> 解決方案：重新連結 (Reconnect)</h3>
+                    <p class="text-lg text-gray-200 leading-relaxed">
+                        我們無法靠自己的努力修好這條線。所以，耶穌來了。
+                        祂在十字架上付出了代價，就像是為我們付清了所有的「欠款」，重新接通了我們與上帝的連線。
+                        <br><strong class="block mt-4 text-xl text-white">十字架，就是那個「重新連線」的按鈕。</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: The Invitation & Prayer -->
+    <section id="prayer" class="py-24 prayer-bg relative text-center">
+        <div class="max-w-3xl mx-auto px-4 relative z-10">
+            <div id="invitation-card" class="bg-white/95 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl fade-in-section border border-white/50">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">不需要變得完美，現在就可以開始</h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    信仰不是要你遵守一堆規則，而是接受一份無條件的愛。<br>
+                    如果你累了，想找一個可以永遠依靠的家，請試著用這段話，簡單地跟耶穌說：
+                </p>
+                
+                <div class="bg-indigo-50 p-6 rounded-xl text-left border-l-4 border-indigo-500 mb-8 hover:bg-indigo-100 transition duration-300">
+                    <p class="text-gray-800 text-lg leading-loose font-medium">
+                        「親愛的耶穌，<br>
+                        我承認我有時候真的很累，不想再假裝堅強。<br>
+                        我心裡有一塊空缺，是世界填不滿的。<br>
+                        謝謝祢愛原本的我，謝謝祢為我死在十字架上，原諒了我所有的過錯和不足。<br>
+                        現在，我願意打開心門，邀請祢進來，做我最好的朋友和生命的主人。<br>
+                        請帶領我，給我真正的平靜。<br>
+                        奉耶穌的名禱告，阿們。」
+                    </p>
+                </div>
+
+                <button id="pray-btn" class="group relative w-full md:w-auto overflow-hidden rounded-full bg-indigo-600 px-10 py-5 text-white shadow-2xl transition-all hover:bg-indigo-700 hover:scale-105 active:scale-95 animate-shine">
+                    <!-- Ping effect ring -->
+                    <span class="absolute inset-0 rounded-full ring-4 ring-white/30 animate-ping opacity-20"></span>
+                    <span class="relative z-10 text-xl font-bold tracking-wide flex items-center justify-center">
+                        這也是我的心聲 <i class="fas fa-heart ml-2 animate-beat text-red-300"></i>
+                    </span>
+                    <!-- Glow effect -->
+                    <div class="absolute inset-0 h-full w-full scale-0 rounded-full transition-all duration-300 group-hover:scale-100 group-hover:bg-indigo-600/30"></div>
+                </button>
+            </div>
+
+            <!-- Success Message (Hidden initially) -->
+            <div id="success-message" class="hidden bg-white/95 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl transform transition-all duration-500 scale-95 opacity-0 border border-green-200">
+                <div class="text-green-500 text-6xl mb-6 animate-bounce">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">歡迎回家！</h2>
+                <p class="text-xl text-gray-700 mb-8 leading-relaxed">
+                    這是一個美好的開始。你不再是一個人面對這個世界，上帝已經與你連線。
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div class="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition">
+                        <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-book-open mr-2"></i> 認識祂的話語</h4>
+                        <p class="text-sm text-blue-600">下載聖經App，建議從<a href="luke-story.html" class="inline-block text-blue-800 font-bold underline hover:text-blue-900 hover:decoration-blue-900 transition-colors animate-breathe">《路加福音》</a>讀起。「路加是位醫生，他細膩地記錄了耶穌的腳蹤。讀這卷書，你會看見耶穌如何醫治那些被世界遺忘的人，並明白——其實耶穌一直都在等你回家。」</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition">
+                        <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-water mr-2"></i> 到教會受洗</h4>
+                        <p class="text-sm text-blue-600">尋找當地的教會，透過受洗公開宣告你的信仰，正式成為神家裡的一份子。</p>
+                    </div>
+                </div>
+                <button onclick="location.reload()" class="mt-8 text-gray-400 hover:text-gray-600 text-sm underline">回到首頁</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="serif text-2xl text-gray-200 mb-4">願你享有出人意外的平安</p>
+            <p class="text-sm">Created with love. 分享給你在忙碌中迷失的朋友。</p>
+            <div class="mt-6 flex justify-center space-x-6">
+                <a href="#" class="hover:text-white transition transform hover:scale-110"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="hover:text-white transition transform hover:scale-110"><i class="fab fa-line fa-lg"></i></a>
+                <a href="#" class="hover:text-white transition transform hover:scale-110"><i class="fab fa-instagram fa-lg"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" onclick="window.scrollTo(0,0)" class="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition transform hover:-translate-y-1 focus:outline-none z-50">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Scroll Animation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Intersection Observer for Fade-in effects
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            const sections = document.querySelectorAll('.fade-in-section');
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // 2. Prayer Button Interaction with Confetti
+            const prayBtn = document.getElementById('pray-btn');
+            const invitationCard = document.getElementById('invitation-card');
+            const successMessage = document.getElementById('success-message');
+
+            prayBtn.addEventListener('click', () => {
+                // Fire Confetti
+                fireConfetti();
+                
+                // Transition UI
+                invitationCard.style.opacity = '0';
+                invitationCard.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    invitationCard.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                    
+                    // Trigger reflow
+                    void successMessage.offsetWidth;
+                    
+                    successMessage.style.opacity = '1';
+                    successMessage.style.transform = 'scale(1)';
+                    successMessage.classList.add('is-visible');
+                }, 500);
+            });
+
+            // 3. Navbar scroll effect & Back to Top visibility
+            const nav = document.getElementById('navbar');
+            const backToTopBtn = document.getElementById('back-to-top');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-md');
+                    nav.classList.replace('bg-white/90', 'bg-white/95');
+                } else {
+                    nav.classList.remove('shadow-md');
+                    nav.classList.replace('bg-white/95', 'bg-white/90');
+                }
+
+                if (window.scrollY > 500) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            // 4. Hero Particle System
+            initParticles();
+        });
+
+        // --- Particle System Functions ---
+        function initParticles() {
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 2 + 1;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0) this.x = width;
+                    if (this.x > width) this.x = 0;
+                    if (this.y < 0) this.y = height;
+                    if (this.y > height) this.y = 0;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+        }
+
+        // --- Confetti Function ---
+        function fireConfetti() {
+            const colors = ['#a864fd', '#29cdff', '#78ff44', '#ff718d', '#fdff6a'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // Random properties
+                const bg = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100 + 'vw';
+                const animDuration = Math.random() * 3 + 2 + 's';
+                const size = Math.random() * 8 + 4 + 'px';
+                
+                confetti.style.backgroundColor = bg;
+                confetti.style.left = left;
+                confetti.style.animationDuration = animDuration;
+                confetti.style.width = size;
+                confetti.style.height = size;
+                confetti.style.top = '-10px';
+                
+                document.body.appendChild(confetti);
+
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
