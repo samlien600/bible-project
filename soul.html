@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心靈急救箱 | Soul First Aid</title>
+    
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Google Fonts: Playfair Display (英文古典標題) + Noto Serif TC (中文古典標題/內文) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#F2F0E9',      // 羊皮紙底色
+                        ink: '#2C2825',        // 深墨色文字
+                        gold: '#A88B60',       // 古銅金
+                        'paper-light': '#FDFBF7',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Serif TC"', 'serif'],
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        display: ['"Playfair Display"', 'serif'],
+                    },
+                    backgroundImage: {
+                        'texture': "url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E\")",
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1.2s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F2F0E9;
+            color: #2C2825;
+        }
+        /* 古典裝飾線條 */
+        .separator-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 1.5rem 0;
+        }
+        .separator-line::before,
+        .separator-line::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #D6D3C9;
+            margin: 0 1rem;
+        }
+        /* 捲軸隱藏但可滾動 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D6D3C9; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        
+        /* 標籤按鈕樣式 */
+        .category-tab {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .category-tab.active {
+            color: #2C2825;
+            font-weight: 600;
+        }
+        .category-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            background-color: #A88B60;
+        }
+        .category-tab:hover {
+            color: #A88B60;
+        }
+    </style>
+</head>
+<body class="bg-paper text-ink font-serif min-h-screen relative overflow-x-hidden selection:bg-gold selection:text-white bg-texture">
+
+    <!-- Intro Modal (新增的使用指南) -->
+    <div id="intro-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 transition-opacity duration-700 ease-out">
+        <!-- Backdrop: 點擊背景關閉 (onclick="closeIntro()") -->
+        <div class="absolute inset-0 bg-[#2C2825]/80 backdrop-blur-[2px] cursor-pointer" onclick="closeIntro()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-[#F2F0E9] relative z-10 max-w-lg w-full p-8 md:p-12 shadow-2xl border border-[#A88B60]/30 animate-fade-in">
+            <!-- Decorative Corners -->
+            <div class="absolute top-3 left-3 w-6 h-6 border-l-2 border-t-2 border-[#A88B60]/40"></div>
+            <div class="absolute top-3 right-3 w-6 h-6 border-r-2 border-t-2 border-[#A88B60]/40"></div>
+            <div class="absolute bottom-3 left-3 w-6 h-6 border-l-2 border-b-2 border-[#A88B60]/40"></div>
+            <div class="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-[#A88B60]/40"></div>
+
+            <div class="text-center mb-8">
+                <div class="inline-block p-3 border border-[#A88B60]/20 rounded-full mb-4">
+                    <i data-lucide="book-open" class="w-6 h-6 text-[#A88B60]"></i>
+                </div>
+                <h2 class="text-3xl font-serif text-[#2C2825] mb-2 tracking-wide">使用指南</h2>
+                <p class="text-[10px] font-display tracking-[0.3em] text-[#A88B60] uppercase mb-6">User Guide</p>
+                
+                <!-- 新增：網站說明 -->
+                <p class="text-[#2C2825]/70 font-serif text-sm leading-7 px-4">
+                    這是一個結合聖經智慧與心靈慰藉的急救站。<br>
+                    在這裡，我們將現代常見的情緒困擾，轉化為屬天的祝福。
+                    無論您正面臨什麼風暴，都能在此找到安歇的港灣。
+                </p>
+            </div>
+
+            <div class="space-y-6 text-[#2C2825]/80 font-serif leading-relaxed mb-10 px-2 border-t border-b border-[#A88B60]/10 py-6">
+                <div class="flex gap-5 group items-start">
+                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">01</span>
+                    <div>
+                        <h3 class="font-bold text-[#2C2825] text-base mb-1">覺察情緒</h3>
+                        <p class="text-sm font-light leading-6">誠實面對內心真實狀態，在下方分類中尋找共鳴，無需隱藏。</p>
+                    </div>
+                </div>
+                <div class="flex gap-5 group items-start">
+                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">02</span>
+                    <div>
+                        <h3 class="font-bold text-[#2C2825] text-base mb-1">領受話語</h3>
+                        <p class="text-sm font-light leading-6">透過聖經經文與屬靈洞見，轉化眼光，獲得屬天安慰。</p>
+                    </div>
+                </div>
+                <div class="flex gap-5 group items-start">
+                    <span class="text-[#A88B60] font-display italic text-2xl opacity-60 group-hover:opacity-100 transition-opacity mt-[-2px]">03</span>
+                    <div>
+                        <h3 class="font-bold text-[#2C2825] text-base mb-1">禱告交託</h3>
+                        <p class="text-sm font-light leading-6">跟隨引導禱告詞，將重擔卸給神，重獲心靈的安息。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="closeIntro()" class="relative overflow-hidden group px-12 py-3 bg-[#2C2825] text-[#F2F0E9] hover:bg-[#A88B60] transition-colors duration-500 ease-out shadow-lg">
+                    <span class="relative z-10 text-xs tracking-[0.2em] font-medium uppercase">Enter</span>
+                    <!-- Button Decor -->
+                    <div class="absolute inset-0 border border-white/20 opacity-0 group-hover:opacity-100 group-hover:scale-95 transition-all duration-500"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 邊框裝飾 (Frame) -->
+    <div class="fixed inset-0 pointer-events-none z-50 p-3 md:p-6">
+        <div class="w-full h-full border border-gold/30 rounded-sm"></div>
+        <div class="absolute top-4 left-4 md:top-7 md:left-7 w-[calc(100%-2rem)] h-[calc(100%-2rem)] md:w-[calc(100%-3.5rem)] md:h-[calc(100%-3.5rem)] border border-gold/20 rounded-sm"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-6 py-16 md:py-24 relative z-10">
+        
+        <!-- Guide Button (New) -->
+        <button onclick="openIntro()" class="absolute top-4 right-6 md:top-8 md:right-8 text-ink/40 hover:text-gold transition-colors duration-300 flex items-center gap-2 group z-50" aria-label="開啟使用指南">
+            <span class="text-xs font-serif tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">Guide</span>
+            <div class="p-2 border border-transparent group-hover:border-gold/30 rounded-full transition-all duration-300">
+                <i data-lucide="help-circle" class="w-5 h-5"></i>
+            </div>
+        </button>
+
+        <!-- Header: 古典排版 -->
+        <header class="text-center mb-16 animate-fade-in">
+            <!-- 耶穌象徵元素：十字架與神聖光暈 -->
+            <div class="relative inline-flex items-center justify-center mb-8">
+                <!-- 光暈背景 -->
+                <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full scale-110"></div>
+                <!-- 圓形徽章 -->
+                <div class="relative z-10 p-5 border border-gold/40 rounded-full bg-paper shadow-sm">
+                    <i data-lucide="cross" class="w-10 h-10 text-gold" stroke-width="1.2"></i>
+                </div>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-display font-medium text-ink mb-4 tracking-tight">
+                Soul First Aid
+            </h1>
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="h-[1px] w-12 bg-gold"></span>
+                <span class="text-lg md:text-xl font-medium tracking-[0.3em] text-ink/80 uppercase">心靈急救箱</span>
+                <span class="h-[1px] w-12 bg-gold"></span>
+            </div>
+            <p class="text-ink/60 max-w-lg mx-auto leading-relaxed text-sm md:text-base italic font-light">
+                "Come to me, all you who are weary and burdened, and I will give you rest."
+            </p>
+        </header>
+
+        <!-- Category Filter -->
+        <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12 animate-fade-in text-sm md:text-base tracking-widest text-ink/50 uppercase" id="category-filters">
+            <button onclick="filterCategory('all')" class="category-tab active" data-cat="all">全部顯示</button>
+            <button onclick="filterCategory('storms')" class="category-tab" data-cat="storms">情緒風暴</button>
+            <button onclick="filterCategory('relations')" class="category-tab" data-cat="relations">關係與自我</button>
+            <button onclick="filterCategory('spiritual')" class="category-tab" data-cat="spiritual">靈性與迷惘</button>
+            <button onclick="filterCategory('sin')" class="category-tab" data-cat="sin">罪與試探</button>
+        </div>
+
+        <!-- Main Content -->
+        <main id="app-content" class="min-h-[400px]">
+            <!-- JavaScript Rendered Content -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-24 text-center animate-fade-in opacity-0" style="animation-delay: 0.5s;">
+            <div class="w-8 h-8 mx-auto mb-4 border border-gold/40 rotate-45 flex items-center justify-center">
+                <div class="w-6 h-6 border border-gold/20 bg-paper"></div>
+            </div>
+            <p class="text-ink/40 text-xs tracking-[0.2em] font-light uppercase">
+                Est. <span id="year"></span> · Soli Deo Gloria
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 關閉使用指南 Modal
+        function closeIntro() {
+            const modal = document.getElementById('intro-modal');
+            modal.style.opacity = '0'; // 淡出效果
+            setTimeout(() => {
+                modal.style.display = 'none'; // 移除元素
+            }, 700); // 配合 CSS duration-700
+        }
+
+        // 開啟使用指南 Modal (新增)
+        function openIntro() {
+            const modal = document.getElementById('intro-modal');
+            modal.style.display = 'flex';
+            // Force reflow to enable transition
+            void modal.offsetWidth; 
+            modal.style.opacity = '1';
+        }
+
+        // 擴充至 24 種情緒並加入 category
+        // Categories: storms (情緒風暴), relations (關係與自我), spiritual (靈性與迷惘), sin (罪與試探)
+        // 經文更新：使用 CUNP-神版 (和合本 神版)
+        const emotions = [
+            // --- 情緒風暴 (Storms) ---
+            {
+                id: 'anxiety',
+                category: 'storms',
+                title: '焦慮不安',
+                enTitle: 'Anxiety',
+                subtitle: '擔憂未來 · 無法掌控',
+                iconName: 'cloud-lightning',
+                theme: { accent: 'text-slate-700', bg: 'bg-slate-100', border: 'border-slate-200', verseColor: 'text-slate-800' },
+                verse: '應當一無掛慮，只要凡事藉著禱告、祈求，和感謝，將你們所要的告訴　神。神所賜、出人意外的平安必在基督耶穌裏保守你們的心懷意念。',
+                ref: '腓立比書 4:6-7',
+                insight: '焦慮往往來自於我們試圖扮演上帝的角色。聖經的解方不是「忽視問題」，而是「轉移重擔」。當你開始感謝，焦慮就會停止。',
+                prayer: '親愛的天父，我承認我很害怕未知的將來。現在，我選擇把這份沉重的擔子交給祢。求祢用祢出人意外的平安，代替我心中的混亂。'
+            },
+            {
+                id: 'anger',
+                category: 'storms',
+                title: '憤怒生氣',
+                enTitle: 'Anger',
+                subtitle: '遭受不公 · 情緒失控',
+                iconName: 'flame',
+                theme: { accent: 'text-red-900', bg: 'bg-red-50', border: 'border-red-100', verseColor: 'text-red-950' },
+                verse: '生氣卻不要犯罪；不可含怒到日落，也不可給魔鬼留地步。',
+                ref: '以弗所書 4:26-27',
+                insight: '情緒本身沒有對錯，耶穌也曾生氣。但關鍵在於如何處理。憤怒若不處理，會變成毒根。神教導我們要在當天處理情緒，不讓苦毒在心中過夜。',
+                prayer: '主啊，我承認我現在很生氣，我覺得受傷。求祢勒住我的舌頭，不說傷人的話。我願意把審判的權利交給祢，求祢撫平我不平的心。'
+            },
+            {
+                id: 'fear',
+                category: 'storms',
+                title: '恐懼害怕',
+                enTitle: 'Fear',
+                subtitle: '缺乏安全 · 畏懼失敗',
+                iconName: 'shield-alert',
+                theme: { accent: 'text-rose-950', bg: 'bg-[#FDF2F4]', border: 'border-[#F0D5D9]', verseColor: 'text-rose-950' },
+                verse: '因為　神賜給我們，不是膽怯的心，乃是剛強、仁愛、謹守的心。',
+                ref: '提摩太後書 1:7',
+                insight: '恐懼是信心的敵人。當眼光定睛在困難，恐懼就變大；當眼光定睛在神，神就變大。神已經賜給你足夠的能力去面對挑戰。',
+                prayer: '全能的神，我拒絕膽怯的靈。我宣告祢與我同在，我就不至缺乏。求祢賜我剛強的心，讓我看見祢比我的問題更大。'
+            },
+            {
+                id: 'grief',
+                category: 'storms',
+                title: '悲傷痛苦',
+                enTitle: 'Grief',
+                subtitle: '失去摯愛 · 心碎',
+                iconName: 'cloud-rain',
+                theme: { accent: 'text-cyan-900', bg: 'bg-cyan-50/50', border: 'border-cyan-100', verseColor: 'text-cyan-950' },
+                verse: '耶和華靠近傷心的人，拯救靈性痛悔的人。',
+                ref: '詩篇 34:18',
+                insight: '悲傷不是軟弱的表現，耶穌也曾哭泣。神沒有要你快點好起來，而是要陪你走過幽谷。眼淚是靈魂的洗滌，讓神接住你的每一滴眼淚。',
+                prayer: '主啊，我的心好痛。謝謝祢沒有離棄傷心的人。求祢抱著我，讓我在祢懷裡哭泣。我知道祢在乎我的眼淚，求祢親自安慰我。'
+            },
+            {
+                id: 'disappointment',
+                category: 'storms',
+                title: '失望落空',
+                enTitle: 'Disappointment',
+                subtitle: '期待落空 · 灰心',
+                iconName: 'cloud-drizzle',
+                theme: { accent: 'text-neutral-700', bg: 'bg-neutral-100', border: 'border-neutral-200', verseColor: 'text-neutral-800' },
+                verse: '盼望不至於羞恥，因為所賜給我們的聖靈將　神的愛澆灌在我們心裏。',
+                ref: '羅馬書 5:5',
+                insight: '對人的期待會落空，但對神的盼望永不落空。失望是一個邀請，讓你將眼光從「結果」轉向「神的美意」。神正透過這件事，編織更美的故事。',
+                prayer: '主啊，我很失望，事情不如我預期。但我選擇相信祢的意念高過我的意念。求祢醫治我受傷的期待，讓我重新在祢裡面找到盼望。'
+            },
+            {
+                id: 'despair',
+                category: 'storms',
+                title: '絕望無助',
+                enTitle: 'Despair',
+                subtitle: '走投無路 · 看不見光',
+                iconName: 'anchor',
+                theme: { accent: 'text-slate-800', bg: 'bg-slate-200', border: 'border-slate-300', verseColor: 'text-slate-900' },
+                verse: '我的心哪，你為何憂悶？為何在我裏面煩躁？應當仰望　神，因他笑臉幫助我，我還要稱讚他。',
+                ref: '詩篇 42:5',
+                insight: '絕望告訴你「一切都完了」，但神說「我還沒結束」。在最深的坑中，神的手臂依然夠長能拯救你。請再給神一次機會。',
+                prayer: '主啊，我眼前一片漆黑，我看不到出路。但我選擇抬頭仰望祢。求祢在我心中點燃一盞盼望的燈，救我脫離這死蔭的幽谷。'
+            },
+            {
+                id: 'stress',
+                category: 'storms',
+                title: '壓力山大',
+                enTitle: 'Stress',
+                subtitle: '重擔壓身 · 喘不過氣',
+                iconName: 'activity',
+                theme: { accent: 'text-teal-900', bg: 'bg-teal-50', border: 'border-teal-200', verseColor: 'text-teal-950' },
+                verse: '你要把你的重擔卸給耶和華，他必撫養你。',
+                ref: '詩篇 55:22',
+                insight: '壓力常來自於我們承擔了不屬於我們的責任（如結果、他人的反應）。你只負責順服，神負責成全。把「結果」的包袱還給神吧。',
+                prayer: '主啊，這壓力大到讓我窒息。我現在把這個重擔卸給祢。我盡力而為，剩下的交給祢。求祢賜我肩膀，或挪去重擔。'
+            },
+
+            // --- 關係與自我 (Relations) ---
+            {
+                id: 'loneliness',
+                category: 'relations',
+                title: '孤單寂寞',
+                enTitle: 'Loneliness',
+                subtitle: '無人理解 · 獨自一人',
+                iconName: 'moon',
+                theme: { accent: 'text-indigo-900', bg: 'bg-indigo-50/50', border: 'border-indigo-100', verseColor: 'text-indigo-950' },
+                verse: '我父母離棄我，耶和華必收留我。...我就常與你們同在，直到世界的末了。',
+                ref: '詩篇 27:10 / 馬太福音 28:20',
+                insight: '即使在人群中，我們仍可能感到孤單。這是因為我們的心中有一個只有神能填滿的空缺。人的陪伴有限，但神的同在是永恆且隨時的。',
+                prayer: '愛我的天父，雖然周圍沒有人了解我，但我知道祢看見我。謝謝祢成為我最好的朋友。求祢的愛充滿我，讓我不覺得孤單。'
+            },
+            {
+                id: 'betrayal',
+                category: 'relations',
+                title: '被背叛',
+                enTitle: 'Betrayal',
+                subtitle: '信任破滅 · 內心受傷',
+                iconName: 'heart-crack',
+                theme: { accent: 'text-red-950', bg: 'bg-red-50', border: 'border-red-200', verseColor: 'text-red-900' },
+                verse: '連我知己的朋友，我所倚靠、吃過我飯的也用腳踢我。...但你─耶和華是我四圍的盾牌。',
+                ref: '詩篇 41:9 / 詩篇 3:3',
+                insight: '被信任的人傷害最痛。耶穌也被猶大出賣，祂懂你的痛。將審判的主權交給神，不要讓別人的惡，毒害了你的心。',
+                prayer: '主耶穌，祢懂被背叛的滋味。我把受傷的心交給祢，求祢醫治。我選擇原諒，求祢幫助我釋放這個苦毒，不讓恨捆綁我。'
+            },
+            {
+                id: 'jealousy',
+                category: 'relations',
+                title: '嫉妒比較',
+                enTitle: 'Jealousy',
+                subtitle: '與人比較 · 心生不平',
+                iconName: 'eye',
+                theme: { accent: 'text-lime-900', bg: 'bg-lime-50/50', border: 'border-lime-100', verseColor: 'text-lime-950' },
+                verse: '心中安靜是肉體的生命；嫉妒是骨中的朽爛。',
+                ref: '箴言 14:30',
+                insight: '嫉妒源於忘記了神給你的那份獨特。當你看著別人的草地比較綠時，你忘記了澆灌自己的園子。神給你的劇本是最好的，不需要羨慕別人。',
+                prayer: '主啊，我承認我嫉妒別人。求祢赦免我的比較心。求祢開啟我的眼睛，看見祢給我的祝福是何等豐盛。我為擁有的一切獻上感謝。'
+            },
+            {
+                id: 'insecurity',
+                category: 'relations',
+                title: '自卑渺小',
+                enTitle: 'Insecurity',
+                subtitle: '自我否定 · 覺得不夠好',
+                iconName: 'fingerprint',
+                theme: { accent: 'text-pink-900', bg: 'bg-pink-50', border: 'border-pink-100', verseColor: 'text-pink-950' },
+                verse: '我要稱謝你，因我受造，奇妙可畏。',
+                ref: '詩篇 139:14',
+                insight: '你的價值不是建立在成就或別人的評價上，而是建立在「你是神的孩子」這個事實上。你是萬王之王的傑作，不需要向世界證明什麼。',
+                prayer: '創造我的主，謝謝祢看我為寶貴。當我覺得自己不夠好時，求祢提醒我，我是祢重價買贖回來的。我要用祢的眼光來看自己。'
+            },
+            {
+                id: 'shame',
+                category: 'relations',
+                title: '羞恥',
+                enTitle: 'Shame',
+                subtitle: '抬不起頭 · 想要躲藏',
+                iconName: 'eye-off',
+                theme: { accent: 'text-zinc-700', bg: 'bg-zinc-100', border: 'border-zinc-200', verseColor: 'text-zinc-800' },
+                verse: '他因那擺在前面的喜樂，就輕看羞辱，忍受了十字架的苦難。',
+                ref: '希伯來書 12:2',
+                insight: '羞恥感叫我們躲藏，但愛叫我們被看見。耶穌在十字架上擔當了你所有的羞恥。你不需要再遮掩，在光中，你是潔白的。',
+                prayer: '愛我的主，我因為過去的事感到羞恥，不敢見祢。但謝謝祢沒有定我的罪。求祢挪去我的羞辱，給我穿上公義的袍子。'
+            },
+            {
+                id: 'injustice',
+                category: 'relations',
+                title: '委屈受冤',
+                enTitle: 'Injustice',
+                subtitle: '被誤解 · 含冤莫白',
+                iconName: 'scale',
+                theme: { accent: 'text-stone-800', bg: 'bg-stone-200', border: 'border-stone-300', verseColor: 'text-stone-900' },
+                verse: '耶和華施行公義，為一切受屈的人伸冤。',
+                ref: '詩篇 103:6',
+                insight: '被誤解是痛苦的，但你不需要急著為自己辯解。神是最終的審判官，祂知道真相。在神的法庭上，你已經被證明是清白的。',
+                prayer: '公義的主，我心裡好委屈，沒人相信我。但我知道祢看見一切。求祢為我伸冤，也保守我的心不生怨恨，安靜等候祢的時間。'
+            },
+
+            // --- 靈性與迷惘 (Spiritual) ---
+            {
+                id: 'exhaustion',
+                category: 'spiritual',
+                title: '疲憊不堪',
+                enTitle: 'Exhaustion',
+                subtitle: '身心俱疲 · 失去動力',
+                iconName: 'battery-low',
+                theme: { accent: 'text-stone-600', bg: 'bg-[#EDE8E4]', border: 'border-[#D6CCC2]', verseColor: 'text-stone-700' },
+                verse: '凡勞苦擔重擔的人可以到我這裏來，我就使你們得安息。',
+                ref: '馬太福音 11:28',
+                insight: '現代社會推崇「忙碌」，但神看重「安息」。你不需要靠自己的努力去證明價值。真正的休息不只是睡覺，而是回到創造你的主面前，重新對焦。',
+                prayer: '主耶穌，我累了。謝謝祢邀請我來到祢面前。我現在放下所有的行事曆和責任，單單在祢裡面休息。求祢重新充滿我的電量。'
+            },
+            {
+                id: 'confusion',
+                category: 'spiritual',
+                title: '迷惘困惑',
+                enTitle: 'Confusion',
+                subtitle: '失去方向 · 不知所措',
+                iconName: 'compass',
+                theme: { accent: 'text-emerald-900', bg: 'bg-[#F0F5F2]', border: 'border-[#D1E0D9]', verseColor: 'text-emerald-950' },
+                verse: '你的話是我腳前的燈，是我路上的光。',
+                ref: '詩篇 119:105',
+                insight: '我們常想看清整個人生地圖，但神通常一次只照亮一步。迷惘時，不需要急著做大決定，只需要順服神今天給你的感動，走好這一步就好。',
+                prayer: '主啊，我看不清前面的路，但我願意信靠祢。求祢光照我，指示我今天該如何行。我不求看見終點，只求祢牽著我的手，一步一步帶領我。'
+            },
+            {
+                id: 'doubt',
+                category: 'spiritual',
+                title: '懷疑動搖',
+                enTitle: 'Doubt',
+                subtitle: '信心不足 · 充滿問號',
+                iconName: 'help-circle',
+                theme: { accent: 'text-violet-800', bg: 'bg-violet-50', border: 'border-violet-100', verseColor: 'text-violet-900' },
+                verse: '我信！但我信不足，求主幫助。',
+                ref: '馬可福音 9:24',
+                insight: '懷疑不是信心的相反，而是信心成長的過程。神不怕你的問題，祂歡迎你帶著疑問來找祂。不要因為懷疑而遠離，要在懷疑中尋求真理。',
+                prayer: '主啊，我有好多疑問，我的信心好小。求祢不要看我的軟弱，求祢親自向我顯現，堅固我的信心。即使在迷霧中，我也要抓住祢。'
+            },
+            {
+                id: 'empty',
+                category: 'spiritual',
+                title: '空虛乾涸',
+                enTitle: 'Emptiness',
+                subtitle: '靈裡枯乾 · 填不滿',
+                iconName: 'droplets',
+                theme: { accent: 'text-sky-800', bg: 'bg-sky-50', border: 'border-sky-200', verseColor: 'text-sky-900' },
+                verse: '人若喝我所賜的水就永遠不渴。我所賜的水要在他裏頭成為泉源，直湧到永生。',
+                ref: '約翰福音 4:14',
+                insight: '我們常試圖用娛樂、工作或愛情來填補內心的洞，但那個洞是無限的，只有無限的神能填滿。回到活水的源頭，你的靈魂才能解渴。',
+                prayer: '主啊，我裡面好空，做什麼都沒勁。我承認我一直在喝這世界的水，卻還要再渴。求祢用聖靈充滿我，滋潤我乾涸的心。'
+            },
+
+            // --- 罪與試探 (Sin) ---
+            {
+                id: 'guilt',
+                category: 'sin',
+                title: '愧疚自責',
+                enTitle: 'Guilt',
+                subtitle: '良心不安 · 懊悔',
+                iconName: 'alert-circle',
+                theme: { accent: 'text-orange-900', bg: 'bg-orange-50', border: 'border-orange-100', verseColor: 'text-orange-950' },
+                verse: '如今，那些在基督耶穌裏的就不定罪了。',
+                ref: '羅馬書 8:1',
+                insight: '愧疚感若讓人悔改是好的，但若讓人陷入自我定罪則是撒旦的謊言。神已經赦免了你，你為什麼不饒恕自己呢？接受恩典，重新開始。',
+                prayer: '天父，我做錯了，求祢赦免我。我接受耶穌的寶血已經洗淨我的罪。我拒絕撒旦的控告，我要在祢的恩典中，抬起頭來。'
+            },
+            {
+                id: 'bitterness',
+                category: 'sin',
+                title: '苦毒怨恨',
+                enTitle: 'Bitterness',
+                subtitle: '無法饒恕 · 內心酸楚',
+                iconName: 'leaf',
+                theme: { accent: 'text-yellow-800', bg: 'bg-yellow-50', border: 'border-yellow-100', verseColor: 'text-yellow-900' },
+                verse: '又要謹慎，恐怕有人失了　神的恩；恐怕有毒根生出來擾亂你們。',
+                ref: '希伯來書 12:15',
+                insight: '苦毒是喝毒藥卻希望別人死。饒恕不是因為對方配得，而是為了釋放你自己。將那份虧欠交給神算帳，讓你的心重獲自由。',
+                prayer: '主啊，我心裡好苦，我放不下。求祢拔除我心中的毒根。我願意順服祢去饒恕，求祢的愛進來，充滿那些受傷的角落。'
+            },
+            {
+                id: 'impatience',
+                category: 'sin',
+                title: '急躁',
+                enTitle: 'Impatience',
+                subtitle: '難以等候 · 想要速成',
+                iconName: 'hourglass',
+                theme: { accent: 'text-amber-800', bg: 'bg-amber-50', border: 'border-amber-100', verseColor: 'text-amber-900' },
+                verse: '但那等候耶和華的必從新得力。',
+                ref: '以賽亞書 40:31',
+                insight: '神的時間表從不誤點，只是常跟我們的不一樣。急躁會讓我們吃未熟的果子。等候不是空轉，而是讓信心在安靜中發酵。',
+                prayer: '永恆的主，我承認我好急，我想掌控時間。求祢賜我耐心，讓我知道祢正在動工。幫助我在等候中，學習安息與信靠。'
+            },
+            {
+                id: 'pride',
+                category: 'sin',
+                title: '驕傲自大',
+                enTitle: 'Pride',
+                subtitle: '自以為是 · 輕看他人',
+                iconName: 'crown',
+                theme: { accent: 'text-purple-900', bg: 'bg-purple-50', border: 'border-purple-200', verseColor: 'text-purple-950' },
+                verse: '　神阻擋驕傲的人，賜恩給謙卑的人。',
+                ref: '雅各書 4:6',
+                insight: '驕傲是一堵牆，阻擋了神的恩典。謙卑不是看輕自己，而是少想到自己，多想到神。當你放下身段，神的恩典就流進來了。',
+                prayer: '主啊，赦免我的狂妄。求祢打碎我的驕傲，讓我看見自己若沒有祢，什麼都不能做。賜我一顆柔和謙卑的心，像耶穌一樣。'
+            },
+            {
+                id: 'lust',
+                category: 'sin',
+                title: '情慾誘惑',
+                enTitle: 'Lust',
+                subtitle: '無法自拔 · 陷入試探',
+                iconName: 'flame-kindling',
+                theme: { accent: 'text-rose-800', bg: 'bg-rose-50', border: 'border-rose-200', verseColor: 'text-rose-900' },
+                verse: '你要逃避少年的私慾，同那清心禱告主的人追求公義、信德、仁愛、和平。',
+                ref: '提摩太後書 2:22',
+                insight: '情慾承諾給你滿足，卻只留下空虛。面對情慾的試探，聖經的策略不是「對抗」，而是「逃避」。轉身跑向愛你的天父，祂才是真正的滿足。',
+                prayer: '聖潔的主，求祢潔淨我的心和眼目。當試探來臨時，賜我力量轉身逃跑。求祢用祢的愛填滿我，讓我不再向世界乞討快樂。'
+            },
+            {
+                id: 'greed',
+                category: 'sin',
+                title: '貪婪不知足',
+                enTitle: 'Greed',
+                subtitle: '想要更多 · 物質主義',
+                iconName: 'coins',
+                theme: { accent: 'text-green-800', bg: 'bg-green-50', border: 'border-green-200', verseColor: 'text-green-900' },
+                verse: '你們要謹慎自守，免去一切的貪心，因為人的生命不在乎家道豐富。',
+                ref: '路加福音 12:15',
+                insight: '貪婪是相信「擁有更多」就會幸福。但這是一個無底洞。真正的富足不是擁有多少，而是對神所賜的感到知足與感恩。',
+                prayer: '主啊，救我脫離金錢的迷惑。教導我數算恩典，而不是數算財富。幫助我知足常樂，並樂意給予，積攢財寶在天上。'
+            },
+            {
+                id: 'laziness',
+                category: 'sin',
+                title: '懶惰拖延',
+                enTitle: 'Laziness',
+                subtitle: '缺乏紀律 · 逃避責任',
+                iconName: 'sofa',
+                theme: { accent: 'text-gray-700', bg: 'bg-gray-100', border: 'border-gray-300', verseColor: 'text-gray-800' },
+                verse: '殷勤不可懶惰；要心裏火熱，常常服事主。',
+                ref: '羅馬書 12:11',
+                insight: '拖延往往是因為恐懼或缺乏目標。神呼召我們做時間的好管家。工作是敬拜的一種形式，當你為神而做，就有動力與尊嚴。',
+                prayer: '主啊，喚醒我的靈魂！除去我的懶散與藉口。求祢賜我熱情與紀律，讓我在每天的小事上忠心，活出榮耀祢的生命。'
+            }
+        ];
+
+        let selectedEmotionId = null;
+        let currentCategory = 'all';
+        let lastScrollY = 0; // 儲存滾動位置的變數
+
+        function init() {
+            renderView();
+        }
+
+        // 篩選功能
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // 更新按鈕狀態
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                if(btn.dataset.cat === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // 回到列表頁並重新渲染
+            selectedEmotionId = null;
+            renderView();
+        }
+
+        function renderView() {
+            const container = document.getElementById('app-content');
+            
+            if (!selectedEmotionId) {
+                // 根據類別篩選
+                const filteredEmotions = currentCategory === 'all' 
+                    ? emotions 
+                    : emotions.filter(e => e.category === currentCategory);
+
+                // Grid View
+                let html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pb-12 animate-slide-up">
+                    ${filteredEmotions.map(emotion => `
+                        <button
+                            onclick="selectEmotion('${emotion.id}')"
+                            class="group relative p-8 bg-paper-light border border-[#E5E0D8]
+                            transition-all duration-500 text-center w-full 
+                            hover:border-gold/60 hover:shadow-[0_4px_20px_-4px_rgba(168,139,96,0.15)]"
+                        >
+                            <!-- 內框線裝飾 -->
+                            <div class="absolute inset-2 border border-[#E5E0D8] opacity-50 pointer-events-none group-hover:border-gold/20 transition-colors duration-500"></div>
+
+                            <div class="flex flex-col items-center justify-center h-full relative z-10 py-2">
+                                <div class="mb-6 p-3 rounded-full bg-paper border border-gold/20 text-ink/70 group-hover:text-gold group-hover:border-gold transition-all duration-500">
+                                    <i data-lucide="${emotion.iconName}" class="w-6 h-6" stroke-width="1.5"></i>
+                                </div>
+                                
+                                <h3 class="text-2xl font-serif text-ink mb-2 group-hover:text-gold transition-colors duration-300">
+                                    ${emotion.title}
+                                </h3>
+                                <p class="text-[10px] font-display font-bold tracking-[0.2em] text-gold uppercase mb-4 opacity-80">
+                                    ${emotion.enTitle}
+                                </p>
+                                <div class="w-8 h-[1px] bg-ink/10 mb-4 group-hover:w-16 group-hover:bg-gold/40 transition-all duration-500"></div>
+                                <p class="text-sm text-ink/60 font-serif italic">
+                                    ${emotion.subtitle}
+                                </p>
+                            </div>
+                        </button>
+                    `).join('')}
+                </div>`;
+                
+                // 如果沒有結果
+                if (filteredEmotions.length === 0) {
+                    html = `<div class="text-center py-20 text-ink/40 italic">此分類暫無內容</div>`;
+                }
+                
+                container.innerHTML = html;
+                
+                // 顯示分類過濾器
+                document.getElementById('category-filters').style.display = 'flex';
+                
+            } else {
+                // Detail View: 書頁風格
+                const emotion = emotions.find(e => e.id === selectedEmotionId);
+
+                let html = `
+                <div class="max-w-3xl mx-auto animate-fade-in relative">
+                    <!-- 優化後的返回按鈕 -->
+                    <button 
+                        onclick="goBack()"
+                        class="mb-10 mx-auto flex items-center justify-center gap-3 px-8 py-3 bg-paper-light border border-gold/40 rounded-full shadow-sm text-gold hover:bg-gold hover:text-white hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        aria-label="返回列表"
+                    >
+                        <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+                        <span class="text-sm font-serif tracking-widest font-medium">返回列表</span>
+                    </button>
+
+                    <div class="bg-paper-light relative p-8 md:p-16 shadow-[0_10px_40px_-10px_rgba(44,40,37,0.05)] border border-[#E5E0D8]">
+                        
+                        <!-- 書頁邊角裝飾 -->
+                        <div class="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-gold/20 m-4"></div>
+                        <div class="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-gold/20 m-4"></div>
+                        <div class="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-gold/20 m-4"></div>
+                        <div class="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-gold/20 m-4"></div>
+
+                        <!-- 內容標題 -->
+                        <div class="text-center mb-12">
+                            <div class="inline-flex items-center justify-center p-3 mb-6 rounded-full border border-gold/30 text-gold bg-paper">
+                                <i data-lucide="${emotion.iconName}" class="w-8 h-8" stroke-width="1.2"></i>
+                            </div>
+                            <h2 class="text-3xl md:text-4xl font-serif text-ink mb-2">
+                                ${emotion.title}
+                            </h2>
+                            <p class="text-xs font-display tracking-[0.3em] text-gold uppercase">
+                                ${emotion.enTitle}
+                            </p>
+                        </div>
+
+                        <div class="space-y-12 relative z-10 px-2 md:px-8">
+                            
+                            <!-- 經文 (Verse) -->
+                            <div class="text-center">
+                                <blockquote class="font-serif text-xl md:text-2xl leading-loose italic text-ink/90 relative inline-block">
+                                    <span class="text-4xl text-gold/30 absolute -top-4 -left-6 font-display">"</span>
+                                    ${emotion.verse}
+                                    <span class="text-4xl text-gold/30 absolute -bottom-8 -right-6 font-display">"</span>
+                                </blockquote>
+                                <div class="mt-8 flex items-center justify-center gap-3 opacity-60">
+                                    <span class="h-[1px] w-8 bg-ink/30"></span>
+                                    <p class="text-xs font-bold tracking-widest uppercase text-ink">${emotion.ref}</p>
+                                    <span class="h-[1px] w-8 bg-ink/30"></span>
+                                </div>
+                            </div>
+
+                            <!-- 分隔線 -->
+                            <div class="separator-line opacity-30">
+                                <i data-lucide="diamond" class="w-3 h-3 text-gold fill-current"></i>
+                            </div>
+
+                            <!-- 靈修筆記 (Insight) -->
+                            <div class="text-justify leading-9 text-ink/80 font-serif md:text-lg px-2 md:px-4">
+                                <span class="float-left text-4xl font-display text-gold mr-3 mt-[-6px] leading-none">
+                                    ${emotion.insight.charAt(0)}
+                                </span>
+                                ${emotion.insight.slice(1)}
+                            </div>
+
+                            <!-- 禱告 (Prayer) -->
+                            <div class="bg-paper border border-gold/20 p-8 mt-8 text-center relative mx-2 md:mx-0">
+                                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-paper px-4 text-gold text-xs tracking-widest uppercase">
+                                    Prayer
+                                </div>
+                                <p class="text-ink/70 leading-8 italic font-light">
+                                    「${emotion.prayer}」
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML = html;
+                
+                // 隱藏分類過濾器以保持版面乾淨
+                document.getElementById('category-filters').style.display = 'none';
+            }
+
+            lucide.createIcons();
+            // 注意：這裡移除了全局的 window.scrollTo(0, 0)，改由各個函數自己控制
+        }
+
+        function selectEmotion(id) {
+            // 1. 記錄當前位置
+            lastScrollY = window.scrollY;
+            
+            selectedEmotionId = id;
+            renderView();
+            
+            // 2. 智慧滾動到內容頂端（保留 Header 不被完全切掉，留一點 buffer）
+            const contentDiv = document.getElementById('app-content');
+            // 計算相對於視窗的絕對位置
+            const headerOffset = 80; // 留給頂部的緩衝空間
+            const elementPosition = contentDiv.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            // 只有當使用者已經滑得比內容起點還深時，才需要往回滾動
+            if (window.scrollY > offsetPosition) {
+                 window.scrollTo({
+                     top: offsetPosition,
+                     behavior: "smooth"
+                 });
+            }
+        }
+
+        function goBack() {
+            selectedEmotionId = null;
+            renderView();
+            
+            // 3. 恢復到之前的滾動位置，使用 auto (瞬間) 讓體驗更連貫
+            window.scrollTo({
+                top: lastScrollY,
+                behavior: "auto"
+            });
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
