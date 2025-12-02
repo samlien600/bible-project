@@ -9,7 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -42,7 +48,6 @@
             }
         }
     </script>
-
     <style>
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -314,13 +319,13 @@
 
             if (tab === 'god') {
                 currentData = godData;
-                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-gold-500 rounded-full inline-block"></span> 父神稱號`;
+                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-gold-500 rounded-full inline-block"></span> 父神尊貴稱號`;
             } else if (tab === 'jesus') {
                 currentData = jesusData;
-                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-red-500 rounded-full inline-block"></span> 耶穌稱號`;
+                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-red-500 rounded-full inline-block"></span> 耶穌尊貴稱號`;
             } else {
                 currentData = spiritData;
-                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-sky-500 rounded-full inline-block"></span> 聖靈稱號`;
+                document.getElementById('listTitle').innerHTML = `<span class="w-2 h-8 bg-sky-500 rounded-full inline-block"></span> 聖靈尊貴稱號`;
             }
             
             document.getElementById('deskSearchInput').value = '';
