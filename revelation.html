@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>啟示錄全景導覽：從創始成終 (Ch 1-22)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* 全域設定 */
+        :root {
+            --bg-dark: #0f0c08;
+            --text-gold: #d4af37;
+            --text-gold-bright: #ffd700;
+            --parchment: #f4e4bc;
+            --parchment-dark: #d8c8a0;
+            --seal-red: #8b0000;
+            --accent-purple: #4a0e4e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Noto Serif TC', serif;
+            color: #ccc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* 背景紋理效果 */
+        .bg-stars {
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            animation: bgMove 120s linear infinite;
+        }
+
+        @keyframes bgMove {
+            from { background-position: 0 0, 40px 60px, 130px 270px; }
+            to { background-position: 550px 550px, 390px 410px, 680px 820px; }
+        }
+
+        /* 文字特效 */
+        .title-glow {
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 區域標題 */
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .section-header::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: var(--text-gold);
+            margin: 1rem auto;
+            border-radius: 2px;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--text-gold);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        /* --- 銜接說明區塊 (New) --- */
+        .transition-box {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3.5rem 2rem 2.5rem 2rem;
+            text-align: center;
+            border-left: 2px solid var(--text-gold);
+            border-right: 2px solid var(--text-gold);
+            background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(212, 175, 55, 0.05), rgba(0,0,0,0));
+            position: relative;
+            margin-bottom: 2rem;
+            margin-top: 2rem;
+        }
+        .transition-box::before {
+            content: '❝';
+            font-size: 3rem;
+            line-height: 1;
+            color: var(--text-gold);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-dark);
+            padding: 0 15px;
+        }
+        .transition-line {
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--text-gold), transparent);
+            margin: 0 auto;
+        }
+
+        /* --- 互動元件：七印書卷 --- */
+        .scroll-container {
+            position: relative;
+            background: linear-gradient(to right, #d8c8a0 0%, #f4e4bc 10%, #f4e4bc 90%, #d8c8a0 100%);
+            border-top: 20px solid #5d4037;
+            border-bottom: 20px solid #5d4037;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            border-radius: 4px;
+            padding: 40px;
+            color: #3e2723;
+            min-height: 500px;
+        }
+        .scroll-container::before, .scroll-container::after {
+            content: ''; position: absolute; top: -25px; width: 106%; height: 30px; left: -3%;
+            background: linear-gradient(to right, #3e2723, #5d4037, #3e2723);
+            border-radius: 15px; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+        }
+        .scroll-container::after { top: auto; bottom: -25px; }
+
+        /* 蠟封樣式 */
+        .wax-seal-btn {
+            width: 50px; height: 50px;
+            background: radial-gradient(circle at 30% 30%, #b22222, #8b0000);
+            border-radius: 50%;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.4);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px dashed rgba(255,255,255,0.2);
+            color: rgba(60,10,10,0.6);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .wax-seal-btn:hover { transform: scale(1.1); }
+        .seal-broken { animation: breakSeal 0.5s forwards; pointer-events: none; }
+        @keyframes breakSeal {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); opacity: 0; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* 內容顯示區 */
+        .revelation-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .revelation-row:hover { opacity: 1; }
+        .hidden-content {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s;
+            pointer-events: none;
+        }
+        .hidden-content.visible {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* --- 互動元件：教會書信 (Tabs) --- */
+        .church-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .church-tab {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--text-gold);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .church-tab:hover, .church-tab.active {
+            background: var(--text-gold);
+            color: #000;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+        .church-content-box {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--text-gold);
+            padding: 30px;
+            border-radius: 8px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- 互動元件：號與碗卡片 --- */
+        .judgment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 稍微加寬卡片 */
+            gap: 20px;
+        }
+        .judgment-card {
+            background: rgba(20, 20, 25, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 180px; /* 統一高度 */
+        }
+        .judgment-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--text-gold);
+            background: rgba(30, 30, 40, 0.9);
+        }
+        .interlude-card {
+            border: 1px dashed var(--text-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        /* --- 靈界爭戰 (Ch 12-14) --- */
+        .conflict-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .conflict-char {
+            width: 250px;
+            background: linear-gradient(145deg, #1a1a1a, #0f0c08);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .conflict-char:hover { transform: scale(1.03); border-color: #d4af37; }
+        
+        /* --- 模態框 (Modal) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            display: none; opacity: 0;
+            justify-content: center; align-items: center;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-paper {
+            background: #f4e4bc;
+            color: #3e2723;
+            width: 90%; max-width: 800px; /* 加寬閱讀區域 */
+            max-height: 85vh;
+            padding: 40px;
+            border-radius: 4px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+            border: 1px solid #8b4513;
+        }
+        /* 捲軸裝飾 */
+        .modal-paper::-webkit-scrollbar { width: 8px; }
+        .modal-paper::-webkit-scrollbar-thumb { background: #8b4513; border-radius: 4px; }
+        .modal-paper::-webkit-scrollbar-track { background: #d8c8a0; }
+
+        .modal-close {
+            position: absolute; top: 15px; right: 20px;
+            font-size: 2rem; cursor: pointer; color: #5d4037;
+        }
+        .modal-close:hover { color: #8b0000; }
+        
+        .verse-ref {
+            display: inline-block;
+            background: #e6dcc3;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            margin-top: 20px;
+            font-weight: bold;
+            border: 1px solid #c2b280;
+            color: #5d4037;
+        }
+
+        /* 導覽列 */
+        .nav-link {
+            position: relative;
+            padding-bottom: 5px;
+        }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px;
+            background: var(--text-gold); transition: width 0.3s;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+    </style>
+</head>
+<body class="bg-stars">
+
+    <!-- 頂部導航 -->
+    <nav class="fixed w-full z-50 bg-black/90 backdrop-blur border-b border-yellow-900/30">
+        <div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+            <div class="text-xl font-bold text-gradient tracking-widest">
+                <i class="fas fa-book-bible mr-2"></i> REVELATION
+            </div>
+            <div class="flex space-x-4 md:space-x-6 text-xs md:text-sm text-gray-400 overflow-x-auto pb-1 md:pb-0">
+                <a href="#churches" class="nav-link hover:text-white whitespace-nowrap">Ch 2-3</a>
+                <a href="#worthy" class="nav-link hover:text-white whitespace-nowrap">Ch 4-5</a>
+                <a href="#seals" class="nav-link hover:text-white whitespace-nowrap">Ch 6-7</a>
+                <a href="#trumpets" class="nav-link hover:text-white whitespace-nowrap">Ch 8-11</a>
+                <a href="#conflict" class="nav-link hover:text-white whitespace-nowrap">Ch 12-14</a>
+                <a href="#bowls" class="nav-link hover:text-white whitespace-nowrap">Ch 15-16</a>
+                <a href="#return" class="nav-link hover:text-white whitespace-nowrap">Ch 17-19</a>
+                <a href="#millennium" class="nav-link hover:text-white whitespace-nowrap">Ch 20-22</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header: 基督的異象 (Ch 1) -->
+    <header class="min-h-screen flex items-center justify-center relative px-4 pt-16">
+        <div class="text-center z-10 max-w-4xl">
+            <div class="chapter-badge">Chapter 1</div>
+            <h1 class="text-5xl md:text-7xl font-bold text-gradient mb-8 title-glow leading-tight">
+                耶穌基督的啟示
+            </h1>
+            <!-- 新增重點經文區塊 (Rev 1:3) -->
+            <div class="mb-10 p-5 border-y-2 border-yellow-600/50 bg-gradient-to-r from-transparent via-yellow-900/20 to-transparent max-w-3xl mx-auto">
+                <i class="fas fa-scroll text-yellow-500 text-2xl mb-3 block"></i>
+                <p class="text-yellow-100 text-xl md:text-2xl font-serif italic leading-relaxed">
+                    「念這書上預言的和那些聽見又遵守其中所記載的，都是有福的，因為日期近了。」
+                </p>
+                <span class="block text-right text-sm text-yellow-500 mt-3 font-bold tracking-widest">— 啟示錄 1:3</span>
+            </div>
+
+            <div class="p-6 border border-yellow-900/50 bg-black/40 rounded-lg max-w-3xl mx-auto backdrop-blur-sm">
+                <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                    使徒約翰因著神的道，被流放到<strong>拔摩海島</strong>。在主日，他被聖靈感動，聽見背後有大聲音如吹號。
+                    他轉過身來，看見<strong>七個金燈臺</strong>，燈臺中間有一位好像<strong>人子</strong>，身穿長衣，直垂到腳，胸間束著金帶。
+                    祂的頭與髮皆白，如白羊毛，如雪；眼目如同火焰；腳好像在爐中鍛鍊光明的銅；聲音如同眾水的聲音。
+                    <br><br>
+                    這書卷不僅是關於末日的災難預言，更是一場關於<strong>榮耀基督最終得勝</strong>的宏大異象。
+                </p>
+            </div>
+            <div class="mt-12 animate-bounce">
+                <a href="#churches" class="text-yellow-600 text-2xl"><i class="fas fa-chevron-down"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 第一部分：給七教會的信 (Ch 2-3) -->
+    <section id="churches" class="py-24 bg-gradient-to-b from-black to-[#1a1510]">
+        <div class="container mx-auto px-4 max-w-5xl">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 2-3</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-yellow-500">七個金燈臺：給教會的信</h2>
+                <p class="text-gray-400 mt-2">察看教會的光景，這既是當時亞細亞七個教會的實況，也是對歷代教會的屬靈提醒。</p>
+            </div>
+
+            <div class="church-nav" id="church-tabs">
+                <!-- JS生成 -->
+            </div>
+
+            <div class="church-content-box mt-8 relative overflow-hidden">
+                <div class="absolute top-[-50px] left-[-50px] w-[150px] h-[150px] bg-yellow-500/10 rounded-full blur-3xl"></div>
+                <div id="church-display">
+                    <!-- JS生成內容 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 1 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-yellow-600 mb-2">天上的視角開啟</h4>
+            <p class="text-lg text-gray-300">
+                審視完地上教會的掙扎、妥協與得勝後，<br>
+                約翰看見天上有門開了，聽見聲音說：<strong class="text-yellow-500">「你上到這裡來，我要將以後必成的事指示你。」</strong><br>
+                從此時起，視角瞬間從地上的戰場轉向<strong>天上榮耀的寶座</strong>，<br>
+                這是理解一切災難與審判的基礎：<strong>神坐著為王</strong>。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第二部分：誰配揭開書卷 (Ch 4-5) -->
+    <section id="worthy" class="py-24 text-center bg-fixed bg-cover relative" style="background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');">
+        <div class="container mx-auto px-4 max-w-4xl relative z-10">
+            <span class="chapter-badge">Chapter 4-5</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8 title-glow mt-4">誰配揭開那書卷？</h2>
+            
+            <div class="space-y-8 text-lg text-gray-300 leading-loose">
+                <p>
+                    約翰看見坐寶座的右手中有<strong class="text-yellow-400">書卷</strong>，裡外都寫著字，<br>
+                    用<strong>七印</strong>封嚴了。這代表了神對宇宙歷史最終的奧秘與審判計畫。
+                </p>
+                
+                <div class="bg-white/5 p-8 rounded-lg border border-white/10 my-8 shadow-lg">
+                    <p class="italic text-gray-400 text-xl font-serif">
+                        「在天上、地上、地底下，沒有能展開、能觀看那書卷的。<br>
+                        因為沒有配展開、配觀看那書卷的，我就大哭。」
+                    </p>
+                    <span class="block text-right text-sm mt-4 text-gray-500">- 啟 5:3-4</span>
+                    <p class="text-sm mt-4 text-gray-400 text-left">
+                        (約翰的哭泣代表了全人類的絕望：如果沒有人能執行神的審判與救贖計畫，罪惡將永遠得不到報應，世界將永遠陷在黑暗中。)
+                    </p>
+                </div>
+
+                <div class="animate-pulse mt-8">
+                    <i class="fas fa-crown text-6xl text-yellow-500 mb-6 drop-shadow-md"></i>
+                    <h3 class="text-3xl font-bold text-yellow-500">唯有猶大支派的獅子，大衛的根</h3>
+                    <p class="mt-4 text-white font-bold text-xl">祂已得勝，能以展開那書卷，揭開那七印！</p>
+                </div>
+
+                <p class="text-gray-400">
+                    約翰轉過身來看獅子，卻看見一隻<strong>羔羊</strong>，像是被殺過的。<br>
+                    這啟示了神得勝的奧秘：不是透過武力，而是透過<strong>犧牲的愛與救贖</strong>。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                     <div class="bg-black/40 p-6 border border-yellow-900/50 rounded-lg cursor-pointer hover:bg-black/60 transition group" onclick="showModal('worship', 0)">
+                        <div class="text-yellow-500 text-2xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-chair mr-2"></i> 第四章：創造主的榮耀</div>
+                        <div class="text-sm text-gray-400">碧玉寶座、虹圍繞、二十四位長老與四活物的晝夜敬拜。點擊查看詳情。</div>
+                     </div>
+                     <div class="bg-black/40 p-6 border border-yellow-900/50 rounded-lg cursor-pointer hover:bg-black/60 transition group" onclick="showModal('worship', 1)">
+                        <div class="text-red-500 text-2xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-cross mr-2"></i> 第五章：羔羊的救贖</div>
+                        <div class="text-sm text-gray-400">羔羊拿書卷，全宇宙唱新歌：你配拿書卷！點擊查看詳情。</div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 2 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-amber-500 mb-2">印信的逐步揭開</h4>
+            <p class="text-lg text-gray-300">
+                既然羔羊配得，祂便一一揭開印信。<br>
+                請注意，這七印並非隨機發生的災難，而是神對罪惡世界的<strong>逐步拆毀</strong>，<br>
+                也是對人類歷史進程的一種預示。每揭開一印，地上的和平就減少一分，直到最終的審判來臨。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第三部分：七印 (Ch 6-7) -->
+    <section id="seals" class="py-24 relative">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 6-7</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-600">七印：揭開歷史的苦難</h2>
+                <p class="text-gray-400 mt-2">請點擊下方的紅色蠟封，揭開對應的異象與深層含義。</p>
+            </div>
+
+            <div class="scroll-container flex flex-col items-center">
+                <h3 class="text-2xl font-bold text-amber-900 mb-8 w-full text-center border-b-2 border-amber-800 pb-4">
+                    書卷上的七印
+                </h3>
+                <div class="w-full space-y-6" id="seal-list">
+                    <!-- JS 生成 Seal 1-6 -->
+                </div>
+                
+                <!-- Ch 7 Interlude Button -->
+                <div class="w-full mt-10 p-6 bg-white/30 border-2 border-amber-800/40 rounded-lg text-center cursor-pointer hover:bg-white/50 transition transform hover:scale-[1.02] shadow-md" onclick="showTextModal('插曲：受印的子民 (Ch 7)', '在揭開第七印帶來更可怕的號角災難之前，神插入了一個充滿安慰的異象。天使被吩咐暫時不傷害地、海、樹，直等到在神眾僕人的額上蓋了印（144,000人，象徵神完整的子民）。<br><br>隨後，約翰看見無人能數的大群眾，從各國、各族、各民、各方而來，站在寶座和羔羊面前，身穿白衣，手拿棕樹枝。長老解釋說：這些是從大患難中出來的，曾用羔羊的血把衣裳洗白淨了。<br><br><strong>神學意義：</strong>這顯示在審判的風暴中，神對祂的子民有絕對的保守與憐憫。', '啟示錄 7:3, 9, 14')">
+                    <span class="text-amber-900 font-bold text-lg"><i class="fas fa-user-shield mr-2"></i> 第 7 章重要插曲：神子民受印與白衣群眾</span>
+                    <p class="text-amber-900/70 text-sm mt-2">在最後的風暴前，神親自保守祂的兒女。</p>
+                </div>
+                
+                <div class="w-full mt-8" id="seal-7-container">
+                    <!-- JS 生成 Seal 7 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 3 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-yellow-500 mb-2">從寂靜到號聲的警告</h4>
+            <p class="text-lg text-gray-300">
+                第七印揭開時，發生了令人屏息的事：<strong>天上寂靜約有二刻</strong>。<br>
+                這暴風雨前的寧靜，是為了聆聽聖徒的祈禱。聖徒的祈禱與祭壇的火一同倒在地上，帶出了七位天使的號聲。<br>
+                這顯示出審判的升級：七印主要影響人的四分之一，而<strong>七號的警告將影響三分之一</strong>，<br>
+                這是神在最終毀滅前，給予人類強烈卻仍帶有憐憫的<strong>悔改呼喚</strong>。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第四部分：七號 (Ch 8-11) -->
+    <section id="trumpets" class="py-24 bg-[#111]">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 8-11</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-yellow-500">七號：警告性的審判</h2>
+                <p class="text-gray-400 mt-2">三分之一的自然界與人類受擊打。注意前四號針對自然界，後三號（三禍）針對未受印記的人類。</p>
+            </div>
+            
+            <div class="judgment-grid" id="trumpet-grid">
+                <!-- JS 生成 Trumpet 1-6 -->
+            </div>
+            
+            <!-- Ch 10-11 Interlude -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+                <div class="judgment-card interlude-card" onclick="showTextModal('插曲：大力天使與小書卷 (Ch 10)', '在第六號與第七號之間，有一位大力的天使從天降下，手拿展開的小書卷。他呼喊時，有七雷發聲（但被封上不寫）。約翰被吩咐要吃盡這小書卷，在他口中甜如蜜，肚子卻發苦。<br><br><strong>神學意義：</strong>這代表先知領受神的話語是甘甜的（因為是真理），但傳講審判與災難的信息對先知而言卻是沈重且痛苦的。天使宣誓：不再有時日了（不復延遲），第七位天使吹號時，神的奧秘就成全了。', '啟示錄 10:9-10')">
+                    <i class="fas fa-book-open text-4xl text-yellow-500 mb-4"></i>
+                    <h4 class="text-white font-bold text-xl mb-2">插曲：吃下小書卷 (Ch 10)</h4>
+                    <p class="text-gray-400 text-sm">先知的使命：口中甜如蜜，腹中發苦。</p>
+                </div>
+                <div class="judgment-card interlude-card" onclick="showTextModal('插曲：兩個見證人 (Ch 11)', '神差遣兩個見證人（穿著毛衣，象徵悔改）傳道1260天。他們有權柄關閉天空不下雨，叫水變為血（有以利亞和摩西的能力）。這期間無人能害他們。<br><br>直到他們作完見證，從無底坑上來的獸把他們殺了，屍首倒在城中三天半，世人為此歡喜快樂。但三天半後，生氣從神那裡進入他們裡面，他們就站起來，並在眾人眼前升天。<br><br>隨後第七位天使吹號，宣告：<strong>世上的國成了我主和主基督的國</strong>。', '啟示錄 11:3, 7, 11, 15')">
+                    <i class="fas fa-users-rays text-4xl text-yellow-500 mb-4"></i>
+                    <h4 class="text-white font-bold text-xl mb-2">插曲：兩個見證人 (Ch 11)</h4>
+                    <p class="text-gray-400 text-sm">至死忠心的見證與復活的榮耀。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 4 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-red-500 mb-2">揭開災難的幕後真相：靈界爭戰</h4>
+            <p class="text-lg text-gray-300">
+                在第七號吹響（神的國降臨）與最終的七碗傾倒之間，<br>
+                啟示錄似乎暫停了時間線的推進，插入了<strong>第12-14章的特寫鏡頭</strong>。<br>
+                這一段揭示了為什麼地上會有這一切的災難與逼迫：<br>
+                因為在靈界有一場<strong>龍（撒但）與婦人（神的子民）</strong>之間跨越歷史的宇宙性爭戰。<br>
+                龍因被摔在地上，便氣忿忿地將權柄給了地上的獸，要逼迫聖徒。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第五部分：靈界爭戰 (Ch 12-14) -->
+    <section id="conflict" class="py-24 bg-gradient-to-b from-[#1a0505] to-[#000]">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 12-14</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-red-500">靈界的爭戰：婦人、龍與兩獸</h2>
+                <p class="text-gray-400 mt-2">這是一場光明與黑暗的對決，也是對信徒忍耐與信心的考驗。</p>
+            </div>
+
+            <div class="conflict-container" id="conflict-list">
+                <!-- JS 生成 -->
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 5 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-red-600 mb-2">神烈怒的充滿與傾倒</h4>
+            <p class="text-lg text-gray-300">
+                因著獸的猖狂、假先知的迷惑，以及人心的剛硬不悔改，<br>
+                神的寬容期（號角期）已過。<br>
+                現在，七位天使掌管最後的七災，因為<strong>神的大怒在這七災中發盡了</strong>。<br>
+                這不再是三分之一的警告，而是<strong>全面的、毀滅性的傾倒</strong>。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第六部分：七碗 (Ch 15-16) -->
+    <section id="bowls" class="py-24 bg-black">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 15-16</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-red-600">七碗：神烈怒的傾倒</h2>
+                <p class="text-gray-400 mt-2">這是最後的災難，目的是審判那些敗壞世界者，不再有憐憫。</p>
+            </div>
+            
+            <div class="judgment-grid" id="bowl-grid">
+                <!-- JS 生成 -->
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 6 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-purple-400 mb-2">大城的裂開與哀歌</h4>
+            <p class="text-lg text-gray-300">
+                第七碗倒下時，那「大城」裂為三段。<br>
+                接下來的第17-18章，是對這<strong>「大巴比倫」</strong>受審判的詳細特寫。<br>
+                這大淫婦代表了與神為敵的世界體系（政治、宗教、經濟的聯合體）。<br>
+                神要向她追討流聖徒之血的罪，她在一小時之間將歸於無有。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第七部分：巴比倫傾倒與君王再來 (Ch 17-19) -->
+    <section id="return" class="py-24 bg-[#2a0a2a] relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 17-19</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-purple-300">巴比倫傾倒與君王再來</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-8">
+                <!-- Ch 17 -->
+                <div class="bg-black/50 p-6 rounded border border-purple-800 cursor-pointer hover:bg-purple-900/30 transition transform hover:-translate-y-2" onclick="showTextModal('大淫婦與獸 (Ch 17)', '約翰被帶到曠野，看見一個女人騎在朱紅色的獸上。那獸有七頭十角，遍體有褻瀆的名號。那女人穿著紫色和朱紅色的衣服，用金子、寶石、珍珠為妝飾，手拿金杯，杯中盛滿了可憎之物，就是她淫亂的污穢。<br><br><strong>奧秘的解釋：</strong><br>她額上寫著：「奧秘哉！大巴比倫，作世上的淫婦和一切可憎之物的母。」天使解釋，那淫婦就是管轄地上眾王的大城。七頭代表七座山，也代表七位王。十角代表十王，他們要將權柄交給獸。最終，獸和十角必恨這淫婦，使她冷落赤身，又要吃她的肉，用火將她燒盡。這顯示邪惡勢力內部的互相吞噬。', '啟示錄 17:3-6, 16')">
+                    <i class="fas fa-wine-glass-empty text-5xl text-purple-400 mb-6"></i>
+                    <h3 class="text-2xl font-bold text-purple-300 mb-2">淫婦的奧秘 (Ch 17)</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">世界的宗教與政治體系，騎在獸上卻最終被獸吞吃。</p>
+                </div>
+                
+                <!-- Ch 18 -->
+                <div class="bg-black/50 p-6 rounded border border-purple-800 cursor-pointer hover:bg-purple-900/30 transition transform hover:-translate-y-2" onclick="showTextModal('巴比倫傾倒的哀歌 (Ch 18)', '一位大力的天使從天降下，大聲喊著說：巴比倫大城傾倒了！傾倒了！因為萬國都被她邪淫大怒的酒傾倒了。地上的君王、客商、船主都為她哭泣哀號，說：「哀哉！哀哉！這大城啊，一時之間她的爵祿就歸於無有了。」<br><br><strong>完全的毀滅：</strong><br>一位大力的天使舉起一塊石頭，好像大磨石，扔在海裡，說：巴比倫大城也必這樣猛力的被扔下去，決不能再見了。彈琴、作樂、吹笛、吹號的聲音，在你中間決不能再聽見；燈光在你中間決不能再照耀；新郎和新婦的聲音，在你中間決不能再聽見。', '啟示錄 18:2, 10, 21')">
+                    <i class="fas fa-city text-5xl text-purple-500 mb-6"></i>
+                    <h3 class="text-2xl font-bold text-purple-300 mb-2">大城傾倒 (Ch 18)</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">世界奢華經濟體系的崩潰，物質榮華瞬間歸零。</p>
+                </div>
+
+                <!-- Ch 19 -->
+                <div class="bg-black/50 p-6 rounded border border-yellow-600 cursor-pointer hover:bg-yellow-900/30 transition transform hover:-translate-y-2" onclick="showTextModal('萬王之王，萬主之主 (Ch 19)', '巴比倫傾倒後，天上發出哈利路亞的讚美聲。羔羊婚娶的時候到了！新婦（教會）也自己預備好了。<br><br><strong>白馬騎士的降臨：</strong><br>隨後天開了，有一匹白馬，騎在馬上的稱為「誠信真實」，祂審判、爭戰都按著公義。祂的眼睛如火焰，頭上戴著許多冠冕。祂穿著濺了血的衣服，名稱為「神之道」。眾天軍騎著白馬跟隨祂。祂有利劍從口中出來，可以擊殺列國。祂腳踏神全能者烈怒的酒榨。在衣服和大腿上有名寫著：「萬王之王，萬主之主」。<br><br>獸和地上的君王被擒拿，活活扔在硫磺火湖裡。', '啟示錄 19:6, 11-16')">
+                    <i class="fas fa-horse text-5xl text-yellow-500 mb-6"></i>
+                    <h3 class="text-2xl font-bold text-yellow-500 mb-2">君王再來 (Ch 19)</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">羔羊的婚娶，哈米吉多頓大戰，白馬騎士的終極審判。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="transition-line"></div>
+
+    <!-- 銜接區塊 7 -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="transition-box">
+            <h4 class="text-xl font-bold text-cyan-400 mb-2">舊事已過，都變成新的了</h4>
+            <p class="text-lg text-gray-300">
+                隨著獸被擒拿，撒但被扔在火湖裡，<br>
+                白色大寶座的審判結束了人類罪惡的歷史。死亡和陰間也被毀滅。<br>
+                現在，海也不再有了，以前的事都過去了。<br>
+                <strong>聖城新耶路撒冷</strong>由神那裡從天而降，神人同住的永恆計畫終於完美實現。
+            </p>
+        </div>
+    </div>
+
+    <div class="transition-line"></div>
+
+    <!-- 第八部分：千年國與新天新地 (Ch 20-22) -->
+    <section id="millennium" class="py-24 bg-gray-900">
+        <div class="container mx-auto px-4 max-w-4xl text-center">
+            <div class="section-header">
+                <span class="chapter-badge">Chapter 20</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-blue-200">一千年與白色大寶座</h2>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8 justify-center items-center">
+                <div class="p-8 bg-gray-800 rounded-lg border border-gray-700 max-w-md cursor-pointer hover:border-blue-500 transition shadow-lg hover:shadow-blue-500/20" onclick="showTextModal('千年國度 (Ch 20:1-6)', '一位天使從天降下，手裡拿著無底坑的鑰匙和一條大鍊子。他捉住那龍，就是古蛇（魔鬼撒但），把牠捆綁一千年，扔在無底坑裡。<br><br><strong>頭一次的復活：</strong><br>約翰看見那些因為給耶穌作見證、並為神之道被斬者的靈魂，以及沒有拜過獸的人，他們都復活了，與基督一同作王一千年。其餘的死人還沒有復活，直等那一千年完了。', '啟示錄 20:1-4')">
+                    <h3 class="text-2xl font-bold text-blue-300 mb-2">千年國度</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">撒但被暫時捆綁，聖徒與基督作王一千年，公義掌權。</p>
+                </div>
+                
+                <i class="fas fa-arrow-right text-3xl text-gray-600 hidden md:block"></i>
+                
+                <div class="p-8 bg-gray-800 rounded-lg border border-gray-700 max-w-md cursor-pointer hover:border-red-500 transition shadow-lg hover:shadow-red-500/20" onclick="showTextModal('白色大寶座審判 (Ch 20:11-15)', '我看見一個白色的大寶座與坐在上面的，從祂面前天地都逃避，再無可見之處了。我若見死了的人，無論大小，都站在寶座前。案卷展開了，並且另有一卷展開，就是生命冊。死了的人都憑著這些案卷所記載的，照他們所行的受審判。<br><br><strong>第二次的死：</strong><br>死亡和陰間也被扔在火湖裡；這火湖就是第二次的死。若有人名字沒記在生命冊上，他就被扔在火湖裡。', '啟示錄 20:11-15')">
+                    <h3 class="text-2xl font-bold text-red-300 mb-2">末日審判</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">案卷展開，按行為受審。生命冊決定永恆的歸宿。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="new-city" class="py-32 bg-gradient-to-b from-gray-900 to-blue-900/30 relative">
+        <div class="container mx-auto px-4 text-center z-10 relative">
+            <span class="chapter-badge">Chapter 21-22</span>
+            <i class="fas fa-gem text-6xl text-cyan-400 mb-6 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)] animate-pulse mt-4"></i>
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-8 title-glow">新耶路撒冷</h2>
+            <div class="max-w-3xl mx-auto space-y-8 text-lg text-gray-200">
+                <p class="text-2xl font-serif leading-relaxed text-cyan-100">
+                    「看哪，神的帳幕在人間。<br>他要與人同住，他們要作他的子民。<br>神要親自與他們同在，作他們的神。」
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-cyan-100 my-8">
+                    <div class="p-6 border border-cyan-500/30 rounded bg-cyan-900/10 hover:bg-cyan-900/20 transition">
+                        <strong class="block text-cyan-400 text-xl mb-3"><i class="fas fa-water mr-2"></i> 生命水</strong>
+                        一道生命水的河，明亮如水晶，從神和羔羊的寶座流出來 (Ch 22:1)。
+                    </div>
+                    <div class="p-6 border border-cyan-500/30 rounded bg-cyan-900/10 hover:bg-cyan-900/20 transition">
+                        <strong class="block text-cyan-400 text-xl mb-3"><i class="fas fa-tree mr-2"></i> 生命樹</strong>
+                        長在河的兩邊，結十二樣果子，每月都結果子，葉子乃為醫治萬民 (Ch 22:2)。
+                    </div>
+                    <div class="p-6 border border-cyan-500/30 rounded bg-cyan-900/10 hover:bg-cyan-900/20 transition">
+                        <strong class="block text-cyan-400 text-xl mb-3"><i class="fas fa-sun mr-2"></i> 榮耀的光</strong>
+                        不再有黑夜，也不用燈光、日光，因為主神要光照他們。他們要作王直到永永遠遠 (Ch 22:5)。
+                    </div>
+                </div>
+                <p class="italic text-yellow-400 font-bold text-3xl mt-16 title-glow">
+                    「證明這事的說：是了，我必快來！<br>阿們！主耶穌啊，我願你來！」
+                </p>
+            </div>
+            
+            <button onclick="window.scrollTo({top:0})" class="mt-16 px-10 py-4 border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition rounded-full text-lg font-bold tracking-widest shadow-lg hover:shadow-yellow-500/50">
+                重新領受異象
+            </button>
+        </div>
+    </section>
+
+    <!-- 通用 Modal -->
+    <div id="modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-paper" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modal-content-area">
+                <!-- 動態注入 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 七教會資料 (Ch 2-3) - 全面擴充 ---
+        const churchesData = [
+            { id: 'ephesus', name: '以弗所', title: '缺乏愛心的教會', icon: 'fa-heart-crack', color: 'text-red-400',
+              msg: '我知道你的行為、勞碌、忍耐，也知道你不能容忍惡人。你也曾試驗那自稱為使徒卻不是使徒的，看出他們是假的來。你也能忍耐，曾為我的名勞苦，並不乏倦。<strong>然而有一件事我要責備你，就是你把起初的愛心離棄了。</strong>所以應當回想你是從哪裡墜落的，並要悔改，行起初所行的事。', 
+              promise: '得勝的，我必將神樂園中生命樹的果子賜給他吃。（恢復伊甸園的團契）' },
+            { id: 'smyrna', name: '士每拿', title: '受逼迫的教會', icon: 'fa-fire', color: 'text-orange-400',
+              msg: '我知道你的患難，你的貧窮（你卻是富足的），也知道那自稱是猶太人所說的毀謗話，其實他們不是猶太人，乃是撒但一會的人。你將要受的苦你不用怕。魔鬼要把你們中間幾個人下在監裡，叫你們被試煉，你們必受患難十日。<strong>你務要至死忠心，我就賜給你那生命的冠冕。</strong>', 
+              promise: '得勝的，必不受第二次死的害。（永恆的生命保障）' },
+            { id: 'pergamum', name: '別迦摩', title: '妥協的教會', icon: 'fa-scale-unbalanced', color: 'text-gray-400',
+              msg: '我知道你的居所，就是有撒但座位之處。當我忠心的見證人安提帕在你們中間、撒但所住的地方被殺之時，你還堅守我的名，沒有棄絕我的道。然而有幾件事我要責備你：因為在你那裡有人服從了巴蘭的教訓（拜偶像與行姦淫），也有人服從了尼哥拉一黨人的教訓。<strong>所以你當悔改！</strong>', 
+              promise: '得勝的，我必將那隱藏的嗎哪賜給他，並賜他一塊白石，石上寫著新名。（神親密的供應與接納）' },
+            { id: 'thyatira', name: '推雅推喇', title: '容忍異端的教會', icon: 'fa-spider', color: 'text-purple-400',
+              msg: '我知道你的行為、愛心、信心、勤勞、忍耐，又知道你末後所行的善事，比起初所行的更多。<strong>然而有一件事我要責備你，就是你容讓那自稱是先知的婦人耶洗別教導我的僕人，引誘他們行姦淫，吃祭偶像之物。</strong>至於你們推雅推喇其餘的人，就是一切不從那教訓、不曉得他們常說的「撒但深奧之理」的人，我告訴你們，我不將別的擔子放在你們身上。', 
+              promise: '那得勝又遵守我命令到底的，我要賜給他權柄制伏列國；他又必得著晨星。（與基督一同掌權）' },
+            { id: 'sardis', name: '撒狄', title: '有名無實的教會', icon: 'fa-bed', color: 'text-blue-300',
+              msg: '我知道你的行為，<strong>按名你是活的，其實是死的。</strong>你要警醒，堅固那剩下將要衰微的，因我見你的行為，在我神面前，沒有一樣是完全的。所以要回想你是怎樣領受、怎樣聽見的，又要遵守，並要悔改。若不警醒，我必臨到你那裡，如同賊一樣。', 
+              promise: '得勝的必這樣穿白衣，我也必不從生命冊上塗抹他的名，且要在我父面前，和我父眾使者面前，認他的名。（公義的裝飾與生命冊的保障）' },
+            { id: 'philadelphia', name: '非拉鐵非', title: '忠心的教會', icon: 'fa-door-open', color: 'text-green-400',
+              msg: '那聖潔、真實、拿著大衛的鑰匙、開了就沒有人能關、關了就沒有人能開的說：我知道你的行為，你略有一點力量，也曾遵守我的道，沒有棄絕我的名。看哪，我在你面前給你一個敞開的門，是無人能關的。<strong>你既遵守我忍耐的道，我必在普天下人受試煉的時候，保守你免去你的試煉。</strong>', 
+              promise: '得勝的，我要叫他在我神殿中作柱子，他也必不再從那裡出去。我又要將我神的名...都寫在他上面。（永不動搖的地位）' },
+            { id: 'laodicea', name: '老底嘉', title: '不冷不熱的教會', icon: 'fa-temperature-half', color: 'text-yellow-600',
+              msg: '我知道你的行為，<strong>你也不冷也不熱；我巴不得你或冷或熱。你既如溫水，也不冷也不熱，所以我必從我口中把你吐出去。</strong>你說：我是富足，已經發了財，一樣都不缺；卻不知道你是那困苦、可憐、貧窮、瞎眼、赤身的。我勸你向我買火煉的金子，叫你富足；又買白衣穿上，叫你赤身的羞恥不露出來；又買眼藥擦你的眼睛，使你能看見。', 
+              promise: '得勝的，我要賜他在我寶座上與我同坐，就如我得了勝，在我父的寶座上與他同坐一般。（與主同坐寶座的榮耀）' }
+        ];
+
+        // --- 2. 敬拜資料 (Ch 4-5) - 全面擴充 ---
+        const worshipData = [
+            { title: "第四章：創造主的榮耀與天上的敬拜", icon: '<i class="fas fa-chair text-yellow-500"></i>',
+              content: "約翰看見一個寶座安置在天上，又有一位坐在寶座上。看那坐著的，好像碧玉和紅寶石；又有虹圍著寶座，好像綠寶石。<br><br><strong>二十四位長老：</strong>寶座周圍有二十四個座位，其上坐著二十四位長老，身穿白衣，頭戴金冠冕。這代表舊約十二支派與新約十二使徒，即全體屬神的子民。<br><br><strong>四活物：</strong>寶座中和寶座周圍有四個活物，前後遍體都滿了眼睛。第一個像獅子（獸中之王），第二個像牛犢（牲畜之首），第三個臉面像人（萬物之靈），第四個像飛鷹（鳥中之王）。這代表受造萬物的代表。他們晝夜不住地說：「<strong>聖哉！聖哉！聖哉！主神是昔在、今在、以後永在的全能者。</strong>」<br><br>他們將榮耀、尊貴、感謝歸給那坐寶座的，因為祂創造了萬物。", scripture: "啟示錄 4:2-11" },
+            { title: "第五章：羔羊的救贖與宇宙的頌讚", icon: '<i class="fas fa-crown text-red-500"></i>',
+              content: "約翰看見坐寶座的右手中有書卷，用七印封嚴了。因無人配展開而大哭。但長老安慰說：猶大支派的獅子，大衛的根，他已得勝！<br><br><strong>被殺的羔羊：</strong>約翰看見羔羊像是被殺過的，有七角（完全的權柄）七眼（完全的智慧/聖靈）。祂前來拿了書卷。四活物和二十四位長老就俯伏在羔羊面前，各拿著琴和盛滿了香的金爐（聖徒的祈禱），唱新歌說：「<strong>你配拿書卷，配揭開七印；因為你曾被殺，用自己的血從各族、各方、各民、各國中買了人來，叫他們歸於神。</strong>」<br><br>隨後，千千萬萬的天使與天地間一切受造之物都加入大合唱，將頌讚、尊貴、榮耀、權勢都歸給坐寶座的和羔羊。", scripture: "啟示錄 5:1-14" }
+        ];
+
+        // --- 3. 七印資料 (Ch 6) - 全面擴充 ---
+        const sealsData = [
+            { title: "第一印：白馬 (Ch 6)", icon: '<i class="fas fa-horse"></i>', 
+              desc: "騎在馬上的拿著弓，並有冠冕賜給他。", 
+              content: "當羔羊揭開第一印時，有一匹白馬出來。騎在馬上的拿著弓（有遠程攻擊能力），並有冠冕賜給他。他便出來，<strong>勝了又要勝</strong>。歷史上有觀點認為這是福音的廣傳，但更多學者認為這象徵<strong>征服與軍事侵略</strong>，甚至是<strong>敵基督</strong>的假冒和平（因為他拿弓卻無箭，可能代表以欺騙性外交手段取得勝利），模仿基督的白馬（啟19章），但帶來的卻是隨後的戰亂。", scripture: "啟示錄 6:1-2" },
+            { title: "第二印：紅馬 (Ch 6)", icon: '<i class="fas fa-horse-head" style="color:#8b0000"></i>', 
+              desc: "有大刀賜給騎馬的，使人彼此相殺。", 
+              content: "另有一匹馬出來，是紅的（象徵流血）。有權柄賜給那騎馬的，可以<strong>從地上奪去太平，使人彼此相殺</strong>；又有一把大刀賜給他。這象徵<strong>戰爭、內亂與暴力的流血衝突</strong>。當虛假的和平（第一印）破滅後，緊接而來的就是赤裸裸的殺戮與毀滅。", scripture: "啟示錄 6:3-4" },
+            { title: "第三印：黑馬 (Ch 6)", icon: '<i class="fas fa-scale-balanced"></i>', 
+              desc: "手裡拿著天平。一錢銀子買一升麥子。", 
+              content: "見有一匹黑馬（象徵哀痛與缺乏）。騎在馬上的，手裡拿著天平（象徵精細的配給）。有聲音說：「一錢銀子買一升麥子，一錢銀子買三升大麥。」一錢銀子是當時工人一天的工資，卻只能買一人份的口糧，顯示出<strong>嚴重的通貨膨脹與饑荒</strong>。然而，「油和酒不可糟蹋」，這暗示奢侈品未受影響，顯示出極端的<strong>貧富差距</strong>與社會不公。", scripture: "啟示錄 6:5-6" },
+            { title: "第四印：灰馬 (Ch 6)", icon: '<i class="fas fa-skull"></i>', 
+              desc: "名字叫作死，陰府也隨著他。", 
+              content: "見有一匹灰色（蒼白，屍體的顏色）馬。騎在馬上的，名字叫作<strong>死</strong>，<strong>陰府</strong>也隨著他。有權柄賜給他們，可以用<strong>刀劍、饑荒、瘟疫、野獸</strong>，殺害地上<strong>四分之一</strong>的人。這是前三印災難的總結與深化，死亡大規模臨到，陰間忙於收納死人。", scripture: "啟示錄 6:7-8" },
+            { title: "第五印：呼冤 (Ch 6)", icon: '<i class="fas fa-cross"></i>', 
+              desc: "為神的道被殺之人的靈魂大聲喊著。", 
+              content: "揭開第五印時，約翰看見在祭壇底下，有為神的道、並為作見證被殺之人的靈魂（殉道者）。他們大聲喊著說：「<strong>聖潔真實的主啊，你不審判住在地上的人，給我們伸流血的冤，要到幾時呢？</strong>」於是有白衣賜給他們各人，又有話對他們說，還要安息片刻，等著一同作僕人的和他們的弟兄也像他們被殺，滿足了數目。", scripture: "啟示錄 6:9-11" },
+            { title: "第六印：大震動 (Ch 6)", icon: '<i class="fas fa-meteor"></i>', 
+              desc: "地大震動，日頭變黑，滿月變紅。", 
+              content: "揭開第六印時，地大震動（大地震），日頭變黑像毛布，滿月變紅像血（天象劇變），天上的星辰墜落於地（隕石/審判）。天就挪移，好像書卷被捲起來；山嶺海島都被挪移離開本位。地上的君王、臣宰、將軍、富戶、壯士，和一切為奴的、自主的，都藏在山洞和巖石穴裡，向山和巖石說：「倒在我們身上吧！<strong>把我們藏起來，躲避坐寶座者的面目和羔羊的忿怒；因為他們忿怒的大日到了，誰能站得住呢？</strong>」", scripture: "啟示錄 6:12-17" }
+        ];
+        
+        const seal7Data = { title: "第七印：寂靜與七號 (Ch 8)", icon: '<i class="fas fa-bell-slash"></i>', 
+              desc: "天上寂靜約有二刻。", 
+              content: "羔羊揭開第七印的時候，<strong>天上寂靜約有二刻</strong>。這是一種充滿敬畏、屏息以待的時刻，暴風雨前的寧靜。這段時間，天使將眾聖徒的祈禱和金壇上的火一同倒在地上，隨即有雷轟、大聲、閃電、地震。這第七印本身沒有具體的災難，而是<strong>帶出了七位天使拿著七支號</strong>，準備吹響更嚴厲的警告。", scripture: "啟示錄 8:1-5" };
+
+        // --- 4. 七號資料 (Ch 8-9, 11) - 全面擴充 ---
+        const trumpetsData = [
+            { icon: "fa-fire", title: "第一號 (Ch 8)", desc: "雹與火攙著血落在地上，地的三分之一被燒了。", 
+              content: "第一位天使吹號，就有雹子與火攙著血丟在地上；地的三分之一和樹的三分之一被燒了，一切的青草也被燒了。這是對地球生態系統的直接打擊。", scripture: "啟 8:7" },
+            { icon: "fa-water", title: "第二號 (Ch 8)", desc: "彷彿火燒的大山扔在海中，海的三分之一變成血。", 
+              content: "第二位天使吹號，就有彷彿火燒的大山扔在海中；海的三分之一變成血，海中的活物死了三分之一，船隻也壞了三分之一。這象徵對海洋資源與商業航運的毀滅。", scripture: "啟 8:8-9" },
+            { icon: "fa-star", title: "第三號 (Ch 8)", desc: "燒著的大星名叫茵陳，落在江河中，水變苦。", 
+              content: "第三位天使吹號，就有燒著的大星，好像火把從天落下，落在江河的三分之一和眾水的泉源上。這星名叫「茵陳」。眾水的三分之一變為茵陳，因水變苦，就死了許多人。這是對淡水資源的污染。", scripture: "啟 8:10-11" },
+            { icon: "fa-sun", title: "第四號 (Ch 8)", desc: "日、月、星的三分之一黑暗了，白晝的三分之一沒有光。", 
+              content: "第四位天使吹號，日頭的三分之一，月亮的三分之一、星辰的三分之一都被擊打，以致日月星的三分之一黑暗了，白晝的三分之一沒有光，黑夜也是這樣。這象徵天體運行的異常與光的減退。", scripture: "啟 8:12" },
+            { icon: "fa-locust", title: "第五號 (第一禍) (Ch 9)", desc: "無底坑開了，有蝗蟲出來螫人五個月，叫人求死不得。", 
+              content: "第五位天使吹號，我看見一個星從天落到地上，有無底坑的鑰匙賜給它。開了無底坑...有蝗蟲從煙中出來。牠們不傷害草木，惟獨傷害額上沒有神印記的人。叫他們受痛苦五個月，求死卻不得死。這是一種屬靈或心理上的極度折磨。", scripture: "啟 9:1-12" },
+            { icon: "fa-horse-head", title: "第六號 (第二禍) (Ch 9)", desc: "釋放幼發拉底河的四使者，二萬萬馬軍殺了人的三分之一。", 
+              content: "第六位天使吹號，釋放那捆綁在伯拉大河的四個使者。馬軍有二萬萬。這些馬的口中噴出火、與煙、與硫磺，殺了人的三分之一。剩下的三分之二人仍舊不悔改手中的惡行。這是大規模的戰爭與殺戮。", scripture: "啟 9:13-21" },
+            { icon: "fa-scroll", title: "第七號 (第三禍) (Ch 11)", desc: "世上的國成了我主和主基督的國。天上的殿開了。", 
+              content: "第七位天使吹號，天上就有大聲音說：「世上的國成了我主和主基督的國；祂要作王，直到永永遠遠。」神天上的殿開了，現出祂的約櫃。隨後有閃電、聲音、雷轟、地震、大雹。這宣告了神最終掌權的時刻來到。", scripture: "啟 11:15-19" }
+        ];
+
+        // --- 5. 靈界爭戰資料 (Ch 12-14) - 全面擴充 ---
+        const conflictData = [
+            { title: "身披日頭的婦人 (Ch 12)", img: "fa-person-dress", color: "text-yellow-400", 
+              desc: "天上出現大異象：有一個婦人身披日頭，腳踏月亮，頭戴十二星的冠冕。她懷了孕，在生產的艱難中疼痛呼叫。<br><br><strong>象徵：</strong>這婦人代表歷代的<strong>以色列/神的子民/教會</strong>。她要生出的男孩子是基督（將來要用鐵杖轄管萬國的）。她逃到曠野，被神養活1260天，象徵教會在患難中蒙神保守。" },
+            { title: "大紅龍 (Ch 12)", img: "fa-dragon", color: "text-red-600", 
+              desc: "這條大紅龍有七頭十角，七頭上戴著七個冠冕。牠的尾巴拖拉著天上星辰的三分之一，摔在地上。<br><br><strong>象徵：</strong>經文言明牠就是<strong>古蛇，名叫魔鬼，又叫撒但</strong>。牠想吞吃婦人的孩子（殺害基督）。米迦勒與龍爭戰，龍被摔在地上，就氣忿忿地去逼迫婦人其餘的兒女（基督徒）。" },
+            { title: "海中上來的獸 (Ch 13)", img: "fa-paw", color: "text-blue-500", 
+              desc: "有一獸從海中上來，有十角七頭。形狀像豹，腳像熊，口像獅子。那龍將自己的能力、座位、權柄都給了牠。<br><br><strong>象徵：</strong>這是<strong>敵基督的政治權勢</strong>。牠全地的人都希奇跟從牠，並拜龍和獸。牠有權柄任意而行42個月，褻瀆神，並與聖徒爭戰且得勝。" },
+            { title: "地中上來的獸 (Ch 13)", img: "fa-mask", color: "text-green-600", 
+              desc: "另有一獸從地中上來，有兩角如同羊羔，說話好像龍。牠在頭一個獸面前，行頭一個獸所有的權柄。<br><br><strong>象徵：</strong>這是<strong>假先知（宗教/宣傳權勢）</strong>。牠行大奇事（如火降下），迷惑地上的人，叫他們拜獸像，並強迫所有人在右手或額上受印記（666），否則不得做買賣。" },
+            { title: "144,000人 (Ch 14)", img: "fa-users", color: "text-white", 
+              desc: "約翰看見羔羊站在錫安山，同他又有144,000人，都有他的名和他父的名寫在額上。他們在寶座前唱新歌。<br><br><strong>特徵：</strong>這些人未曾沾染婦女（屬靈上的童身/純潔），口中察不出謊言。他們是從人間買來的，作初熟的果子歸與神和羔羊。羔羊無論往哪裡去，他們都跟隨他。" }
+        ];
+
+        // --- 6. 七碗資料 (Ch 15-16) - 全面擴充 ---
+        const bowlsData = [
+            { icon: "fa-virus", title: "第一碗：惡毒的瘡 (Ch 16)", desc: "第一位天使便去，把碗倒在地上，就有惡毒的瘡生在那些有獸印記和拜獸像的人身上。", 
+              content: "第一位天使便去，把碗倒在地上，就有惡毒的瘡生在那些有獸印記和拜獸像的人身上。這是針對跟隨敵基督之人的直接身體審判，如同埃及十災中的瘡災。", scripture: "啟 16:2" },
+            { icon: "fa-water", title: "第二碗：海變死血 (Ch 16)", desc: "第二位天使把碗倒在海裡，海就變成血，好像死人的血，海中的活物都死了。", 
+              content: "第二位天使把碗倒在海裡，海就變成血，好像死人的血，海中的活物都死了。相比於第二號的三分之一，這次是海洋生態的完全毀滅。", scripture: "啟 16:3" },
+            { icon: "fa-tint", title: "第三碗：江河變血 (Ch 16)", desc: "倒在江河與眾水的泉源裡，水就變成血。這是報應，因他們曾流聖徒與先知的血。", 
+              content: "第三位天使把碗倒在江河與眾水的泉源裡，水就變成血。掌管水的天使說：「祢這樣判斷是公義的...他們曾流聖徒與先知的血，現在祢給他們血喝，這是他們所配的。」", scripture: "啟 16:4-7" },
+            { icon: "fa-sun", title: "第四碗：日頭烤人 (Ch 16)", desc: "倒在日頭上，叫日頭能用火烤人。人被大熱所烤，就褻瀆神，並不悔改歸榮耀給神。", 
+              content: "第四位天使把碗倒在日頭上，叫日頭能用火烤人。人被大熱所烤，就褻瀆那有權掌管這災的神之名，並不悔改將榮耀歸給神。環境氣候變得極端惡劣。", scripture: "啟 16:8-9" },
+            { icon: "fa-eye-slash", title: "第五碗：黑暗與疼痛 (Ch 16)", desc: "倒在獸的座位上，獸的國就黑暗了。人因疼痛就咬自己的舌頭，因瘡與疼痛褻瀆天上的神，並不悔改。", 
+              content: "第五位天使把碗倒在獸的座位上，獸的國就黑暗了。人因疼痛就咬自己的舌頭；又因所受的疼痛和生的瘡，就褻瀆天上的神，並不悔改所行的。這是對敵基督政權核心的打擊。", scripture: "啟 16:10-11" },
+            { icon: "fa-bridge-water", title: "第六碗：哈米吉多頓 (Ch 16)", desc: "倒在伯拉大河上，河水乾了，要給東方的王預備道路。三個污穢的靈（像青蛙）叫眾王聚集爭戰。", 
+              content: "第六位天使把碗倒在伯拉大河上，河水就乾了，要給那從日出之地所來的王預備道路。又有三個污穢的靈，好像青蛙...出去到普天下眾王那裡，叫他們在神全能者的大日聚集爭戰（哈米吉多頓）。", scripture: "啟 16:12-16" },
+            { icon: "fa-bolt", title: "第七碗：成了 (Ch 16)", desc: "倒在空中，有大聲音說：「成了！」隨後有大地震（巴比倫裂為三段），各海島逃避，大雹子落下。", 
+              content: "第七位天使把碗倒在空中，就有大聲音從殿中的寶座上出來，說：「成了！」又有閃電、聲音、雷轟、大地震，自從有人在地上以來，沒有這樣大、這樣厲害的地震。那大城裂為三段，列國的城也都倒塌了。又有大雹子從天落在人身上。", scripture: "啟 16:17-21" }
+        ];
+
+        // --- 初始化渲染函數 ---
+
+        function init() {
+            renderChurches();
+            renderSeals();
+            renderTrumpets();
+            renderConflict();
+            renderBowls();
+            switchChurch(0);
+        }
+
+        // 1. 渲染教會
+        function renderChurches() {
+            const nav = document.getElementById('church-tabs');
+            churchesData.forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.className = `church-tab ${i===0?'active':''}`;
+                btn.innerText = c.name;
+                btn.onclick = () => switchChurch(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function switchChurch(index) {
+            const data = churchesData[index];
+            document.querySelectorAll('.church-tab').forEach((t, i) => {
+                t.classList.toggle('active', i === index);
+            });
+            const display = document.getElementById('church-display');
+            display.innerHTML = `
+                <i class="fas ${data.icon} text-6xl mb-4 ${data.color}"></i>
+                <h3 class="text-2xl font-bold text-white mb-2">${data.name} - ${data.title}</h3>
+                <div class="text-gray-300 mb-6 max-w-2xl text-left leading-relaxed space-y-4">
+                    <p>${data.msg}</p>
+                </div>
+                <div class="border-t border-gray-700 pt-4 mt-2 w-full max-w-2xl text-left">
+                    <span class="text-yellow-500 font-bold block mb-1"><i class="fas fa-trophy mr-2"></i>給得勝者的應許：</span>
+                    <p class="text-gray-400 text-sm italic">${data.promise}</p>
+                </div>
+            `;
+        }
+
+        // 2. 渲染七印
+        function renderSeals() {
+            const container = document.getElementById('seal-list');
+            sealsData.forEach((seal, index) => {
+                const div = document.createElement('div');
+                div.className = 'revelation-row';
+                div.innerHTML = `
+                    <div class="w-24 text-right font-bold text-amber-900/50">Seal ${index+1}</div>
+                    <div class="wax-seal-btn" onclick="openSeal(this, ${index})">
+                        ${index+1}
+                    </div>
+                    <div class="hidden-content flex-1 border-l-2 border-amber-800/30 pl-4" id="seal-content-${index}">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold text-lg">
+                            ${seal.icon} ${seal.title}
+                        </div>
+                        <p class="text-amber-900/80 mt-1 text-sm line-clamp-1">${seal.desc}</p>
+                        <button class="text-xs text-red-800 underline mt-1" onclick="showModal('seal', ${index})">閱讀詳解</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            // Render Seal 7
+            const div7 = document.createElement('div');
+            div7.className = 'revelation-row justify-center mt-4';
+            div7.innerHTML = `
+                <div class="wax-seal-btn" style="width:70px;height:70px;font-size:1.5rem;" onclick="openSeal7(this)">7</div>
+                <div class="hidden-content flex-1 border-l-2 border-amber-800/30 pl-4" id="seal-content-7">
+                    <div class="flex items-center gap-2 text-amber-900 font-bold text-xl">
+                        ${seal7Data.icon} ${seal7Data.title}
+                    </div>
+                    <p class="text-amber-900/80 mt-1">${seal7Data.desc}</p>
+                    <button class="text-xs text-red-800 underline mt-1" onclick="showTextModal('${seal7Data.title}', '${seal7Data.content}', '${seal7Data.scripture}')">閱讀詳解</button>
+                </div>
+            `;
+            document.getElementById('seal-7-container').appendChild(div7);
+        }
+
+        function openSeal(btn, index) {
+            if (btn.classList.contains('seal-broken')) return;
+            btn.classList.add('seal-broken');
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.style.background = 'transparent';
+                btn.style.boxShadow = 'none';
+                document.getElementById(`seal-content-${index}`).classList.add('visible');
+                showModal('seal', index);
+            }, 400);
+        }
+        
+        function openSeal7(btn) {
+            if (btn.classList.contains('seal-broken')) return;
+            btn.classList.add('seal-broken');
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.style.background = 'transparent';
+                btn.style.boxShadow = 'none';
+                document.getElementById(`seal-content-7`).classList.add('visible');
+                showTextModal(seal7Data.title, seal7Data.content, seal7Data.scripture);
+            }, 400);
+        }
+
+        // 3. 渲染七號
+        function renderTrumpets() {
+            const grid = document.getElementById('trumpet-grid');
+            trumpetsData.forEach((t, i) => {
+                grid.innerHTML += `
+                    <div class="judgment-card" onclick="showModal('trumpet', ${i})">
+                        <i class="fas ${t.icon} text-3xl text-yellow-500 mb-3"></i>
+                        <h4 class="text-white font-bold text-sm mb-2">${t.title}</h4>
+                        <p class="text-gray-500 text-xs line-clamp-3 leading-relaxed">${t.desc}</p>
+                        <div class="mt-auto pt-2 text-yellow-500/50 text-xs">點擊閱讀</div>
+                    </div>
+                `;
+            });
+        }
+
+        // 4. 渲染靈界爭戰
+        function renderConflict() {
+            const container = document.getElementById('conflict-list');
+            conflictData.forEach((c, i) => {
+                container.innerHTML += `
+                    <div class="conflict-char" onclick="showModal('conflict', ${i})">
+                        <i class="fas ${c.img} conflict-img ${c.color}"></i>
+                        <h4 class="text-xl font-bold text-gray-200">${c.title}</h4>
+                        <p class="text-gray-500 text-sm mt-2">點擊查看象徵</p>
+                    </div>
+                `;
+            });
+        }
+
+        // 5. 渲染七碗
+        function renderBowls() {
+            const grid = document.getElementById('bowl-grid');
+            bowlsData.forEach((b, i) => {
+                grid.innerHTML += `
+                    <div class="judgment-card" style="border-color: rgba(139,0,0,0.3)" onclick="showModal('bowl', ${i})">
+                        <i class="fas ${b.icon} text-3xl text-red-600 mb-3"></i>
+                        <h4 class="text-red-100 font-bold text-sm mb-2">${b.title}</h4>
+                        <p class="text-gray-500 text-xs line-clamp-3 leading-relaxed">${b.desc}</p>
+                        <div class="mt-auto pt-2 text-red-500/50 text-xs">點擊閱讀</div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- Modal 邏輯 ---
+        function showModal(type, index) {
+            let data = {};
+            if (type === 'seal') data = sealsData[index];
+            else if (type === 'trumpet') data = trumpetsData[index];
+            else if (type === 'bowl') data = bowlsData[index];
+            else if (type === 'conflict') data = conflictData[index];
+            else if (type === 'worship') data = worshipData[index];
+
+            const modalContent = document.getElementById('modal-content-area');
+            let displayIcon = '';
+            if (data.icon && !data.icon.startsWith('<')) {
+                 let colorClass = (type === 'bowl') ? 'text-red-600' : 'text-yellow-500';
+                 displayIcon = `<i class="fas ${data.icon} ${colorClass}"></i>`;
+            } else if (data.icon) {
+                 displayIcon = data.icon; // 已經是 HTML 標籤 (如 Seals)
+            } else if (data.img) {
+                 displayIcon = `<i class="fas ${data.img} ${data.color}"></i>`; // Conflict
+            }
+            
+            let fullContent = data.content || data.desc;
+            
+            modalContent.innerHTML = `
+                <div class="flex justify-center text-6xl text-amber-800 mb-6">${displayIcon}</div>
+                <h2 class="text-3xl font-bold text-center text-amber-900 mb-6 border-b border-amber-800/20 pb-4 font-serif">${data.title}</h2>
+                <div class="text-lg text-amber-900 leading-loose text-justify font-serif">
+                    ${fullContent}
+                </div>
+                ${data.scripture ? `<div class="mt-8 text-right border-t border-amber-800/10 pt-4"><span class="verse-ref"><i class="fas fa-book-bible mr-2"></i>${data.scripture}</span></div>` : ''}
+            `;
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function showTextModal(title, text, ref) {
+            const modalContent = document.getElementById('modal-content-area');
+            modalContent.innerHTML = `
+                <h2 class="text-3xl font-bold text-center text-amber-900 mb-6 border-b border-amber-800/20 pb-4 font-serif">${title}</h2>
+                <div class="text-lg text-amber-900 leading-loose text-justify font-serif">
+                    ${text}
+                </div>
+                <div class="mt-8 text-right border-t border-amber-800/10 pt-4"><span class="verse-ref"><i class="fas fa-book-bible mr-2"></i>${ref}</span></div>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        init();
+    </script>
+</body>
+</html>
