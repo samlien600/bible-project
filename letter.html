@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天父的信 - Father's Love Letter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入質感襯線字體：新增 Zen Old Mincho 增加書卷氣 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Cinzel:wght@700&family=Zen+Old+Mincho:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        :root {
+            --paper-color: #fdfbf7;
+            --ink-color: #4a3b32; /* 溫暖的深褐色 */
+            --gold-accent: #b48b3b;
+            --seal-red: #8a1c1c;
+        }
+
+        body {
+            font-family: 'Noto Serif TC', serif;
+            /* 明亮暖色背景 */
+            background: linear-gradient(135deg, #fffaf0 0%, #f3e5d0 100%);
+            color: var(--ink-color);
+            min-height: 100vh;
+        }
+
+        /* 古典標題字體 */
+        .title-font {
+            font-family: 'Cinzel', 'Noto Serif TC', serif;
+        }
+
+        /* 優化後的內文質感字體 - 緊湊版 */
+        .texture-font {
+            font-family: 'Zen Old Mincho', 'Noto Serif TC', serif;
+            letter-spacing: 0.03em; /* 縮小字距 */
+            line-height: 1.6;       /* 手機版行高稍微縮小，電腦版可透過 md: 調整 */
+            font-weight: 500;       /* 保持筆畫清晰 */
+        }
+
+        /* 信封卡片樣式 */
+        .envelope-card {
+            background: #ffffff;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
+            /* 調整陰影以適應亮色背景 */
+            box-shadow: 0 10px 15px -3px rgba(180, 139, 59, 0.1), 0 4px 6px -2px rgba(180, 139, 59, 0.05);
+            border: 1px solid #e8e1d5;
+            overflow: hidden;
+        }
+
+        .envelope-card::before {
+            /* 信封摺痕效果 */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 150px 100px 150px; /* Adjust based on width */
+            border-color: transparent transparent rgba(0,0,0,0.03) transparent;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .envelope-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 25px -5px rgba(180, 139, 59, 0.2), 0 10px 10px -5px rgba(180, 139, 59, 0.1);
+            border-color: var(--gold-accent);
+        }
+
+        /* 火漆印樣式 (Wax Seal) */
+        .wax-seal {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #c13e3e, #8a1c1c);
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .wax-seal::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.4);
+        }
+
+        /* 模態框樣式 */
+        .modal-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            perspective: 1000px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .letter-content {
+            opacity: 0;
+            transform: translateY(30px) rotateX(10deg);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background-color: #fffef8;
+            background-image: linear-gradient(to bottom, transparent 29px, rgba(180, 139, 59, 0.08) 30px); /* 淺金色線條 */
+            background-size: 100% 30px; /* 信紙橫線 */
+            line-height: 30px;
+        }
+
+        .modal-overlay.active .letter-content {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+        }
+
+        /* 滾動條美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdfbf7; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4c5a3; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b48b3b; 
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+
+    <!-- 背景紋理裝飾 (淺色紋理) -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-40" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23b48b3b\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    
+    <!-- 暈映效果 (改為暖色調) -->
+    <div class="fixed inset-0 pointer-events-none z-0" style="background: radial-gradient(circle at center, transparent 20%, rgba(139, 69, 19, 0.03) 100%);"></div>
+
+    <!-- Info Button -->
+    <button onclick="openInfo()" class="fixed top-4 right-4 z-40 text-[#8a6a2e] hover:text-[#b48b3b] transition-colors duration-300 drop-shadow-sm group" title="使用說明">
+        <i class="fa-regular fa-circle-question text-3xl md:text-4xl group-hover:scale-110 transition-transform"></i>
+    </button>
+
+    <!-- Header: 手機版上邊距縮小 -->
+    <header class="relative z-10 w-full max-w-4xl mx-auto pt-8 md:pt-12 pb-6 md:pb-8 px-4 text-center">
+        <div class="inline-block border-b-2 border-[#b48b3b]/30 pb-4 mb-4">
+            <h1 class="text-3xl md:text-6xl font-bold text-[#4a3b32] tracking-wider title-font drop-shadow-sm">
+                <span class="text-[#b48b3b] text-4xl md:text-7xl align-middle mr-2">✞</span>
+                Father's Letter
+            </h1>
+            <h2 class="text-lg md:text-2xl text-[#6d5646] mt-2 font-light tracking-[0.2em]">天父的家書</h2>
+        </div>
+        <p class="text-[#8c7362] max-w-lg mx-auto italic text-xs md:text-base font-medium">
+            「我以永遠的愛愛你，因此我以慈愛吸引你。」<br>— 耶利米書 31:3
+        </p>
+    </header>
+
+    <!-- Main Grid: 手機版間距縮小 -->
+    <main class="relative z-10 container mx-auto px-4 pb-20 max-w-6xl">
+        <div id="cardGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8">
+            <!-- Cards will be injected here by JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 text-center text-[#8c7362]/60 text-xs py-6 font-semibold">
+        <p>&copy; 2024 Father's Love Letter. Soli Deo Gloria.</p>
+    </footer>
+
+    <!-- Info/Help Modal -->
+    <div id="infoModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2c1810]/40 backdrop-blur-sm" onclick="closeInfo(event)">
+        <!-- 調整寬度與 padding 以適應手機 -->
+        <div class="letter-content relative w-full max-w-xl bg-[#fffaf0] shadow-2xl rounded-sm overflow-hidden border-4 border-double border-[#b48b3b] flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+            
+            <button onclick="closeInfo()" class="absolute top-2 right-2 md:top-4 md:right-4 text-[#8a1c1c] hover:text-[#500e0e] transition-colors z-20 w-8 h-8 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+            <!-- 內容區域可滾動 -->
+            <div class="p-6 md:p-10 text-[#4a3b32] overflow-y-auto custom-scrollbar">
+                <h3 class="text-xl md:text-2xl font-bold text-center mb-4 md:mb-6 title-font text-[#8a1c1c] tracking-widest border-b border-[#b48b3b]/30 pb-4">
+                    使用說明
+                </h3>
+                
+                <!-- 使用新的質感字體 -->
+                <div class="space-y-4 md:space-y-6 text-justify leading-relaxed texture-font text-sm md:text-base">
+                    <div>
+                        <h4 class="font-bold text-[#b48b3b] mb-1 flex items-center text-base md:text-lg">
+                            <i class="fa-solid fa-bullseye mr-2"></i> 系統目的
+                        </h4>
+                        <p class="opacity-90">
+                            本系統旨在透過隨機抽選的「天父的信」，將聖經真理轉化為溫暖的家書。無論您正處於高峰或低谷，盼望這些話語能為您帶來安慰、造就與勸勉，讓您感受到天父永不改變的愛。
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-[#b48b3b] mb-1 flex items-center text-base md:text-lg">
+                            <i class="fa-solid fa-hand-pointer mr-2"></i> 如何使用
+                        </h4>
+                        <ol class="list-decimal list-inside opacity-90 space-y-1 md:space-y-2 ml-1">
+                            <li><span class="font-bold">靜心</span>：暫時放下手邊的事務，做個深呼吸或默禱。</li>
+                            <li><span class="font-bold">領受</span>：憑感動點擊畫面上的任一個信封。</li>
+                            <li><span class="font-bold">默想</span>：閱讀信中的訊息與經文，讓這份祝福充滿您的心。</li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-[#b48b3b] mb-1 flex items-center text-base md:text-lg">
+                            <i class="fa-solid fa-star mr-2"></i> 系統特點
+                        </h4>
+                        <ul class="list-disc list-inside opacity-90 space-y-1 md:space-y-2 ml-1">
+                            <li><span class="font-bold">隨機不重複</span>：系統會自動記錄您本次已讀過的信件，確保每次點擊都是全新的領受。</li>
+                            <li><span class="font-bold">豐富主題</span>：內容涵蓋身分認同、面對焦慮、人生方向、饒恕與愛等多面向屬靈主題。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 md:mt-8 text-center pb-2">
+                    <button onclick="closeInfo()" class="w-full md:w-auto px-8 py-2 border-2 border-[#8a1c1c] text-[#8a1c1c] hover:bg-[#8a1c1c] hover:text-white transition-all rounded text-sm md:text-base tracking-widest uppercase font-bold texture-font">
+                        開始體驗
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Letter View Modal -->
+    <div id="modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 bg-[#2c1810]/60 backdrop-blur-sm" onclick="closeLetter(event)">
+        <!-- Letter Container -->
+        <!-- 修改: 手機版高度適應 -->
+        <div class="letter-content relative w-full max-w-3xl h-auto max-h-[90vh] md:max-h-[95vh] flex flex-col bg-[#fffef8] shadow-2xl rounded-sm overflow-hidden" onclick="event.stopPropagation()">
+            
+            <!-- Close Button (Top Right) -->
+            <button onclick="closeLetter()" class="absolute top-2 right-2 md:top-3 md:right-3 text-[#8a1c1c] hover:text-[#500e0e] transition-colors z-20 w-8 h-8 flex items-center justify-center text-lg md:text-xl opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+            <!-- Decorative Header inside Letter -->
+            <div class="h-2 bg-[#8a1c1c] shrink-0"></div>
+            <div class="h-1 bg-[#b48b3b] mt-1 shrink-0"></div>
+
+            <!-- Content Area: 手機版 Padding 縮小 -->
+            <div class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 flex flex-col">
+                
+                <!-- Title Section: 減少 margin -->
+                <div class="text-center mb-3 md:mb-4 shrink-0">
+                    <div class="inline-block px-4 py-1 border-b border-[#b48b3b] text-[#b48b3b] text-[10px] md:text-xs tracking-widest uppercase mb-1 texture-font">我的孩子</div>
+                    <h2 id="letterTitle" class="text-xl md:text-3xl font-bold text-[#2c1810] title-font mb-1 md:mb-2">
+                        <!-- Dynamic Title -->
+                    </h2>
+                    <div class="w-10 md:w-12 h-1 bg-[#2c1810] mx-auto rounded-full opacity-20"></div>
+                </div>
+
+                <!-- Body Content: 手機版字體 text-[15px] -->
+                <div class="prose prose-lg mx-auto text-[#3e2723] leading-snug md:leading-tight text-justify text-[15px] md:text-lg grow">
+                    <!-- 應用質感字體類別 texture-font -->
+                    <p id="letterContent" class="texture-font first-letter:text-3xl md:first-letter:text-4xl first-letter:font-bold first-letter:text-[#8a1c1c] first-letter:mr-1 md:first-letter:mr-2 first-letter:float-left first-letter:leading-none">
+                        <!-- Dynamic Content -->
+                    </p>
+                </div>
+
+                <!-- Verse Section (Boxed): 手機版 margin 縮小 -->
+                <div class="mt-4 md:mt-6 p-3 md:p-4 bg-[#f7f3e8] border border-[#e0d6c2] rounded shadow-inner relative mx-1 md:mx-0 shrink-0">
+                    <i class="fa-solid fa-quote-right absolute top-2 right-2 text-[#d4af37] text-xl md:text-2xl opacity-30"></i>
+                    <!-- 應用質感字體 texture-font, 手機版字體 text-sm -->
+                    <p id="letterVerse" class="texture-font text-[#5d4037] italic text-sm md:text-lg font-medium relative z-10 text-center px-2 md:px-4 leading-relaxed">
+                        <!-- Dynamic Verse -->
+                    </p>
+                    <p id="letterRef" class="text-center text-[#8a1c1c] font-bold mt-1 md:mt-2 text-[10px] md:text-xs tracking-wide uppercase title-font">
+                        <!-- Dynamic Reference -->
+                    </p>
+                </div>
+
+                <!-- Signature: 減少 margin -->
+                <div class="mt-4 md:mt-6 text-right pr-2 md:pr-4 shrink-0 pb-2">
+                    <p class="text-[#8a1c1c] font-bold text-sm md:text-base mb-1 transform -rotate-2 inline-block texture-font">愛你的，</p>
+                    <p class="text-lg md:text-2xl font-serif text-[#2c1810] texture-font">天父</p>
+                </div>
+
+            </div>
+            
+            <!-- Decorative Footer inside Letter -->
+            <div class="h-1 bg-[#b48b3b] mb-1 shrink-0"></div>
+            <div class="h-2 bg-[#8a1c1c] shrink-0"></div>
+        </div>
+    </div>
+
+    <script>
+        // 擴充後的資料庫：涵蓋安慰、造就、勸勉、身分、供應、方向等主題
+        // 所有經文已核對為 CUNP 神版
+        const messages = [
+            // --- 類別：安慰與同在 ---
+            {
+                title: "你不孤單",
+                content: "親愛的孩子，我知道最近的夜裡，你常常感覺到一股深深的孤單。那種即便在人群中喧鬧，心卻依然空蕩蕩的感覺，我全都看在眼裡。你可能覺得沒有人能真正理解你的掙扎，沒有人能體會你心底那份說不出的疲憊。但我看見了，我也在這裡。當全世界都安靜下來的時候，我是那位永遠聆聽你的神。不要害怕周圍的寂靜，也不要被那份孤獨感吞噬，因為正是在這樣的時刻，我想要更深地擁抱你。我的同在就像空氣一樣，無時無刻不包圍著你，只要你輕輕呼喚，我就回應你。",
+                verse: "你不要害怕，因為我與你同在；不要驚惶，因為我是你的神。我必堅固你，我必幫助你，我必用我公義的右手扶持你。",
+                reference: "以賽亞書 41:10"
+            },
+            {
+                title: "深夜的眼淚",
+                content: "我親愛的孩子，我看見你在深夜裡輾轉難眠，看見那些你不願在人前流露的淚水。你總是習慣在白天表現得堅強，把笑容掛在臉上，但夜深人靜時，那些壓抑的委屈與傷痛便如潮水般湧上心頭。請不要以為你的眼淚是徒勞的，也不要覺得這是一種軟弱。你的每一滴眼淚，我都細心收藏；你的每一次嘆息，我都側耳垂聽。把你的悲傷帶到我面前來吧，不要獨自承受這一切。讓我親自擦去你的淚水，用我溫柔的愛填補你心中的空缺，使你的心再次得著平靜。",
+                verse: "我幾次流離，你都記數；求你把我眼淚裝在你的皮袋裡。這不都記在你冊子上嗎？",
+                reference: "詩篇 56:8"
+            },
+            {
+                title: "放下重擔",
+                content: "孩子，我看見你肩膀上的重擔已經把你壓得喘不過氣了。工作上的壓力、家庭的責任、對未來的焦慮...這些東西就像一塊塊沈重的石頭，讓你幾乎忘記了輕鬆是什麼感覺。你總覺得必須靠自己硬撐，擔心一鬆手世界就會崩塌。但親愛的，這些重擔從來不是設計給你獨自承擔的。我渴望給你安息，渴望看見你輕省地奔跑。現在，試著深呼吸，把你手中抓得緊緊的憂慮鬆開，把它們交給我。讓我來為你掌舵，讓我成為你的力量。休息一下吧，在我的懷裡，你是安全的。",
+                verse: "凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。",
+                reference: "馬太福音 11:28"
+            },
+            
+            // --- 類別：身分與價值 ---
+            {
+                title: "無價之寶",
+                content: "這個世界常常用成就、外貌、財富來衡量你的價值，告訴你「你不夠好」、「你不夠成功」。那些聲音讓你感到自卑，讓你覺得自己好像比不上別人。但我親愛的孩子，請關掉那些噪音，聽我對你說：在我眼中，你是無價的珍寶。你的價值不在於你能做什麼，而在於你是誰——你是我深愛的孩子。為了你，我甚至願意付上極重的代價來贖回你。不要再透過別人的濾鏡看自己，要透過我的眼光來看自己。抬起頭來，你是皇室的成員，是被極深愛著的。",
+                verse: "惟有你們是被揀選的族類，是有君尊的祭司，是聖潔的國度，是屬神的子民。",
+                reference: "彼得前書 2:9"
+            },
+            {
+                title: "精心傑作",
+                content: "有時候你會看著鏡子，對自己的某些部分感到不滿意，甚至懷疑自己是不是個錯誤。但我告訴你，你不是意外，也不是流水線上的複製品。在我創造宇宙萬物時，我花費了心思精心地設計了你。你的個性、你的笑容、你的特質，甚至你認為的那些「怪癖」，都是我有意的安排，為了讓你成為獨一無二的你。你是我最滿意的作品，是我眼中的瞳人。不要輕看自己，因為創造你的神從不失誤。擁抱原本的你，活出我創造你的美好樣式吧。",
+                verse: "我們原是他的工作，在基督耶穌裡造成的，為要叫我們行善，就是神所預備叫我們行的。",
+                reference: "以弗所書 2:10"
+            },
+
+            // --- 類別：方向與引導 ---
+            {
+                title: "迷霧中的光",
+                content: "前面的路看起來模糊不清嗎？我知道你對未來充滿了不確定感，不知道下一步該往哪裡走，這種迷惘讓你感到焦慮。親愛的孩子，人生本來就是一場信心的旅程，你不需要看見整條路通往何方，你只需要看見我。就像在濃霧中行走，只要你緊緊牽著我的手，我就會一步一步引導你。不要過度依賴自己的聰明去分析每一個變數，那只會讓你更混亂。安靜下來，尋求我的面，相信我的時間表。我的光也許只照亮你腳前的一步，但那一步就足夠了。",
+                verse: "你要專心仰賴耶和華，不可倚靠自己的聰明，在你一切所行的事上都要認定他，他必指引你的路。",
+                reference: "箴言 3:5-6"
+            },
+            {
+                title: "美好的計畫",
+                content: "我知道目前的環境看起來不如你意，也許你遭遇了挫折，也許事情的發展超出了你的預期。你心裡充滿了問號：「為什麼會這樣？」但孩子，請相信我對你懷著美好的意念。我正在編織一個宏大的藍圖，現在的困難只是一個過程，是為了鍛鍊你的生命，讓你承接將來更大的祝福。不要因為眼前的烏雲就否定了背後的太陽。我對你的計畫是要賜平安，而不是降災禍，是要給你一個充滿盼望的未來。耐心等候，你會看見萬事互相效力。",
+                verse: "耶和華說：我知道我向你們所懷的意念是賜平安的意念，不是降災禍的意念，要叫你們末後有指望。",
+                reference: "耶利米書 29:11"
+            },
+
+            // --- 類別：勇氣與力量 ---
+            {
+                title: "剛強壯膽",
+                content: "面對眼前的挑戰和那些看似無法跨越的巨人，我知道你心裡感到渺小和害怕。你的雙手在發抖，你想逃避，想放棄。但孩子，得勝的關鍵從來不在於你的能力有多大，而在於你的神有多大。當年我如何與約書亞同在，帶領他攻破堅固的城池，今天我也同樣與你同在。不要看環境的艱難，要定睛在我的大能上。我沒有賜給你膽怯的心，而是剛強、仁愛、謹守的心。深吸一口氣，勇敢地跨出那一步，你會驚訝地發現，紅海將在你面前分開。",
+                verse: "我豈沒有吩咐你嗎？你當剛強壯膽！不要懼怕，也不要驚惶，因為你無論往哪裡去，耶和華你的神必與你同在。",
+                reference: "約書亞記 1:9"
+            },
+            {
+                title: "軟弱中的力量",
+                content: "這世界教導你要堅強，不能流露出一絲軟弱，所以你總是拼命地偽裝。但孩子，在我面前你不需要逞強。承認自己的軟弱並不可恥，也不代表失敗。相反地，當你承認自己「不能」的時候，正是我的能力要介入的時刻。我的恩典是在人的軟弱上顯得完全。當你覺得自己撐不下去、力氣用盡時，就倒在我的懷裡吧。我會成為你的力量，我會托住你。倚靠我，你會發現你能做到的，遠遠超乎你自己的想像。",
+                verse: "我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。",
+                reference: "哥林多後書 12:9"
+            },
+
+            // --- 類別：饒恕與新造 ---
+            {
+                title: "重新開始",
+                content: "親愛的，不要再讓過去的失敗捆綁你了。我知道你為了曾經做錯的決定、說錯的話而懊悔不已，甚至在心裡不斷地定罪自己。但昨天已經過去，今天我賜給你的是一個全新的禮物。無論你犯了什麼錯，只要你帶著誠實的心回轉向我，我就已經完全饒恕了你。我不記念你的過犯，你也不要再緊抓著不放。擦乾眼淚，站起來，我們重新出發。不要讓過去定義你的未來，在我的恩典裡，每一天都是新的開始。",
+                verse: "若有人在基督裡，他就是新造的人，舊事已過，都變成新的了。",
+                reference: "哥林多後書 5:17"
+            },
+            {
+                title: "無條件的愛",
+                content: "有些時候，你會覺得自己不配被愛，覺得自己太糟糕、太骯髒。你以為我的愛是需要靠好表現來換取的，如果表現不好，愛就會收回。但我親愛的孩子，這完全不是事實。我愛你，不是因為你做了什麼，而是因為你是我的。我的愛是無條件的，沒有任何事物——無論是你的軟弱、你的過犯、別人的批評，或是環境的艱難——能隔絕我對你的愛。這份愛是永恆的盟約，堅定不移。你永遠是被我深愛著的，這一點永遠不會改變。",
+                verse: "因為我深信無論是死，是生……都不能叫我們與神的愛隔絕；這愛是在我們的主基督耶穌裡的。",
+                reference: "羅馬書 8:38-39"
+            },
+
+            // --- 類別：供應與照顧 ---
+            {
+                title: "不必憂慮",
+                content: "經濟的壓力、生活的開銷、未知的缺乏，這些憂慮像藤蔓一樣纏繞著你的心，讓你睡不安穩。孩子，抬頭看看窗外的飛鳥，牠們不種也不收，也沒有糧倉，但我尚且養活牠們，讓牠們自由飛翔。難道你不比飛鳥貴重得多嗎？我是你的天父，我清楚知道你的一切需要。不要把時間花在憂慮明天上，憂慮不能解決問題，只會偷走今天的力量。將你的需要告訴我，相信我是耶和華以勒——預備的主。我必會照著我榮耀的豐富，供應你一切所需。",
+                verse: "我的神必照他榮耀的豐富，在基督耶穌裡，使你們一切所需用的都充足。",
+                reference: "腓立比書 4:19"
+            },
+            
+            // --- 更多豐富內容 ---
+            {
+                title: "平靜風浪",
+                content: "外面的環境也許狂風大作，生活中的突發狀況讓你措手不及，感到驚慌失措。但我的孩子，你心裡可以擁有一份超越環境的平靜。就像當年在船上，門徒驚慌呼救，但我一說話，風浪就平息了。今天，我也能平息你心中的風暴。不要把焦點放在那些令你恐懼的事物上，把眼目轉向我。我是那位掌管天地的主，只要有我在船上，你就不用害怕沈沒。我將我的平安賜給你，這平安是世界奪不走的。安息吧，我正在掌權。",
+                verse: "我留下平安給你們；我將我的平安賜給你們。……你們心裡不要憂愁，也不要膽怯。",
+                reference: "約翰福音 14:27"
+            },
+            {
+                title: "等候的藝術",
+                content: "等待是一門很難的功課，我知道你心急如焚，想快點看到結果，想快點脫離現狀。每分每秒的煎熬我都懂。但親愛的，就像農夫忍耐等候地裡寶貴的出產，我也正在這段等待的時間裡，在你的生命深處動工。這段時間不是浪費，也不是停滯，我正在扎深你的根基，擴張你的容量，磨練你的品格。若沒有經過冬天的沉潛，就沒有春天的綻放。耐心點，不要放棄，那等候我的必從新得力，你將如鷹展翅上騰。",
+                verse: "但那等候耶和華的必從新得力。他們必如鷹展翅上騰……",
+                reference: "以賽亞書 40:31"
+            },
+            {
+                title: "喜樂的良藥",
+                content: "親愛的，我看見你的眉頭深鎖，笑容似乎已經很久沒有出現在你臉上了。生活的重擔奪走了你的喜樂，讓你覺得生活充滿了苦澀。但我渴望看見你笑。喜樂不是因為環境順利才有的情緒，而是一種信心的選擇。是因為知道無論發生什麼事，我都在看顧你。喜樂是靈魂的良藥，能醫治受傷的心靈，使枯乾的骨頭滋潤。今天，試著轉移你的眼光，數算一下生命中那些微小的恩典，你會發現，即使在曠野中，也有值得感恩和喜樂的泉源。",
+                verse: "喜樂的心乃是良藥；憂傷的靈使骨枯乾。",
+                reference: "箴言 17:22"
+            },
+            {
+                title: "智慧的開端",
+                content: "你正站在人生的十字路口，感到困惑迷惘，不知道該做哪個決定嗎？各種聲音充斥在耳邊，讓你無所適從。孩子，不要只倚靠自己的經驗或分析，來到我面前求問吧。我樂意賜智慧給尋求我的人，而且是厚賜不吝嗇的神。安靜下來，關掉外界的雜音，聆聽我微小的聲音。我會賜給你屬天的智慧，讓你看見事情的全貌，分辨當行的路。把你的抉擇交給我，我會成為你腳前的燈，路上的光。",
+                verse: "你們中間若有缺少智慧的，應當求那厚賜與眾人、也不斥責人的神，主就必賜給他。",
+                reference: "雅各書 1:5"
+            },
+            {
+                title: "醫治的大能",
+                content: "無論是你身體上的病痛，還是心靈深處那些不為人知的創傷，我都知道。那些傷口或許已經結痂，但每當碰觸時依然隱隱作痛。親愛的孩子，我是那位醫治者（Jehovah Rapha）。不要隱藏你的傷口，把它們敞開在我面前。讓我溫柔的手觸摸你受傷的地方，讓我用愛膏油你的傷處。雖然復原的過程可能需要時間，也可能會痛，但我應許你，我必纏裹，我必醫治。在我的愛裡，你將重新變得完整，不再破碎。",
+                verse: "他醫好傷心的人，裹好他們的傷處。",
+                reference: "詩篇 147:3"
+            },
+            {
+                title: "愛的命令",
+                content: "孩子，這世界充滿了紛爭、仇恨和冷漠，但我呼召你成為不一樣的人。我呼召你成為和平之子，去愛那些不可愛的人，去饒恕那些傷害你的人。我知道這很難，非常難，這違背了人的本性。但請記得，當你還在做罪人的時候，我就已經這樣愛了你。不要靠自己的愛去愛，那會枯竭；要支取我的愛，讓我的愛像活水江河一樣流經你，去滋潤周圍的人。當你願意給出愛，你會發現自己並沒有因此減少，反而更加富足。",
+                verse: "我們愛，因為神先愛我們。",
+                reference: "約翰一書 4:19"
+            },
+            {
+                title: "避難所",
+                content: "這個世界有時像戰場，讓你感到疲憊不堪，遍體鱗傷。你一直在尋找一個可以安全停靠的港灣，一個可以卸下面具的地方。親愛的，不要再往外尋找了，快跑回到我這裡。我是你的避難所，是你的高臺，是你隨時的幫助。在我這裡，沒有定罪，沒有懼怕，只有完全的接納與安息。當暴風雨來襲時，躲在我的翅膀蔭下，直到災害過去。在這裡，你是絕對安全的，我是你堅固的保障。",
+                verse: "神是我們的避難所，是我們的力量，是我們在患難中隨時的幫助。",
+                reference: "詩篇 46:1"
+            },
+            {
+                title: "光的兒女",
+                content: "看著這世代的黑暗與敗壞，你或許會感到灰心，覺得自己微不足道，無法改變什麼。但孩子，你是我放在這世代的光。光的存在，就是為了照亮黑暗。不要把你的燈放在斗底下，不要隱藏你的善良、正直和真理。即使是一點微小的光，也能劃破厚重的黑暗，給人帶來方向與希望。活出你的呼召，用你的生命去影響生命。在這彎曲悖謬的世代，你要像明光照耀，讓人從你身上看見我的榮耀。",
+                verse: "你們是世上的光。城造在山上是不能隱藏的。",
+                reference: "馬太福音 5:14"
+            }
+        ];
+
+        // 狀態管理：記錄已讀過的信，避免重複
+        let seenIndices = new Set();
+
+        // 渲染網格
+        const gridContainer = document.getElementById('cardGrid');
+        const totalBoxes = 12; // 顯示 12 個信箱
+
+        // 渲染信封
+        for (let i = 0; i < totalBoxes; i++) {
+            const card = document.createElement('div');
+            card.className = 'envelope-card rounded cursor-pointer group flex items-center justify-center';
+            card.style.height = '180px';
+            
+            // 隨機旋轉角度，增加自然感
+            const rotate = Math.random() * 2 - 1; 
+            card.style.transform = `rotate(${rotate}deg)`;
+
+            // 信封內容 HTML
+            card.innerHTML = `
+                <div class="absolute inset-0 bg-[#fdfbf7] flex flex-col items-center justify-center p-4">
+                    <!-- 郵票裝飾 -->
+                    <div class="absolute top-3 right-3 opacity-60">
+                        <div class="w-10 h-12 border-2 border-[#d4af37] border-dotted flex items-center justify-center bg-[#fffaf0]">
+                            <i class="fa-solid fa-cross text-[#d4af37] text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 寄件者/收件者文字 -->
+                    <div class="w-full text-left mb-4 pl-2">
+                        <div class="h-px w-16 bg-slate-300 mb-1"></div>
+                        <div class="h-px w-24 bg-slate-300"></div>
+                    </div>
+
+                    <!-- 火漆印 (點擊觸發點) -->
+                    <div class="wax-seal z-10 transition-transform duration-300 group-hover:scale-110">
+                        <i class="fa-solid fa-heart text-sm"></i>
+                    </div>
+
+                    <!-- Modified to Traditional Chinese "開啟" instead of OPEN -->
+                    <div class="mt-4 text-[#8a1c1c] font-bold text-sm tracking-widest opacity-70 group-hover:opacity-100 transition-opacity title-font">
+                        開啟
+                    </div>
+                </div>
+            `;
+
+            // 綁定點擊事件
+            card.onclick = () => openRandomLetter();
+            gridContainer.appendChild(card);
+        }
+
+        // 開啟隨機信件邏輯
+        function openRandomLetter() {
+            // 如果所有信都看過了，重置記錄
+            if (seenIndices.size >= messages.length) {
+                seenIndices.clear();
+            }
+
+            // 尋找一個還沒看過的索引
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * messages.length);
+            } while (seenIndices.has(randomIndex));
+
+            // 記錄這個索引
+            seenIndices.add(randomIndex);
+            
+            const message = messages[randomIndex];
+
+            // 填充內容
+            document.getElementById('letterTitle').textContent = message.title;
+            document.getElementById('letterContent').textContent = message.content;
+            document.getElementById('letterVerse').textContent = message.verse;
+            document.getElementById('letterRef').textContent = message.reference;
+
+            // 顯示模態框
+            const modal = document.getElementById('modal');
+            modal.classList.add('active');
+        }
+
+        // 關閉信件
+        function closeLetter(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+        }
+
+        // 開啟說明視窗
+        function openInfo() {
+            const modal = document.getElementById('infoModal');
+            modal.classList.add('active');
+        }
+
+        // 關閉說明視窗
+        function closeInfo(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('infoModal');
+            modal.classList.remove('active');
+        }
+
+        // [新增] 頁面載入後自動開啟說明視窗
+        window.addEventListener('load', function() {
+            // 設定一個小延遲，讓頁面元素先渲染出來，體驗比較流暢
+            setTimeout(openInfo, 600);
+        });
+    </script>
+</body>
+</html>

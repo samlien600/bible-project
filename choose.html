@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>生命指南針 | Life Compass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'grow-width': 'growWidth 1s ease-out forwards',
+                        'grow-height': 'growHeight 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards', /* Bouncy effect */
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        growWidth: {
+                            '0%': { width: '0%' },
+                            '100%': { width: 'var(--target-width)' },
+                        },
+                        growHeight: {
+                            '0%': { height: '0%' },
+                            '100%': { height: 'var(--target-height)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap');
+
+        /* Custom Scrollbar for the Card Content */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            margin: 4px 0;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Glass Panel Utility */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-[100dvh] w-screen overflow-hidden relative selection:bg-indigo-500 selection:text-white">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[80vw] h-[80vw] max-w-[500px] max-h-[500px] bg-indigo-900/20 rounded-full blur-[80px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[80vw] h-[80vw] max-w-[500px] max-h-[500px] bg-purple-900/20 rounded-full blur-[80px] animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app" class="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 md:p-6">
+        <!-- Content will be injected here by JavaScript -->
+    </div>
+
+    <!-- Icons -->
+    <div style="display: none;">
+        <!-- UI Icons -->
+        <svg id="icon-compass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <svg id="icon-arrow-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <svg id="icon-chevron-right" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg id="icon-refresh" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <svg id="icon-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <svg id="icon-book-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+
+        <!-- Result Theme Icons -->
+        <svg id="icon-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="icon-zap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg id="icon-star" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg id="icon-shield" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg id="icon-book" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <svg id="icon-cloud" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 16v6"/><path d="M8 16v6"/><path d="M12 18v6"/></svg>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const DIMENSION_NAMES = ['安慰', '智慧', '行動', '愛', '公義', '故事', '盼望'];
+        
+        // Map internal ID to YouVersion (Bible.com) code
+        const YOUVERSION_MAP = {
+            'Gen': 'GEN', 'Exo': 'EXO', 'Lev': 'LEV', 'Num': 'NUM', 'Deu': 'DEU',
+            'Jos': 'JOS', 'Jdg': 'JDG', 'Rut': 'RUT', '1Sa': '1SA', '2Sa': '2SA',
+            '1Ki': '1KI', '2Ki': '2KI', '1Ch': '1CH', '2Ch': '2CH', 'Ezr': 'EZR',
+            'Neh': 'NEH', 'Est': 'EST', 'Job': 'JOB', 'Psa': 'PSA', 'Pro': 'PRO',
+            'Ecc': 'ECC', 'Son': 'SNG', 'Isa': 'ISA', 'Jer': 'JER', 'Lam': 'LAM',
+            'Eze': 'EZK', 'Dan': 'DAN', 'Hos': 'HOS', 'Joe': 'JOL', 'Amo': 'AMO',
+            'Oba': 'OBA', 'Jon': 'JON', 'Mic': 'MIC', 'Nah': 'NAM', 'Hab': 'HAB',
+            'Zep': 'ZEP', 'Hag': 'HAG', 'Zec': 'ZEC', 'Mal': 'MAL', 'Mat': 'MAT',
+            'Mar': 'MRK', 'Luk': 'LUK', 'Joh': 'JHN', 'Act': 'ACT', 'Rom': 'ROM',
+            '1Co': '1CO', '2Co': '2CO', 'Gal': 'GAL', 'Eph': 'EPH', 'Phi': 'PHP',
+            'Col': 'COL', '1Th': '1TH', '2Th': '2TH', '1Ti': '1TI', '2Ti': '2TI',
+            'Tit': 'TIT', 'Phm': 'PHM', 'Heb': 'HEB', 'Jam': 'JAS', '1Pe': '1PE',
+            '2Pe': '2PE', '1Jo': '1JN', '2Jo': '2JN', '3Jo': '3JN', 'Jud': 'JUD',
+            'Rev': 'REV'
+        };
+
+        const BIBLE_BOOKS = [
+            // Pentateuch - Adjusted for distinction: Law/Justice high, Story high
+            { id: 'Gen', name: '創世記', tags: [1, 2, 2, 2, 3, 5, 2], intro: '萬物的起源，家族的興衰，看見創造與揀選的計畫。', verse: '起初，神創造天地。', verseRef: '創世記 1:1', author: '摩西', details: '創世記是聖經的開篇，敘述了宇宙的起源、人類的受造以及罪的進入。後半部聚焦於亞伯拉罕、以撒、雅各和約瑟四代族長的家族歷史。它解答了「我們從何而來」的問題，並展示了即便在人的軟弱與失敗中，神仍有宏大的祝福計畫。', themes: '創造、墮落、揀選、應許' },
+            { id: 'Exo', name: '出埃及記', tags: [1, 2, 5, 1, 4, 5, 3], intro: '從奴隸到自由的旅程，經歷救贖與大能。', verse: '耶和華是我的力量，我的詩歌，也成了我的拯救。', verseRef: '出埃及記 15:2', author: '摩西', details: '記載以色列人如何奇蹟般地脫離埃及的奴役，穿越紅海，並在西奈山領受律法。這卷書描繪了神如何介入歷史，釋放受壓迫的人，並建立聖幕作為祂與人同住的記號。這是一段關於自由、身份認同與建立神聖契約的壯闊旅程。', themes: '救贖、律法、同在、釋放' },
+            { id: 'Lev', name: '利未記', tags: [0, 1, 1, 0, 5, 0, 1], intro: '關於聖潔與敬拜的指引，學習如何親近神。', verse: '你們要聖潔，因為我耶和華─你們的神是聖潔的。', verseRef: '利未記 11:45', author: '摩西', details: '這是一本關於「如何生活在聖潔的神面前」的手冊。雖然充滿了獻祭禮儀與潔淨條例，其核心精神卻是呼召人在生活的每一個細節——飲食、關係、節期——中分別為聖。它提醒我們，敬拜不僅發生在會幕裡，更體現在日常生活的聖潔中。', themes: '聖潔、獻祭、節期、潔淨' },
+            { id: 'Num', name: '民數記', tags: [1, 2, 4, 1, 3, 4, 1], intro: '曠野中的試煉與信心的功課，在管教中仍有恩典。', verse: '耶和華賜福給你，保護你。', verseRef: '民數記 6:24', author: '摩西', details: '這卷書記錄了以色列人在曠野漂流近四十年的歷史。從數點百姓開始，經歷了無數次的抱怨、悖逆與神的管教。這是一面鏡子，反映出人性在困難環境中的真實面貌，同時也見證了神的信實——即便人失信，祂仍引導他們走向應許之地。', themes: '信實、管教、曠野、引導' },
+            { id: 'Deu', name: '申命記', tags: [2, 4, 2, 3, 4, 1, 3], intro: '重申愛的約定，提醒在進入新階段前莫忘初衷。', verse: '你要盡心、盡性、盡力愛耶和華─你的神。', verseRef: '申命記 6:5', author: '摩西', details: '這是摩西臨終前對新生代以色列人的三篇語重心長的講道。他回顧過去的歷史，重申律法的精意，並呼籲百姓要「盡心、盡性、盡力」愛神。申命記不是枯燥的律法條文，而是充滿情感的勸勉，教導人如何在豐盛中不忘記賜福的源頭。', themes: '回顧、順服、愛神、傳承' },
+
+            // History - High Story, Varied Action
+            { id: 'Jos', name: '約書亞記', tags: [1, 2, 5, 1, 3, 5, 3], intro: '剛強壯膽的應許，帶領你跨越障礙，得地為業。', verse: '你當剛強壯膽！不要懼怕，也不要驚惶。', verseRef: '約書亞記 1:9', author: '約書亞', details: '這是一部關於征服與實現應許的史詩。約書亞接續摩西帶領百姓過約旦河，攻取耶利哥，並將土地分給各支派。這卷書強調「剛強壯膽」與「順服神的話語」是得勝的關鍵。對於正面臨生命巨大挑戰或轉折點的人來說，這是最好的行動指南。', themes: '勇氣、得勝、應許、信實' },
+            { id: 'Jdg', name: '士師記', tags: [0, 1, 4, 0, 3, 5, 1], intro: '在混亂的世代中，看見人的軟弱與神不放棄的拯救。', verse: '那時以色列中沒有王，各人任意而行。', verseRef: '士師記 21:25', author: '傳統認為是撒母耳', details: '這是一個關於「悖逆、受苦、呼求、拯救」的循環歷史。書中記載了基甸、參孫等士師的故事。這是一個道德相對主義盛行的時代，人們「任意而行」。這卷書深刻地描繪了當社會失去絕對真理標準時的混亂，以及神在絕望中一次次興起拯救者的憐憫。', themes: '循環、墮落、拯救、軟弱' },
+            { id: 'Rut', name: '路得記', tags: [4, 1, 2, 5, 2, 5, 3], intro: '平凡生活中的忠誠與愛，看見奇妙的護理與眷顧。', verse: '你的國就是我的國，你的神就是我的神。', verseRef: '路得記 1:16', author: '不詳', details: '在士師記混亂的大背景下，路得記像是一首田園詩，講述了一個外邦女子路得對婆婆拿俄米不離不棄的愛。這卷書展示了神如何在平凡人的苦難與忠誠中，編織祂宏大的救贖計畫。它告訴我們：沒有任何微小的善行在神眼中是徒然的。', themes: '忠誠、救贖、恩慈、護理' },
+            { id: '1Sa', name: '撒母耳記上', tags: [2, 3, 4, 1, 3, 5, 2], intro: '聽命勝於獻祭，在人的選擇與主權中學習謙卑。', verse: '耶和華不像人看人：人是看外貌；耶和華是看內心。', verseRef: '撒母耳記上 16:7', author: '不詳', details: '記載了以色列從士師時代轉型為王國的過程，聚焦於撒母耳、掃羅與大衛三個人物。書中充滿了關於領導力、順服與人性的深刻洞見。掃羅的失敗與大衛的興起形成強烈對比，教導我們神看重的是內心的誠實與對祂的依靠，而非外在的優勢。', themes: '揀選、順服、王權、內心' },
+            { id: '2Sa', name: '撒母耳記下', tags: [2, 2, 3, 2, 4, 5, 2], intro: '合神心意的人也會跌倒，但悔改帶來復興與恩典。', verse: '我必堅定他的國位，直到永遠。', verseRef: '撒母耳記下 7:16', author: '不詳', details: '專注於大衛作王時期的歷史。他是合神心意的人，但也犯下了嚴重的罪。這卷書沒有掩飾英雄的污點，反而真實地記錄了罪的後果以及真實悔改帶來的赦免。它向我們展示了，一個領袖的偉大不在於不犯錯，而在於在神面前破碎與重整的勇氣。', themes: '悔改、恩典、後果、約' },
+            { id: '1Ki', name: '列王紀上', tags: [1, 4, 3, 1, 3, 5, 1], intro: '智慧的開端與國度的分裂，看見順服與悖逆的結局。', verse: '求你賜我智慧，可以判斷你的民。', verseRef: '列王紀上 3:9', author: '傳統認為是耶利米', details: '從所羅門的輝煌到王國的分裂。這卷書探討了政治與信仰的關係。所羅門求智慧的故事令人嚮往，但他晚年的妥協也帶來警示。書中也記載了以利亞先知挑戰巴力先知的戲劇性場面，強調在妥協的世代中，堅持真理需要極大的勇氣。', themes: '智慧、分裂、先知、偶像' },
+            { id: '2Ki', name: '列王紀下', tags: [1, 2, 4, 1, 3, 5, 1], intro: '先知的神蹟與國家的存亡，話語絕不落空。', verse: '與我們同在的，比與他們同在的更多。', verseRef: '列王紀下 6:16', author: '傳統認為是耶利米', details: '延續南北國的歷史直到滅亡。這段時期充滿了以利沙的神蹟，但也充滿了國家的動盪。這卷書悲劇性地展示了當一個民族持續離棄真理源頭時，最終將導致的衰敗與被擄。然而，即便在絕望中，神仍透過先知說話，並保留餘種。', themes: '神蹟、審判、流亡、信實' },
+            { id: '1Ch', name: '歷代志上', tags: [2, 1, 2, 2, 2, 4, 3], intro: '追本溯源，在敬拜與次序中重尋身分與歸屬。', verse: '應當稱謝耶和華；因他本是良善的，他的慈愛永遠長存！', verseRef: '歷代志上 16:34', author: '傳統認為是以斯拉', details: '這卷書以冗長的家譜開篇，這是為了幫助被擄歸回的百姓重新確立身分認同。書中重述了大衛的歷史，但特別聚焦於他對聖殿建造的預備與敬拜制度的設立。它提醒我們，無論歷史如何變遷，以神為中心的敬拜生活才是穩固的根基。', themes: '家譜、敬拜、預備、身分' },
+            { id: '2Ch', name: '歷代志下', tags: [2, 1, 2, 2, 3, 4, 4], intro: '歸向的呼召，當人自卑禱告，神必醫治這地。', verse: '這稱為我名下的子民，若是自卑、禱告，尋求我的面...', verseRef: '歷代志下 7:14', author: '傳統認為是以斯拉', details: '記載了猶大諸王的歷史，特別強調那些帶來宗教改革的君王（如希西家、約西亞）。書中的核心信息是「尋求神」。它給出了著名的應許：當百姓自卑、禱告、轉離惡行時，神必從天上垂聽，赦免他們的罪，醫治他們的地。', themes: '改革、復興、禱告、醫治' },
+            { id: 'Ezr', name: '以斯拉記', tags: [2, 4, 4, 2, 3, 4, 3], intro: '重建聖殿與信仰的根基，恢復對話語的渴慕。', verse: '以斯拉定志考究遵行耶和華的律法。', verseRef: '以斯拉記 7:10', author: '以斯拉', details: '講述了被擄百姓分批回歸耶路撒冷，並在艱難中重建聖殿的過程。文士以斯拉在後半部登場，致力於教導律法，帶來屬靈的復興。這卷書教導我們，外在建築的重建固然重要，但內在信仰根基的重建與對真理的渴慕更為關鍵。', themes: '回歸、重建、教導、聖潔' },
+            { id: 'Neh', name: '尼希米記', tags: [1, 3, 5, 2, 3, 5, 3], intro: '在廢墟中重建城牆，結合禱告與行動的領袖榜樣。', verse: '靠耶和華而得的喜樂是你們的力量。', verseRef: '尼希米記 8:10', author: '尼希米', details: '這是一本卓越的領導力手冊。尼希米放棄波斯王宮的舒適，回到荒涼的耶路撒冷重建城牆。他面對內憂外患，一手做工，一手拿兵器。這卷書展示了禱告與策劃、信心與行動如何完美結合，激勵我們為著共同的異象勇敢站立。', themes: '領導、建造、抵擋、喜樂' },
+            { id: 'Est', name: '以斯帖記', tags: [2, 3, 5, 2, 3, 5, 3], intro: '雖然看不見神的名字，卻處處看見隱藏的保守。', verse: '焉知你得了王后的位分不是為現今的機會嗎？', verseRef: '以斯帖記 4:14', author: '不詳', details: '這是聖經中唯一沒有提到「神」字樣的書卷，但神的指紋卻遍布全書。講述猶太女子以斯帖如何成為波斯王后，並在民族危急存亡之際，運用智慧與勇氣拯救同胞。這卷書告訴我們，即使在看似神缺席的時刻，祂仍在幕後掌權，逆轉局勢。', themes: '護理、勇氣、時機、逆轉' },
+
+            // Poetry & Wisdom - High Wisdom/Comfort, Low Action/Story (except Job)
+            { id: 'Job', name: '約伯記', tags: [4, 4, 0, 1, 3, 3, 2], intro: '在苦難中尋求意義，雖然不明白，仍選擇信靠。', verse: '然而他知道我所行的路；他試煉我之後，我必如精金。', verseRef: '約伯記 23:10', author: '不詳', details: '探討了人類永恆的問題：「義人為何受苦？」約伯在一夕之間失去一切，他在痛苦中與神辯論。這卷書沒有給出廉價的安慰，也沒有簡單的答案，而是透過神在大自然中顯出的威嚴，引導人進入更深層的信靠。它是受苦者的安慰，也是信心的煉淨。', themes: '苦難、主權、奧祕、信靠' },
+            { id: 'Psa', name: '詩篇', tags: [5, 3, 1, 4, 2, 0, 3], intro: '情感的避難所，用讚美與禱告與心意對齊。', verse: '我的心哪，你為何憂悶？...應當仰望神。', verseRef: '詩篇 42:5', author: '大衛等多位作者', details: '這是一本靈魂的解剖學，包含150首詩歌。無論是極度的喜樂、深沉的悲傷、憤怒的控訴還是平靜的信靠，人類所有的情感都在這裡向神敞開。詩篇教導我們如何禱告，如何將真實的情緒帶到神面前，並在讚美中重新得力。', themes: '讚美、哀歌、情感、敬拜' },
+            { id: 'Pro', name: '箴言', tags: [1, 5, 2, 1, 3, 0, 1], intro: '生活的實用指南，敬畏是智慧的開端。', verse: '你要專心仰賴耶和華，不可倚靠自己的聰明。', verseRef: '箴言 3:5', author: '所羅門等', details: '這是一本關於生活藝術的書。它提供了精煉的格言，涵蓋了財富、言語、工作、家庭、友誼等各個層面。箴言強調智慧不是抽象的理論，而是具體的生活技能，而這一切的基礎在於「敬畏耶和華」。它是追求卓越人生者的必讀指南。', themes: '智慧、生活、言語、紀律' },
+            { id: 'Ecc', name: '傳道書', tags: [2, 5, 0, 1, 0, 0, 1], intro: '看透世事的虛空，在日光之下尋找日光之上的意義。', verse: '這些事都已聽見了，總意就是：敬畏神，謹守他的誡命。', verseRef: '傳道書 12:13', author: '所羅門', details: '作者以極度誠實的筆觸，剖析了在「日光之下」追求名利、享樂、知識的虛空。如果沒有永恆的維度，一切都是捕風。這卷書看似悲觀，實則引導人打破對物質世界的幻象，回歸簡單的生活，享受神當下的賜予，並記念造物的主。', themes: '虛空、意義、永恆、當下' },
+            { id: 'Son', name: '雅歌', tags: [3, 1, 0, 5, 0, 1, 2], intro: '良人與佳偶的愛情，體會那份熱情如火的愛。', verse: '我的良人屬我，我也屬他。', verseRef: '雅歌 2:16', author: '所羅門', details: '這是一首關於愛情的歌劇。表面上描寫男女之間熾熱、親密的愛情與相思，在屬靈層面上，它象徵了神與人之間神聖而親密的關係。它肯定了愛的美好與神聖，並提醒我們，信仰的核心不僅是教條，更是一份充滿熱情的愛之關係。', themes: '愛情、親密、渴望、聯合' },
+
+            // Major Prophets - High Hope/Justice/Future
+            { id: 'Isa', name: '以賽亞書', tags: [4, 3, 1, 3, 4, 1, 5], intro: '雖然有審判，更有救恩的盼望，預言救贖者的降臨。', verse: '得救在乎歸回安息；得力在乎平靜安穩。', verseRef: '以賽亞書 30:15', author: '以賽亞', details: '被稱為「小聖經」，結構宏大。前半部多講審判與警告，後半部則充滿安慰與救贖的應許。書中對「受苦的僕人」（彌賽亞）有極其詳盡的預言。這卷書展現了神的聖潔與威嚴，同時也展現了祂如母親般安慰百姓的溫柔。', themes: '聖潔、救贖、彌賽亞、安慰' },
+            { id: 'Jer', name: '耶利米書', tags: [3, 2, 2, 3, 4, 2, 2], intro: '流淚先知的心聲，拆毀是為了更好的建立。', verse: '耶和華說：我知道我向你們所懷的意念是賜平安的意念。', verseRef: '耶利米書 29:11', author: '耶利米', details: '耶利米生於國家將亡之際，被迫宣講不受歡迎的審判信息，因此被稱為「流淚的先知」。這卷書記錄了他內心的掙扎與痛苦，但也包含極其寶貴的應許，如「新約」的設立。它教導我們，有時候舊的必須被拆毀，新的生命才能建立。', themes: '眼淚、新約、拆毀、建立' },
+            { id: 'Lam', name: '耶利米哀歌', tags: [5, 1, 0, 2, 3, 0, 2], intro: '在廢墟中的哀哭，但誠實極其廣大，每早晨都是新的。', verse: '我們不致消滅，是出於耶和華諸般的慈愛。', verseRef: '耶利米哀歌 3:22', author: '耶利米', details: '這是為耶路撒冷毀滅而作的五首葬歌。作者在極度悲痛中，沒有否認痛苦，而是將痛苦昇華為對神的仰望。書中核心的宣告——「你的誠實極其廣大，每早晨這都是新的」——是在最黑暗的時刻發出的光芒，帶給受苦者無比的安慰。', themes: '哀傷、盼望、信實、憐憫' },
+            { id: 'Eze', name: '以西結書', tags: [2, 2, 3, 1, 4, 2, 5], intro: '看見枯骨復活的異象，靈風要吹進你的生命。', verse: '我也要賜給你們一個新心，將新靈放在你們裡面。', verseRef: '以西結書 36:26', author: '以西結', details: '以西結是被擄到巴比倫的祭司與先知。這卷書充滿了奇異的異象（如四活物、枯骨復活）。它強調神的榮耀不被聖殿的牆垣所限制，祂要在列國中顯明祂的名。枯骨復活的異象強有力地宣告：在神沒有難成的事，祂能使絕望的生命重現生機。', themes: '榮耀、異象、復活、新心' },
+            { id: 'Dan', name: '但以理書', tags: [2, 4, 3, 1, 4, 4, 5], intro: '在外邦中堅守信仰，神掌管歷史的更迭與終局。', verse: '這神在天上、地下施行神蹟奇事。', verseRef: '但以理書 6:27', author: '但以理', details: '前半部講述但以理和朋友在異國宮廷中堅守信仰的故事（獅子坑、火窯），後半部則是關於末世的異象。這卷書鼓勵在敵對環境中的信徒：即使政權更迭，歷史動盪，至高者仍在人的國中掌權，祂的國度將存到永遠。', themes: '主權、忠誠、預言、國度' },
+
+            // Minor Prophets - Specific Justice/Hope niches
+            { id: 'Hos', name: '何西阿書', tags: [3, 1, 2, 5, 3, 1, 2], intro: '那份不離不棄的愛，呼喚迷失者歸回。', verse: '我們務要認識耶和華，竭力追求認識他。', verseRef: '何西阿書 6:3', author: '何西阿', details: '神命令先知去娶一個淫婦，以此象徵神對不忠子民那種心碎卻又堅定的愛。這是一卷關於「單向的愛」的書。它深刻地描繪了罪如何傷了神的心，以及神如何用愛索將人牽引回來。它呼喚我們在關係中不僅是守約，更是要有深情的認識。', themes: '忠貞、背道、慈愛、歸回' },
+            { id: 'Joe', name: '約珥書', tags: [1, 1, 3, 1, 4, 0, 4], intro: '末後的日子，靈要澆灌凡有血氣的。', verse: '凡求告耶和華名的就必得救。', verseRef: '約珥書 2:32', author: '約珥', details: '以一場毀滅性的蝗災為切入點，預表「耶和華的日子」——那是審判也是拯救的日子。約珥書最著名的預言是關於聖靈的澆灌。它呼籲百姓不僅要撕裂衣服，更要撕裂心腸歸向神。這是一卷關於靈性覺醒與復興的書。', themes: '審判、聖靈、悔改、復興' },
+            { id: 'Amo', name: '阿摩司書', tags: [0, 2, 4, 0, 5, 0, 1], intro: '為公義發聲，願公平如大水滾滾。', verse: '惟願公平如大水滾滾，使公義如江河滔滔。', verseRef: '阿摩司書 5:24', author: '阿摩司', details: '阿摩司原本是個牧人，卻發出了最強烈的社會公義呼聲。他嚴厲指責當時社會的奢華、對窮人的壓榨以及虛假的宗教儀式。這卷書提醒我們，真正的信仰必然帶來社會責任的實踐，神厭惡沒有公義行為的宗教聚會。', themes: '公義、審判、社會責任' },
+            { id: 'Oba', name: '俄巴底亞書', tags: [0, 1, 3, 0, 5, 0, 2], intro: '驕傲在敗壞以先，神必審判狂傲，為受苦者伸冤。', verse: '必有拯救者上到錫安山...國度就歸耶和華了。', verseRef: '俄巴底亞書 1:21', author: '俄巴底亞', details: '這是舊約最短的書卷，專門針對以東國的審判。以東在以色列遭難時幸災樂禍、落井下石。這卷書警告所有的旁觀者與驕傲者：神看顧祂百姓的苦難，必會按公義報應。它向受苦者保證，正義終將得到伸張。', themes: '驕傲、報應、公義' },
+            { id: 'Jon', name: '約拿書', tags: [2, 2, 3, 3, 2, 5, 2], intro: '逃避神的人與憐憫人的神，學習體貼神的心腸。', verse: '救恩出於耶和華。', verseRef: '約拿書 2:9', author: '約拿', details: '這是一個戲劇性的故事。不情願的先知約拿試圖逃避呼召，卻經歷了大魚的吞吐，最終去向敵國傳道。這卷書諷刺了狹隘的民族主義，展示了神對萬國（甚至包括敵人、動物）廣大的憐憫。它挑戰我們：你是否願意去愛那些你認為「不配」的人？', themes: '憐憫、宣教、主權、悔改' },
+            { id: 'Mic', name: '彌迦書', tags: [2, 3, 3, 2, 5, 0, 3], intro: '神向你所要的是什麼？只要你行公義，好憐憫。', verse: '存謙卑的心，與你的神同行。', verseRef: '彌迦書 6:8', author: '彌迦', details: '彌迦既宣告審判也宣告盼望，著名的「伯利恆預言」即出於此。他總結了信仰的精髓：神不看重千千萬萬的獻祭，而是看重「行公義，好憐憫，存謙卑的心，與神同行」。這是對形式主義信仰的一記當頭棒喝。', themes: '公義、謙卑、真信仰' },
+            { id: 'Nah', name: '那鴻書', tags: [1, 1, 3, 0, 5, 0, 1], intro: '神是忌邪施報的神，也是在患難日子認得祂之人的保障。', verse: '耶和華本為善，在患難的日子為人的保障。', verseRef: '那鴻書 1:7', author: '那鴻', details: '這是關於尼尼微城（亞述帝國首都）傾覆的預言。不同於約拿書時的悔改，這次尼尼微因其殘暴終將受審。這卷書展現了神是戰士，祂必擊打惡勢力，保護投靠祂的人。對於受壓迫的群體而言，這是神必伸冤的安慰之書。', themes: '審判、保障、公義' },
+            { id: 'Hab', name: '哈巴谷書', tags: [3, 4, 2, 1, 3, 0, 4], intro: '在困惑中與神對話，雖然無花果樹不發旺，仍因救我的神喜樂。', verse: '惟義人因信得生。', verseRef: '哈巴谷書 2:4', author: '哈巴谷', details: '先知與神展開了一場激烈的對話：「為何惡人吞滅比自己公義的人？」神沒有直接解釋苦難的原因，而是啟示祂的榮耀。哈巴谷最終從懷疑轉為信心的讚歌，宣告即便是環境全然絕望，他仍要因耶和華歡欣。這是關於「信心」極致的詮釋。', themes: '信心、疑問、喜樂、榮耀' },
+            { id: 'Zep', name: '西番雅書', tags: [2, 1, 2, 3, 4, 0, 3], intro: '神在你中間必因你歡欣喜樂，默然愛你。', verse: '耶和華─你的神是施行拯救、大有能力的主。', verseRef: '西番雅書 3:17', author: '西番雅', details: '這卷書以嚴厲的審判開始，卻以極其溫柔的應許結束。它描繪了神像一位慈愛的父親，抱著祂的百姓歌唱。這讓我們看見，神的管教最終是為了恢復關係。那句「祂必默然愛你，且因你喜樂而歡呼」是整本聖經中最動人的畫面之一。', themes: '審判、喜樂、歸回、愛' },
+            { id: 'Hag', name: '哈该書', tags: [1, 2, 5, 1, 2, 0, 3], intro: '省察你的行為，優先建立神的家，神必賜福。', verse: '這殿後來的榮耀必大過先前的榮耀。', verseRef: '哈該書 2:9', author: '哈該', details: '當時百姓回歸後只顧建造自己的房屋，卻任憑聖殿荒涼。哈該挑戰他們的優先次序：「你們撒的種多，收的卻少...」。這卷書教導我們關於生活優先次序的功課：當我們先求神的國和義，生活的其他層面自然會蒙福與歸正。', themes: '優先次序、重建、榮耀' },
+            { id: 'Zec', name: '撒迦利亞書', tags: [2, 2, 3, 1, 3, 1, 5], intro: '不是倚靠勢力，不是倚靠才能，乃是倚靠神的靈方能成事。', verse: '萬軍之耶和華說：不是倚靠勢力，不是倚靠才能...', verseRef: '撒迦利亞書 4:6', author: '撒迦利亞', details: '這是一卷充滿異象的書（如金燈台、飛卷）。它不僅鼓勵重建聖殿，更遙指未來的彌賽亞君王——祂將謙謙和和地騎著驢駒來到。這卷書的核心在於依靠聖靈的大能而非人的血氣，並展望神最終在全地的掌權。', themes: '聖靈、異象、彌賽亞、聖潔' },
+            { id: 'Mal', name: '瑪拉基書', tags: [1, 2, 3, 3, 4, 0, 2], intro: '神不變的愛與公義，必有公義的日頭出現，其光線有醫治之能。', verse: '萬軍之耶和華說：我曾愛你們。', verseRef: '瑪拉基書 1:2', author: '瑪拉基', details: '作為舊約的最後一卷書，它以「我曾愛你們」開場，卻面對百姓冷漠的質疑。書中透過一連串的問答，指出百姓在奉獻、婚姻、事奉上的敷衍。它呼籲真實的悔改，並預言在沉默四百年後，將有使者（施洗約翰）為彌賽亞預備道路。', themes: '辯論、奉獻、守約、預備' },
+
+            // Gospels & Acts - High Love/Story/Action
+            { id: 'Mat', name: '馬太福音', tags: [2, 4, 3, 3, 4, 5, 3], intro: '天國的君王，成全了律法，帶來了天國的法則。', verse: '你們要先求他的國和他的義。', verseRef: '馬太福音 6:33', author: '馬太', details: '馬太為猶太讀者寫作，引用大量舊約預言，證明耶穌就是那應許的彌賽亞、大衛的子孫。書中包含著名的「登山寶訓」，闡述了天國子民的生活準則。它強調耶穌是君王，也是完美的教師，來成全律法而非廢掉律法。', themes: '天國、君王、成全、權柄' },
+            { id: 'Mar', name: '馬可福音', tags: [1, 2, 5, 3, 2, 5, 2], intro: '僕人君王，忙碌卻專注，為要服事人並捨命。', verse: '人子來，並不是要受人的服事，乃是要服事人。', verseRef: '馬可福音 10:45', author: '馬可', details: '這是最早寫成、節奏最快的福音書。常用「隨即」、「立刻」等詞，展現耶穌作為「受苦僕人」的行動力。馬可較少記載長篇講論，更多記載神蹟與行動。它向我們展示了一位捲起袖子服事、並最終走上十字架捨命的行動派救主。', themes: '僕人、行動、受苦、捨命' },
+            { id: 'Luk', name: '路加福音', tags: [4, 3, 2, 5, 3, 5, 3], intro: '人子耶穌，尋找拯救失喪的人，充滿對邊緣人的憐憫。', verse: '人子來，為要尋找、拯救失喪的人。', verseRef: '路加福音 19:10', author: '路加 (醫生)', details: '路加是一位醫生兼歷史學家，他的筆觸細膩，充滿人文關懷。這卷書特別關注婦女、窮人、稅吏等社會邊緣人。著名的「浪子回頭」比喻就記載於此。它展現了耶穌完美的人性，以及神對每一個失喪靈魂深切的尋回之愛。', themes: '人子、憐憫、邊緣人、禱告' },
+            { id: 'Joh', name: '約翰福音', tags: [4, 5, 1, 5, 1, 3, 4], intro: '道成肉身的真理，神就是光，神就是愛。', verse: '神愛世人，甚至將他的獨生子賜給他們。', verseRef: '約翰福音 3:16', author: '約翰', details: '約翰福音具有深邃的神學高度。它以「太初有道」開篇，宣告耶穌的神性。透過七個「我是」的宣告（如我是光、我是糧、我是路），啟示了基督的本質。這卷書強調「信」與「生命」，目的是叫人因信耶穌得生命。', themes: '道、生命、光、愛、信' },
+            { id: 'Act', name: '使徒行傳', tags: [2, 2, 5, 2, 2, 5, 4], intro: '聖靈降臨，教會誕生，將福音從耶路撒冷傳到地極。', verse: '但聖靈降臨在你們身上，你們就必得著能力。', verseRef: '使徒行傳 1:8', author: '路加', details: '這是路加福音的續篇，記載了初期教會在聖靈大能下的擴展歷史。從五旬節聖靈降臨，到彼得、保羅的宣教旅程。這是一卷關於「突破」的書——突破種族、文化、地域的限制，見證福音如何改變世界。', themes: '聖靈、教會、宣教、見證' },
+
+            // Paul's Letters - High Wisdom/Love/Justice/Comfort, Low Story
+            { id: 'Rom', name: '羅馬書', tags: [2, 5, 2, 3, 5, 0, 4], intro: '福音的完整論述，因信稱義，在恩典中得著新生命。', verse: '福音本是神的大能，要救一切相信的。', verseRef: '羅馬書 1:16', author: '保羅', details: '被譽為基督教神學的大教堂。保羅在此系統性地闡述了人類的罪、神的義以及藉著信心的救贖。它解釋了福音如何解決人類最深層的問題，並帶來成聖生活的能力。若想明白信仰的邏輯與根基，這是必讀之書。', themes: '因信稱義、罪、恩典、新生活' },
+            { id: '1Co', name: '哥林多前書', tags: [2, 4, 3, 5, 3, 0, 2], intro: '教會生活的問題解答，愛是最大的恩賜。', verse: '愛是恆久忍耐，又有恩慈。', verseRef: '哥林多前書 13:4', author: '保羅', details: '哥林多教會充滿恩賜但也充滿問題（紛爭、淫亂、混亂）。保羅寫信一一導正。著名的「愛篇」（13章）就在這裡，提醒我們若沒有愛，一切恩賜與知識都算不得什麼。這卷書教導如何在具體的教會與社會生活中活出信仰。', themes: '愛、恩賜、合一、復活' },
+            { id: '2Co', name: '哥林多後書', tags: [5, 2, 2, 4, 1, 0, 3], intro: '神能力的完美彰顯在人的軟弱上，患難中的安慰。', verse: '我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。', verseRef: '哥林多後書 12:9', author: '保羅', details: '這是保羅最個人化、最充滿情感的書信。他赤露敞開分享自己的苦難與軟弱。他提出一個顛覆性的真理：神的寶貝放在我們這瓦器裡；我們的軟弱正是神大能彰顯的舞台。這對於在挫折與自我懷疑中的人，是極大的安慰。', themes: '安慰、軟弱、和好、職分' },
+            { id: 'Gal', name: '加拉太書', tags: [2, 3, 4, 3, 5, 0, 2], intro: '在基督裡的自由，不被宗教儀式綑綁，結出生命果子。', verse: '基督釋放了我們，叫我們得以自由。', verseRef: '加拉太書 5:1', author: '保羅', details: '被稱為「自由大憲章」。保羅嚴厲駁斥那些要求外邦信徒也要守舊約律法的人。他強調我們是因信稱義，不是靠行為。但真正的自由不是放縱，而是順著聖靈而行，結出仁愛、喜樂、和平等聖靈的果子。', themes: '自由、恩典、聖靈果子' },
+            { id: 'Eph', name: '以弗所書', tags: [3, 5, 3, 4, 2, 0, 3], intro: '教會是基督的身體，穿戴全副軍裝，在愛中建立自己。', verse: '你們得救是本乎恩，也因著信。', verseRef: '以弗所書 2:8', author: '保羅', details: '這卷書展示了教會榮耀的地位——是基督的身體，是神永遠計畫的核心。前半部講述我們在基督裡豐盛的產業，後半部講述這身分如何落實在家庭、職場與屬靈爭戰中。它呼籲我們穿戴神的全副軍裝，抵擋仇敵。', themes: '教會、合一、軍裝、基業' },
+            { id: 'Phi', name: '腓立比書', tags: [5, 2, 2, 4, 1, 0, 4], intro: '監獄中的喜樂書信，靠主大大喜樂，一無掛慮。', verse: '應當一無掛慮，只要凡事藉著禱告、祈求，和感謝...', verseRef: '腓立比書 4:6', author: '保羅', details: '保羅寫這封信時身在監獄，但「喜樂」一詞卻出現了十多次。這證明了真正的喜樂不受環境限制。書中這首「基督虛己歌」描繪了耶穌謙卑的榜樣。它教導我們如何擁有一種超越環境、以基督為至寶的人生觀。', themes: '喜樂、謙卑、知足、至寶' },
+            { id: 'Col', name: '歌羅西書', tags: [2, 5, 2, 3, 3, 0, 3], intro: '基督是萬有的元首，在祂裡面有一切的豐盛與智慧。', verse: '因為神本性一切的豐盛都有形有體地居住在基督裡面。', verseRef: '歌羅西書 2:9', author: '保羅', details: '針對當時貶低基督的異端，保羅高舉基督的超越性——祂是創造的主，也是救贖的主，萬有都是靠祂而立。這卷書強調，我們不需要在基督之外尋求什麼神秘知識或補充，因為在祂裡面已經擁有了一切的豐盛。', themes: '基督論、豐盛、元首' },
+            { id: '1Th', name: '帖撒羅尼迦前書', tags: [4, 2, 2, 4, 1, 0, 5], intro: '在大患難中的喜樂與盼望，等候主的再來。', verse: '要常常喜樂，不住的禱告，凡事謝恩。', verseRef: '帖撒羅尼迦前書 5:16-18', author: '保羅', details: '這是保羅寫給一個年輕卻受逼迫教會的信。他像慈父兼母親般安慰他們，並重點教導關於「主再來」的真理。這不是為了滿足好奇心，而是為了在苦難中帶出盼望與聖潔的生活動力。', themes: '再來、盼望、聖潔、安慰' },
+            { id: '2Th', name: '帖撒羅尼迦後書', tags: [2, 3, 3, 1, 4, 0, 5], intro: '末世的警惕，不倦行善，堅守真理的教導。', verse: '主是信實的，要堅固你們，保護你們脫離那惡者。', verseRef: '帖撒羅尼迦後書 3:3', author: '保羅', details: '糾正教會對於末世的錯誤觀念（以為主已經來了而停止工作）。保羅強調在主再來之前必有大罪人顯露。他呼籲信徒要安靜做工，吃自己的飯，在混亂的世代中保持清醒與勤奮，堅守使徒的教導。', themes: '末世、警醒、工作、堅守' },
+            { id: '1Ti', name: '提摩太前書', tags: [1, 3, 4, 2, 3, 0, 1], intro: '年輕領袖的守則，敬虔加上知足的心便是大利。', verse: '不可叫人小看你年輕，總要在言語、行為、愛心...作信徒的榜樣。', verseRef: '提摩太前書 4:12', author: '保羅', details: '這是老保羅寫給年輕提摩太的牧會手冊。內容涵蓋如何設立領袖、如何處理異端、如何看待金錢以及如何敬拜。它強調「敬虔」是生命的根基，並鼓勵年輕領袖不要因年紀小而自卑，要在品格上作眾人的榜樣。', themes: '牧養、敬虔、領袖、榜樣' },
+            { id: '2Ti', name: '提摩太後書', tags: [2, 2, 5, 2, 2, 0, 4], intro: '最後的叮嚀，為真道打美好的仗，無愧的工人。', verse: '那美好的仗我已經打過了，當跑的路我已經跑盡了。', verseRef: '提摩太後書 4:7', author: '保羅', details: '這是保羅的絕筆，寫於殉道前夕。語氣充滿了深情與緊迫感。他將福音的火炬交棒給提摩太，囑咐他務要傳道，無論得時不得時。這卷書展示了一個跑盡當跑之路的戰士，在面對死亡時的坦然與對冠冕的確信。', themes: '傳承、忍耐、無愧、冠冕' },
+            { id: 'Tit', name: '提多書', tags: [1, 2, 4, 1, 4, 0, 2], intro: '純正的道理與行善的見證，在生活中活出信仰。', verse: '留心做正經事業。這都是美事，並且與人有益。', verseRef: '提多書 3:8', author: '保羅', details: '寫給在克里特島服事的提多。那裡民風強悍、道德敗壞。保羅教導如何在那樣的環境中建立有序的教會，並強調「純正的道理」必須帶出「美好的行為」。信仰不是空談，必須在社會責任與家庭倫理中體現出來。', themes: '善行、秩序、教義、生活' },
+            { id: 'Phm', name: '腓利門書', tags: [2, 1, 2, 5, 1, 1, 1], intro: '接納與饒恕，在主裡不再是奴僕，乃是親愛的兄弟。', verse: '願我們主耶穌基督的恩常在你的心裡。', verseRef: '腓利門書 1:25', author: '保羅', details: '這是一封關於和好的私人信件。保羅請求腓利門原諒並接納逃跑的奴隸阿尼西母，且不再看他是奴隸，而是親愛的兄弟。這卷書強有力地展示了福音如何打破社會階級與隔閡，帶來真實的饒恕與關係的修復。', themes: '饒恕、接納、兄弟情誼' },
+
+            // General Letters & Revelation
+            { id: 'Heb', name: '希伯來書', tags: [2, 5, 1, 2, 3, 1, 5], intro: '基督超越一切，信就是所望之事的實底。', verse: '我們既有這許多的見證人，如同雲彩圍著我們...', verseRef: '希伯來書 12:1', author: '不詳', details: '寫給一群面臨逼迫想要回到猶太教的信徒。作者詳細論證了基督比天使、摩西、亞倫更尊貴，祂獻上了更美的祭。第11章的「信心英雄榜」激勵我們，既然有如雲彩般的見證人圍繞，就當放下重擔，存心忍耐奔跑前路。', themes: '超越、更美之約、信心、忍耐' },
+            { id: 'Jam', name: '雅各書', tags: [1, 5, 5, 1, 4, 0, 1], intro: '聽道也要行道，信心沒有行為是死的。', verse: '你們中間若有缺少智慧的，應當求那厚賜與眾人...的神。', verseRef: '雅各書 1:5', author: '耶穌的兄弟雅各', details: '這是一本極具實踐性的書，被稱為「新約的箴言」。雅各直言不諱地指出：信心若沒有行為就是死的。他談論勒住舌頭、看顧孤兒寡婦、不偏待人以及忍受試煉。它挑戰我們的信仰是否真實地影響了我們的日常生活與人際關係。', themes: '行為、智慧、言語、試煉' },
+            { id: '1Pe', name: '彼得前書', tags: [5, 2, 3, 2, 2, 0, 5], intro: '寄居者的盼望，在試煉中信心更顯寶貴。', verse: '你們將一切的憂慮卸給神，因為他顧念你們。', verseRef: '彼得前書 5:7', author: '彼得', details: '寫給分散在各地受苦的信徒。彼得提醒我們在這個世界是「寄居的客旅」，受苦是難免的，甚至是有福的，因為這能試煉我們的信心如金子般寶貴。這卷書充滿了對受苦者的柔情安慰，並呼籲在苦難中活出聖潔的見證。', themes: '受苦、盼望、聖潔、寄居' },
+            { id: '2Pe', name: '彼得後書', tags: [1, 4, 3, 1, 4, 0, 4], intro: '在恩典和知識上長進，防備錯謬的引誘。', verse: '主所應許的尚未成就，有人以為他是耽延，其實不是耽延...', verseRef: '彼得後書 3:9', author: '彼得', details: '彼得警告信徒要防備假教師和嘲笑主再來的人。他強調神寬容人，是為了給人悔改的機會。這卷書呼籲信徒要分外殷勤，在信心、德行、知識等美德上層層遞進，以免在真道上失腳，並熱切等候新天新地的來到。', themes: '真知識、防備、長進、寬容' },
+            { id: '1Jo', name: '約翰一書', tags: [4, 3, 1, 5, 2, 0, 4], intro: '神就是愛，住在愛裡面的，就是住在神裡面。', verse: '我們愛，因為神先愛我們。', verseRef: '約翰一書 4:19', author: '使徒約翰', details: '老約翰用螺旋式的論述，反覆強調「光」、「愛」與「生命」。他給出了分辨真假信仰的試金石：承認耶穌、彼此相愛、遵守誡命。這卷書帶給信徒極大的確據：我們知道自己有永生，因為我們愛弟兄，且住在神的愛中。', themes: '愛、相交、確據、真理' },
+            { id: '2Jo', name: '約翰二書', tags: [1, 2, 2, 4, 4, 0, 1], intro: '遵行真理，彼此相愛，也要防備敵對者。', verse: '我們大家所愛，不但我愛，也是一切知道真理之人所愛的。', verseRef: '約翰二書 1:1', author: '使徒約翰', details: '這是一封簡短的信，寫給「蒙揀選的太太」（可能指某教會）。約翰再次強調彼此相愛的命令，但同時嚴肅警告：對於越過基督教訓的人，不要接待他們，以免在他們的惡行上有份。這教導我們愛心必須在真理的界線之內。', themes: '真理、愛心、界線' },
+            { id: '3Jo', name: '約翰三書', tags: [2, 1, 3, 4, 2, 1, 1], intro: '按真理而行，接待客旅，效法善不效法惡。', verse: '親愛的兄弟啊，我願你凡事興盛，身體健壯，正如你的靈魂興盛一樣。', verseRef: '約翰三書 1:2', author: '使徒約翰', details: '這封信稱讚該猶熱心接待作客旅的弟兄，這是「一同為真理做工」。同時譴責好為首、不僅不接待反將人趕出教會的丟特腓。這卷書讓我們看見初期教會的接待文化，以及領袖品格對教會氣氛的關鍵影響。', themes: '接待、支持、榜樣' },
+            { id: 'Jud', name: '猶大書', tags: [0, 2, 4, 1, 5, 1, 2], intro: '為真道竭力爭辯，保守自己常在愛中。', verse: '保守自己常在神的愛中，仰望我們主耶穌基督的憐憫。', verseRef: '猶大書 1:21', author: '猶大 (耶穌兄弟)', details: '這是一封緊急的戰書。因為有不虔誠的人偷偷引進教會，將恩典當作放縱情慾的機會。猶大引用歷史鑑戒（如所多瑪、天使犯錯），呼籲信徒要在至聖的真道上造就自己，在聖靈裡禱告，並要把那些在火中掙扎的人搶救出來。', themes: '爭辯、保守、審判、憐憫' },
+            { id: 'Rev', name: '啟示錄', tags: [3, 3, 2, 2, 5, 2, 5], intro: '末世的異象，得勝的君王，新天新地將來到。', verse: '神要擦去他們一切的眼淚；不再有死亡，也不再有悲哀。', verseRef: '啟示錄 21:4', author: '使徒約翰', details: '聖經的終章。透過宏大壯麗的異象，揭示歷史的終局不是毀滅，而是新天新地。儘管有龍、獸與大巴比倫的猖狂，但被殺的羔羊最終得勝。這是給受苦教會的安慰書：忍耐到底，因為君王即將再來，祂將更新一切，擦去一切眼淚。', themes: '終局、得勝、敬拜、新天新地' }
+        ];
+
+        // --- NEW QUESTIONS LOGIC (Life-oriented, No Bible jargon) ---
+        const QUESTIONS = [
+            {
+                id: 1,
+                question: "現在的你，如果用一種天氣來形容，最接近哪一種？",
+                options: [
+                    { text: "暴風雨中，急需尋找避難所", tags: [5, 0, 0, 2, 0, 0, 1] }, 
+                    { text: "大霧瀰漫，看不清前方的路", tags: [1, 5, 0, 0, 2, 0, 1] }, 
+                    { text: "烈日當空，正揮汗如雨地趕路", tags: [0, 1, 5, 0, 1, 2, 0] },
+                    { text: "漫長寒冬，渴望春天的跡象", tags: [1, 0, 0, 1, 0, 0, 5] },
+                ]
+            },
+            {
+                id: 2,
+                question: "你比較喜歡閱讀哪種類型的書籍或電影？",
+                options: [
+                    { text: "真實人物傳記，看見人性的光輝與軟弱", tags: [1, 1, 2, 1, 0, 5, 0] },
+                    { text: "寫給摯愛的家書，充滿情感與叮嚀", tags: [2, 2, 0, 5, 0, 0, 0] },
+                    { text: "邏輯嚴謹的哲學或指導手冊", tags: [0, 5, 0, 0, 4, 0, 0] },
+                    { text: "壯闊的史詩或充滿想像力的預言", tags: [4, 1, 0, 2, 2, 0, 4] },
+                ]
+            },
+            {
+                id: 3,
+                question: "如果可以獲得一種超能力來面對生活，你最想要？",
+                options: [
+                    { text: "突破現狀、改變環境的行動力", tags: [0, 1, 5, 0, 2, 1, 0] },
+                    { text: "撫慰受傷心靈的治癒力", tags: [5, 0, 0, 3, 0, 0, 1] },
+                    { text: "看穿謊言、分辨是非的洞察力", tags: [0, 2, 2, 0, 5, 0, 0] },
+                    { text: "包容一切、無條件愛人的能力", tags: [2, 0, 1, 5, 0, 0, 0] },
+                ]
+            },
+            {
+                id: 4,
+                question: "當你感到困惑時，你傾向從哪裡尋找答案？",
+                options: [
+                    { text: "回顧過去：從歷史與根源中找教訓", tags: [0, 3, 0, 0, 2, 5, 0] },
+                    { text: "專注當下：尋求解決眼前問題的實用方法", tags: [1, 5, 3, 2, 0, 0, 0] },
+                    { text: "展望未來：想知道這一切最終的結局", tags: [0, 1, 0, 0, 3, 1, 5] },
+                    { text: "仰望永恆：思考超越時間的真理", tags: [3, 4, 0, 3, 4, 0, 2] },
+                ]
+            },
+            {
+                id: 5,
+                question: "此刻你覺得自己最像處於什麼樣的狀態？",
+                options: [
+                    { text: "莫名受苦，心中充滿了「為什麼」", tags: [5, 3, 0, 0, 2, 1, 1] },
+                    { text: "雖有軟弱失敗，但仍想重新站起來", tags: [4, 1, 2, 4, 0, 2, 2] },
+                    { text: "為了某個使命或目標，正全力衝刺", tags: [1, 3, 5, 2, 1, 0, 3] },
+                    { text: "看見周遭的不公義，心中憤憤不平", tags: [0, 1, 2, 0, 5, 0, 3] },
+                ]
+            },
+            {
+                id: 6,
+                question: "你希望獲得一位什麼樣的導師指引？",
+                options: [
+                    { text: "像慈父般，給我無條件的接納與擁抱", tags: [5, 0, 0, 5, 0, 0, 0] },
+                    { text: "像威嚴的法官，為我主持公道", tags: [0, 2, 1, 0, 5, 1, 3] },
+                    { text: "像智者般，指點我人生的迷津", tags: [1, 5, 2, 0, 1, 0, 0] },
+                    { text: "像親密摯友，懂我內心深處的感受", tags: [3, 0, 0, 5, 0, 0, 1] },
+                ]
+            },
+            {
+                id: 7,
+                question: "當你犯錯或失敗時，你通常的第一反應是？",
+                options: [
+                    { text: "尋求原諒，希望能修復受損的關係", tags: [3, 0, 1, 5, 1, 0, 0] },
+                    { text: "自我反省，分析原因並找出修正法則", tags: [0, 4, 2, 0, 4, 0, 0] },
+                    { text: "坦然面對，相信這也是人生的一部分", tags: [2, 2, 0, 2, 0, 3, 4] },
+                    { text: "積極彌補，用實際行動來證明改變", tags: [0, 1, 5, 1, 2, 0, 0] },
+                ]
+            },
+            {
+                id: 8,
+                question: "最後，你現在想閱讀的內容，篇幅長度如何？",
+                options: [
+                    { text: "短小精悍，能在幾分鐘內讀完並獲得啟發", tags: [0, 0, 1, 1, 1, 0, 0] },
+                    { text: "中等篇幅，針對特定主題有完整的探討", tags: [1, 1, 0, 0, 0, 0, 0] },
+                    { text: "長篇史詩，願意花時間慢慢品味其中的細節", tags: [0, 0, 0, 0, 0, 2, 1] },
+                    { text: "不拘長短，只要能切中我現在的需要", tags: [0, 0, 0, 0, 0, 0, 0] },
+                ]
+            }
+        ];
+
+        // --- APP STATE ---
+        let currentStep = 'welcome';
+        let currentQuestionIndex = 0;
+        let userProfile = [0, 0, 0, 0, 0, 0, 0];
+        let result = null;
+
+        // --- DOM ELEMENTS ---
+        const app = document.getElementById('app');
+
+        // --- RENDER FUNCTIONS ---
+        
+        function renderWelcome() {
+            const compassIcon = document.getElementById('icon-compass').outerHTML;
+            const arrowIcon = document.getElementById('icon-arrow-right').outerHTML;
+
+            app.innerHTML = `
+                <div class="glass-panel max-w-md w-full text-center space-y-8 animate-fade-in p-10 rounded-[2.5rem] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="mb-6 flex justify-center">
+                            <div class="p-5 bg-white/5 rounded-full backdrop-blur-md shadow-2xl border border-white/10 ring-1 ring-white/20">
+                                <div class="w-16 h-16 text-indigo-200 animate-pulse-slow">${compassIcon}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl md:text-5xl font-serif font-bold tracking-tight text-white drop-shadow-lg mb-3">
+                                生命指南針
+                            </h1>
+                            <p class="text-[0.65rem] tracking-[0.3em] text-indigo-300 uppercase opacity-80">Life Compass • 66 Books Edition</p>
+                        </div>
+                        <div class="text-base md:text-lg text-slate-300 leading-relaxed font-light my-6">
+                            <p class="mb-4">聖經共有六十六卷書，<br/>每一卷都是為了人生的特定時刻而寫。</p>
+                            <p>透過 <span class="text-white font-medium">8 個深度提問</span>，<br/>找出此刻要對你說話的那一卷書。</p>
+                        </div>
+                        <button onclick="startQuiz()" class="group relative w-full inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-2xl hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] active:scale-95 shadow-lg border border-white/10">
+                            開始探索
+                            <div class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform">${arrowIcon}</div>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuiz() {
+            const question = QUESTIONS[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / QUESTIONS.length) * 100;
+            const chevronIcon = document.getElementById('icon-chevron-right').outerHTML;
+
+            let optionsHtml = question.options.map((option, index) => `
+                <button onclick="handleAnswer([${option.tags}])" class="w-full text-left p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-400/30 transition-all duration-200 group flex items-center justify-between hover:translate-x-1 animate-slide-up active:bg-white/20 active:scale-[0.99]" style="animation-delay: ${index * 80}ms">
+                    <span class="text-slate-100 text-base md:text-lg font-medium group-hover:text-white transition-colors">
+                        ${option.text}
+                    </span>
+                    <div class="w-5 h-5 text-slate-500 group-hover:text-indigo-300 opacity-50 group-hover:opacity-100 transition-all">${chevronIcon}</div>
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                <div class="max-w-2xl w-full h-full flex flex-col justify-center animate-fade-in">
+                    <!-- Progress Bar -->
+                    <div class="mb-8 w-full bg-slate-800/50 rounded-full h-2 overflow-hidden backdrop-blur-sm mx-auto max-w-md">
+                        <div class="bg-gradient-to-r from-indigo-400 to-purple-400 h-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(129,140,248,0.5)]" style="width: ${progress}%"></div>
+                    </div>
+
+                    <!-- Question Card -->
+                    <div class="glass-panel p-6 md:p-10 rounded-[2rem] shadow-2xl relative overflow-hidden flex flex-col">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                        
+                        <div class="relative z-10">
+                            <span class="text-indigo-300 text-xs font-bold tracking-widest uppercase mb-4 block opacity-80">
+                                Question ${currentQuestionIndex + 1} / ${QUESTIONS.length}
+                            </span>
+                            <h2 class="text-2xl md:text-3xl font-serif font-bold mb-8 text-white leading-snug">
+                                ${question.question}
+                            </h2>
+
+                            <div class="space-y-3">
+                                ${optionsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCalculating() {
+            app.innerHTML = `
+                <div class="text-center animate-fade-in max-w-sm px-4">
+                    <div class="relative w-32 h-32 mx-auto mb-8">
+                        <div class="absolute inset-0 border-t-2 border-indigo-400/30 rounded-full animate-spin"></div>
+                        <div class="absolute inset-3 border-r-2 border-purple-400/50 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-3xl animate-pulse">✨</span>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-serif text-white mb-3 font-bold">正在掃描 66 卷書...</h2>
+                    <div class="space-y-2 text-sm text-slate-400 font-light tracking-wide">
+                        <p class="animate-pulse" style="animation-delay: 0.1s">分析您的內心頻率...</p>
+                        <p class="animate-pulse" style="animation-delay: 0.3s">對照聖經主題...</p>
+                        <p class="animate-pulse" style="animation-delay: 0.5s">尋找最佳共鳴...</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateAnalysisText(profile) {
+            let indices = profile.map((score, i) => ({ score, i })).sort((a, b) => b.score - a.score);
+            let top1 = indices[0].i;
+            let top2 = indices[1].i;
+
+            const PHRASES = [
+                "心靈的撫慰與安息",   // Comfort
+                "生命的智慧與指引",   // Wisdom
+                "突破現狀的行動力",   // Action
+                "被愛與連結的渴望",   // Love
+                "真理、秩序與公義",   // Justice
+                "在故事中尋找共鳴",   // Story
+                "對未來的確據與盼望"  // Hope
+            ];
+
+            return `根據分析，您目前最渴望的是<span class="text-indigo-300 font-bold mx-1">${PHRASES[top1]}</span>與<span class="text-purple-300 font-bold mx-1">${PHRASES[top2]}</span>。`;
+        }
+
+        function renderResult() {
+            if (!result) return;
+            
+            const resultColor = getResultColor(result.tags);
+            const resultIcon = getResultIcon(result.tags);
+            const refreshIcon = document.getElementById('icon-refresh').outerHTML;
+            const arrowIcon = document.getElementById('icon-arrow-right').outerHTML;
+            const bookIcon = document.getElementById('icon-book-open').outerHTML;
+            const chartIcon = document.getElementById('icon-chart').outerHTML;
+            const analysisText = generateAnalysisText(userProfile);
+            
+            // Generate YouVersion Link
+            const youVersionCode = YOUVERSION_MAP[result.id] || 'GEN';
+            const youVersionLink = `https://www.bible.com/zh-TW/bible/139/${youVersionCode}.1.RCUV`;
+
+            // Chart Generation (Compact Version)
+            const maxScore = Math.max(...userProfile) || 1;
+            
+            // Get top 2 indices for highlighting
+            const sortedIndices = userProfile.map((s, i) => ({s, i})).sort((a, b) => b.s - a.s).map(x => x.i);
+            const top1Index = sortedIndices[0];
+            const top2Index = sortedIndices[1];
+
+            const chartHtml = DIMENSION_NAMES.map((name, i) => {
+                const score = userProfile[i];
+                const percentage = (score / maxScore) * 100;
+                
+                let barColor = 'bg-slate-700/50';
+                let textColor = 'text-slate-500';
+                let opacity = '0.7';
+                let shadow = '';
+
+                if (i === top1Index) {
+                    barColor = 'bg-indigo-400';
+                    textColor = 'text-indigo-300 font-bold';
+                    opacity = '1';
+                    shadow = 'shadow-[0_0_8px_rgba(129,140,248,0.6)]';
+                } else if (i === top2Index) {
+                    barColor = 'bg-purple-400';
+                    textColor = 'text-purple-300 font-bold';
+                    opacity = '1';
+                    shadow = 'shadow-[0_0_8px_rgba(192,132,252,0.6)]';
+                }
+                
+                return `
+                    <div class="flex flex-col items-center gap-2 group w-6">
+                        <div class="h-24 w-2 bg-slate-800/50 rounded-full overflow-hidden relative flex flex-col justify-end">
+                             <div class="${barColor} ${shadow} w-full rounded-full animate-grow-height" style="--target-height: ${percentage}%; height: ${percentage}%; opacity: ${opacity}"></div>
+                        </div>
+                        <span class="text-[10px] ${textColor} whitespace-nowrap transform -rotate-45 origin-top-left translate-x-2 md:rotate-0 md:translate-x-0 md:whitespace-normal leading-tight">${name}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // New Layout Structure: Fixed Card with Internal Scroll
+            app.innerHTML = `
+                <!-- Modal Card Container -->
+                <div class="w-full max-w-4xl h-[90vh] md:h-[85vh] flex flex-col glass-panel rounded-[2rem] overflow-hidden shadow-2xl animate-fade-in relative border-0 md:border">
+                    
+                    <!-- Fixed Header (Visual Anchor) - Compact Size -->
+                    <div class="shrink-0 relative h-auto py-6 md:py-8 bg-gradient-to-br ${resultColor} overflow-hidden flex flex-col items-center justify-center text-center px-6 z-20 shadow-lg">
+                        <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                        
+                        <div class="relative z-10 flex flex-col items-center animate-slide-up">
+                            
+                            <h3 class="text-white/80 text-[10px] font-bold tracking-[0.2em] uppercase mb-1">Your Divine Match</h3>
+                            <h1 class="text-3xl md:text-4xl font-serif font-bold text-white drop-shadow-xl mb-3">${result.name}</h1>
+                            <p class="text-sm md:text-lg text-white font-serif italic max-w-lg leading-relaxed px-4 opacity-95">"${result.intro}"</p>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Content Area -->
+                    <div class="flex-1 overflow-y-auto custom-scrollbar relative bg-slate-900/50">
+                        <div class="p-6 md:p-10 space-y-8 pb-32"> <!-- Extra bottom padding for scroll -->
+                            
+                            <!-- Analysis Section (Why this book?) -->
+                            <section class="animate-slide-up" style="animation-delay: 0.1s">
+                                <div class="bg-slate-800/40 rounded-3xl p-5 border border-white/5 flex flex-col md:flex-row gap-6 items-center">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <div class="w-4 h-4 text-indigo-400">${chartIcon}</div>
+                                            <h3 class="text-lg font-bold text-slate-200 tracking-wide">分析報告</h3>
+                                        </div>
+                                        <p class="text-slate-200 text-lg md:text-xl font-medium leading-relaxed text-justify mb-4">
+                                            ${analysisText}
+                                        </p>
+                                        <div class="text-xs text-slate-500 bg-black/20 p-2 rounded-lg border border-white/5">
+                                            系統根據您的屬性與 66 卷書進行比對，這卷書在您得分最高的維度上展現了極強的相關性。
+                                        </div>
+                                    </div>
+                                    <!-- Mini Bar Chart -->
+                                    <div class="shrink-0 bg-black/20 px-4 py-3 rounded-2xl border border-white/5 flex gap-3 h-full items-end justify-center overflow-x-auto">
+                                        ${chartHtml}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Key Verse (Visual Break) -->
+                            <section class="animate-slide-up" style="animation-delay: 0.2s">
+                                <div class="relative group">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl transform -rotate-1 scale-[1.01] transition-transform group-hover:rotate-0"></div>
+                                    <div class="relative bg-slate-800/80 p-6 md:p-8 rounded-2xl border border-white/10 flex flex-col items-center text-center shadow-lg">
+                                        <div class="w-6 h-6 text-indigo-400 mb-4 opacity-70">${bookIcon}</div>
+                                        <blockquote class="text-lg md:text-2xl font-serif font-medium text-white leading-loose italic">
+                                            「${result.verse}」
+                                        </blockquote>
+                                        <div class="mt-4 text-indigo-300 font-medium tracking-wide border-t border-white/10 pt-2 px-4">
+                                            ${result.verseRef}
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Detailed Book Report -->
+                            <section class="animate-slide-up space-y-4" style="animation-delay: 0.3s">
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-slate-400 text-sm font-bold uppercase tracking-[0.2em]">深度導讀</h3>
+                                    <div class="h-px bg-slate-700/50 flex-1"></div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Author & Themes (Compact Grid) -->
+                                    <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex flex-col justify-center">
+                                        <h4 class="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-1">作者</h4>
+                                        <p class="text-white font-serif text-xl">${result.author}</p>
+                                    </div>
+                                    <div class="bg-white/5 p-5 rounded-2xl border border-white/5 flex flex-col justify-center">
+                                        <h4 class="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-1">核心主題</h4>
+                                        <p class="text-white font-medium text-base leading-relaxed">${result.themes}</p>
+                                    </div>
+                                    
+                                    <!-- Full Details (Spans Full Width) -->
+                                    <div class="md:col-span-2 bg-white/5 p-6 rounded-2xl border border-white/5 leading-relaxed">
+                                        <h4 class="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">背景與信息</h4>
+                                        <p class="text-slate-300 text-base md:text-lg leading-7 text-justify">
+                                            ${result.details}
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Bottom Action Area (Inside scroll to ensure visibility) -->
+                            <div class="flex flex-col gap-3 pt-4 animate-slide-up" style="animation-delay: 0.4s">
+                                <a href="${youVersionLink}" target="_blank" rel="noopener noreferrer" class="group w-full flex items-center justify-center px-6 py-4 bg-white text-slate-900 font-bold rounded-xl hover:bg-indigo-50 transition-all shadow-[0_4px_20px_rgba(255,255,255,0.15)] active:scale-[0.98]">
+                                    開始閱讀
+                                    <div class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform">${arrowIcon}</div>
+                                </a>
+                                <button onclick="resetApp()" class="w-full flex items-center justify-center px-6 py-4 text-slate-400 font-medium transition-colors hover:text-white hover:bg-white/5 rounded-xl border border-white/5 hover:border-white/20">
+                                    <div class="w-4 h-4 mr-2">${refreshIcon}</div>
+                                    重新測驗
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600 text-[10px] absolute bottom-2 left-0 w-full text-center pointer-events-none opacity-50 z-0">
+                    © Life Compass. Scripture taken from CUV.
+                </p>
+            `;
+        }
+
+        // --- LOGIC FUNCTIONS (Updated to Cosine Similarity) ---
+        function startQuiz() { currentStep = 'quiz'; renderQuiz(); }
+        
+        function handleAnswer(tags) {
+            userProfile = userProfile.map((score, index) => score + tags[index]);
+            if (currentQuestionIndex < QUESTIONS.length - 1) {
+                currentQuestionIndex++;
+                setTimeout(renderQuiz, 150);
+            } else {
+                currentStep = 'calculating';
+                renderCalculating();
+                calculateResult();
+            }
+        }
+
+        // Calculate cosine similarity between two vectors
+        function cosineSimilarity(vecA, vecB) {
+            let dotProduct = 0;
+            let magnitudeA = 0;
+            let magnitudeB = 0;
+            for (let i = 0; i < vecA.length; i++) {
+                dotProduct += vecA[i] * vecB[i];
+                magnitudeA += vecA[i] * vecA[i];
+                magnitudeB += vecB[i] * vecB[i];
+            }
+            magnitudeA = Math.sqrt(magnitudeA);
+            magnitudeB = Math.sqrt(magnitudeB);
+            if (magnitudeA === 0 || magnitudeB === 0) return 0;
+            return dotProduct / (magnitudeA * magnitudeB);
+        }
+
+        function calculateResult() {
+            let bestBook = null;
+            let highestScore = -Infinity;
+            
+            BIBLE_BOOKS.forEach(book => {
+                // Use Cosine Similarity for better shape matching
+                let score = cosineSimilarity(userProfile, book.tags);
+                
+                // Add tiny random jitter to break perfect ties, but keep logic deterministic enough
+                score += Math.random() * 0.03; 
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestBook = book;
+                }
+            });
+            
+            result = bestBook;
+            setTimeout(() => { currentStep = 'result'; renderResult(); }, 2000);
+        }
+
+        function resetApp() {
+            currentStep = 'welcome';
+            currentQuestionIndex = 0;
+            userProfile = [0, 0, 0, 0, 0, 0, 0];
+            result = null;
+            renderWelcome();
+        }
+
+        function getResultIcon(tags) {
+            const maxIndex = tags.indexOf(Math.max(...tags));
+            const ids = ['icon-heart', 'icon-sun', 'icon-zap', 'icon-star', 'icon-shield', 'icon-book', 'icon-cloud'];
+            const id = ids[maxIndex] || 'icon-book-open';
+            return document.getElementById(id).outerHTML;
+        }
+
+        function getResultColor(tags) {
+            const maxIndex = tags.indexOf(Math.max(...tags));
+            const colors = [
+                "from-pink-600 to-rose-700", "from-amber-500 to-orange-700", "from-blue-600 to-indigo-700",
+                "from-purple-600 to-violet-700", "from-emerald-600 to-teal-700", "from-indigo-600 to-blue-800",
+                "from-cyan-600 to-sky-700"
+            ];
+            return colors[maxIndex] || "from-slate-600 to-slate-800";
+        }
+
+        window.onload = function() { renderWelcome(); };
+    </script>
+</body>
+</html>
