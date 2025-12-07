@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經歷史地理全覽圖</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        body, html { height: 100%; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; }
+        #map { height: 100%; width: 100%; z-index: 0; }
+        .sidebar { z-index: 1000; transition: transform 0.3s ease-in-out; }
+        .book-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin: 2px;
+            background-color: rgba(255,255,255,0.9);
+            border: 1px solid #bfdbfe;
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+        /* Highlight overlay overlapping books */
+        .book-tag.highlight {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        /* Custom scrollbar for sidebar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #555; }
+        
+        .leaflet-popup-content-wrapper { border-radius: 8px; }
+        .period-btn.active { border-left: 4px solid #2563eb; background-color: #eff6ff; font-weight: bold; }
+        
+        /* Layer control customization */
+        .leaflet-control-layers {
+            border: none !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            border-radius: 0.5rem !important;
+            padding: 8px !important;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+    </style>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body class="bg-gray-100 flex flex-col md:flex-row h-screen overflow-hidden">
+
+    <!-- Sidebar / Control Panel -->
+    <div class="sidebar w-full md:w-1/3 lg:w-1/4 h-1/2 md:h-full bg-white shadow-xl flex flex-col border-r border-gray-200">
+        <div class="p-4 bg-blue-900 text-white flex-none shadow-md">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                聖經歷史地理圖
+            </h1>
+            <p class="text-xs text-blue-200 mt-1">點擊時期查看地理背景與相關書卷</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scroll p-2 space-y-2" id="period-list">
+            <!-- Period buttons will be injected here by JS -->
+        </div>
+        
+        <div class="p-3 bg-gray-50 text-xs text-gray-500 text-center border-t border-gray-200">
+            <span class="text-blue-600 font-bold">提示：</span>若地圖空白，請點擊地圖右上角切換至「英文備用」。
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="flex-1 relative h-1/2 md:h-full">
+        <div id="map"></div>
+        
+        <!-- Info Overlay (Visible on map) -->
+        <div id="info-overlay" class="absolute bottom-6 left-4 right-4 md:left-6 md:right-auto md:w-96 bg-white/95 backdrop-blur shadow-lg rounded-lg p-4 z-[999] hidden transition-all duration-300 transform translate-y-2 opacity-0 border border-gray-200 max-h-[60vh] overflow-y-auto custom-scroll">
+            <div class="flex justify-between items-start mb-2">
+                <h2 id="overlay-title" class="text-lg font-bold text-gray-800"></h2>
+                <button onclick="closeOverlay()" class="text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <p id="overlay-desc" class="text-sm text-gray-600 mb-3 leading-relaxed"></p>
+            <div class="border-t pt-2">
+                <p class="text-xs font-semibold text-gray-500 mb-1">相關與重疊書卷：</p>
+                <div id="overlay-books" class="flex flex-wrap gap-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Data Structure ---
+        // Format Standard: "Book Name (Note)" - space before parenthesis
+        const periods = [
+            {
+                id: 0,
+                title: "序言：聖經救贖計劃總覽",
+                color: "#475569", // Slate-600
+                desc: "【救贖計劃總覽】聖經並非散亂的經卷，而是一部首尾呼應的救贖史詩。故事始於神的「創造」與人的「墮落」，神隨即啟動救贖計劃：由揀選一個家族（列祖）發展為一個祭司國度（以色列），歷經律法、王國、被擄的管教，最終引向救主耶穌基督的降生、受死與復活。這計劃並不止於此，更延伸至福音廣傳萬邦，直到基督再來建立新天新地。此地圖將帶您走過這橫跨歐亞非三洲的歷史舞台，見證神對人類永恆的愛。",
+                books: ["全本聖經 (66卷)"],
+                center: [34.0, 32.0], 
+                zoom: 4,
+                polygon: [
+                    [42.5, 12.0], [41.0, 29.0], [40.0, 45.0], [37.0, 52.0],
+                    [29.0, 50.0], [27.0, 35.0], [28.0, 30.0], [31.0, 25.0],
+                    [35.0, 14.0], [42.5, 12.0]
+                ]
+            },
+            {
+                id: 1,
+                title: "1. 創世與族長時期",
+                color: "#10b981", // Emerald
+                desc: "【起源與呼召】承接序言的創造，人類因罪惡深重招致洪水審判，神藉「挪亞方舟」存留餘種並立虹為記。洪水後人類又在巴別塔背叛而分散。神隨即呼召亞伯拉罕離開拜偶像的吾珥，應許賜給他迦南地。此時期涵蓋列祖在應許之地的寄居生活。結束於雅各全家因大饑荒南下「埃及」，為下一時期的「出埃及」埋下伏筆。",
+                books: ["創世記", "約伯記"],
+                center: [32.5, 40.0],
+                zoom: 5,
+                polygon: [
+                    [30.0, 48.0], [33.0, 44.0], [36.0, 39.0], [36.0, 36.0],
+                    [33.0, 35.0], [30.0, 31.0], [29.0, 32.0], [31.0, 35.5],
+                    [34.0, 41.0], [30.0, 47.0]
+                ]
+            },
+            {
+                id: 2,
+                title: "2. 律法與曠野時期",
+                color: "#f97316", // Orange
+                desc: "【救贖與立約】神藉摩西行神蹟帶領百姓「出埃及」。在西奈山，神與以色列立約並頒布律法，正式建立神權政體。然而因不信，他們在曠野漂流四十年。此時期結束於摩西逝世，新生一代準備「進迦南」。",
+                books: ["出埃及記", "利未記", "民數記", "申命記", "詩篇 (第90篇：摩西)"],
+                center: [29.5, 34.0],
+                zoom: 7,
+                polygon: [
+                    [31.1, 31.5], [29.5, 32.3], [27.8, 34.2], [29.5, 35.0],
+                    [31.5, 35.8], [32.0, 35.5], [31.0, 34.0], [31.1, 31.5]
+                ]
+            },
+            {
+                id: 3,
+                title: "3. 迦南征服與士師時期",
+                color: "#eab308", // Yellow
+                desc: "【得地與背道】約書亞帶領百姓攻佔迦南諸城並分地。但約書亞死後，百姓陷入「犯罪→受苦→呼求→士師拯救」的惡性循環。政治混亂與屬靈黑暗，導致百姓最終渴望「立王」，導向王國時期。",
+                books: ["約書亞記", "士師記", "路得記"],
+                center: [32.0, 35.2],
+                zoom: 8,
+                polygon: [
+                    [33.3, 35.1], [33.0, 35.8], [31.5, 35.5], [31.2, 34.8],
+                    [31.5, 34.4], [32.8, 34.9], [33.3, 35.1]
+                ]
+            },
+            {
+                id: 4,
+                title: "4. 王國興衰時期",
+                color: "#2563eb", // Blue
+                desc: "【榮耀與分裂】神設立君王（掃羅、大衛、所羅門），版圖擴張至極盛，聖殿建成。後因所羅門拜偶像，國家分裂為「北國以色列」與「南國猶大」。兩國在幾百年間多行耶和華眼中看為惡的事，終局走向衰亡。",
+                books: [
+                    "撒母耳記上下", "列王紀上下", "歷代志上下", 
+                    "詩篇 (大衛王朝)", "箴言", "傳道書", "雅歌",
+                    "約珥書 (早期觀點)", "俄巴底亞書 (早期觀點)"
+                ],
+                center: [32.0, 35.5],
+                zoom: 7,
+                polygon: [
+                    [34.5, 36.5], [33.5, 36.5], [31.0, 36.0], [29.5, 35.0],
+                    [31.0, 34.0], [33.0, 35.0], [34.5, 36.5]
+                ]
+            },
+            {
+                id: 5,
+                title: "5. 亞述危機時期",
+                color: "#ef4444", // Red
+                desc: "【北國的滅亡】神興起殘暴的亞述帝國作為審判的杖。北國以色列於主前722年被亞述滅亡。亞述大軍南下威脅猶大，希西家王雖暫時倖存，但危機未解。此時期記錄了北國的終局與南國的掙扎。",
+                books: [
+                    "列王紀下 (後半)", "歷代志下 (後半)", 
+                    "以賽亞書 (1-39章)", "何西阿書", "阿摩司書", 
+                    "約拿書", "彌迦書", "那鴻書"
+                ],
+                center: [34.5, 40.0],
+                zoom: 6,
+                polygon: [
+                    [36.5, 43.0], [35.5, 44.0], [34.0, 42.0], [36.0, 39.0],
+                    [36.0, 36.0], [32.0, 35.0], [34.0, 37.0], [35.0, 41.0], [36.5, 43.0]
+                ]
+            },
+            {
+                id: 6,
+                title: "6. 巴比倫被擄時期",
+                color: "#9333ea", // Purple
+                desc: "【南國的審判】新興的巴比倫帝國擊敗亞述與埃及，主前586年毀滅耶路撒冷與聖殿。百姓被擄至巴比倫七十年。這是一段深刻反省的時期，但以理在王宮見證神，耶利米與以西結在絕望中宣告新約的盼望。",
+                books: [
+                    "列王紀下 (結尾)", "歷代志下 (結尾)", 
+                    "耶利米書", "耶利米哀歌", "以西結書", "但以理書 (1-6章：歷史)", 
+                    "以賽亞書 (40-55章)", "哈巴谷書", "西番雅書", "俄巴底亞書 (晚期觀點)", 
+                    "詩篇 (被擄詩歌)"
+                ],
+                center: [32.5, 40.0],
+                zoom: 6,
+                polygon: [
+                    [32.5, 44.4], [33.5, 44.0], [35.0, 41.0], [35.0, 38.0],
+                    [32.0, 35.2], [31.0, 35.5], [32.0, 40.0], [31.0, 45.0], [32.5, 44.4]
+                ]
+            },
+            {
+                id: 7,
+                title: "7. 波斯恢復時期",
+                color: "#0d9488", // Teal
+                desc: "【歸回與重建】波斯帝國取代巴比倫，古列王下詔釋放猶太人歸回。百姓重建了聖殿與城牆。舊約在瑪拉基書的呼籲中結束，進入沈默期，等候彌賽亞。",
+                books: [
+                    "以斯拉記", "尼希米記", "以斯帖記", 
+                    "哈该書", "撒迦利亞書", "瑪拉基書", 
+                    "以賽亞書 (56-66章)", "但以理書 (7-12章：異象)", "約珥書 (晚期觀點)"
+                ],
+                center: [32.0, 44.0],
+                zoom: 5,
+                polygon: [
+                    [32.0, 48.3], [30.0, 52.0], [35.0, 50.0], [37.0, 38.0],
+                    [32.0, 35.0], [30.0, 32.0], [28.0, 45.0], [32.0, 48.3]
+                ]
+            },
+            {
+                id: 8,
+                title: "8. 羅馬統治時期 (新約歷史)",
+                color: "#ca8a04", // Gold
+                desc: "【救主降生與教會建立】「時候滿足」，羅馬帝國統一了環地中海世界，其發達的道路系統與通用的希臘語言，為福音廣傳預備了最佳環境。在此歷史舞台上，耶穌基督道成肉身，成全了律法與先知的預言。隨後聖靈降臨，教會在耶路撒冷誕生。先是彼得與眾使徒將福音傳遍耶路撒冷、猶太全地與撒馬利亞；隨後藉著保羅的宣教旅程，進一步將福音傳向外邦，遍及小亞細亞、希臘，最終抵達帝國的心臟——羅馬。新約27卷書皆寫作於此時期，見證了從「以色列民族」到「萬國教會」的榮耀轉化。",
+                books: [
+                    "馬太福音", "馬可福音", "路加福音", "約翰福音", "使徒行傳", 
+                    "羅馬書", "哥林多前後書", "加拉太書", "以弗所書", 
+                    "腓立比書", "歌羅西書", "帖撒羅尼迦前後書", 
+                    "提摩太前後書", "提多書", "腓利門書", 
+                    "希伯來書", "雅各書", "彼得前後書", 
+                    "約翰一二三書", "猶大書", "啟示錄 (寫作背景)"
+                ],
+                center: [38.0, 24.0], 
+                zoom: 5,
+                polygon: [
+                    [41.9, 12.5], [40.6, 22.9], [38.0, 23.7], [37.9, 27.3],
+                    [36.2, 36.1], [32.8, 35.2], [31.7, 35.2], [31.2, 29.9],
+                    [35.0, 24.0], [35.9, 14.4], [41.9, 12.5]
+                ]
+            },
+            {
+                id: 9,
+                title: "9. 末日與新天新地 (預言)",
+                color: "#4c1d95", // Deep Violet
+                desc: "【終局與新造】這是歷史的終局。\n聖經中關於列國興衰與基督初臨的預言都已精準應驗，如今只剩下最後的篇章。歷史時鐘正在倒數，基督將榮耀再來，審判罪惡，並更新萬有。屆時舊的天地將過去，不再有死亡與悲哀，神將帶來永恆完美的新天新地（新耶路撒冷）與人同住。\n願您把握機會，趕快相信福音，進入這榮耀的永恆盼望中！\n※註：地圖僅標示預言核心地點供地理參考，但此時期的影響實際上涵蓋全球。",
+                books: [
+                    "啟示錄 (主要內容)", "但以理書 (70個七)", 
+                    "以西結書 (37-48章)", "以賽亞書 (65-66章)", "撒迦利亞書 (14章)", 
+                    "約珥書 (耶和華的日子)", "帖撒羅尼迦前後書", 
+                    "馬太福音 (24-25章)", "彼得後書 (新天新地)"
+                ],
+                center: [32.2, 35.3],
+                zoom: 8,
+                polygon: [
+                    [32.65, 35.10], [32.80, 35.30], [32.50, 35.60], [31.78, 35.24],
+                    [31.70, 35.10], [32.00, 34.80], [32.65, 35.10]
+                ]
+            }
+        ];
+
+        // --- 2. Map Initialization ---
+        
+        // Define layers: Google (Chinese) and CartoDB (English backup)
+        const googleChinese = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', {
+            attribution: '&copy; Google Maps',
+            maxZoom: 20
+        });
+
+        const cartoEnglish = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        });
+
+        // Init map with Chinese default
+        const map = L.map('map', {
+            center: [32.0, 35.0],
+            zoom: 6,
+            zoomControl: false,
+            layers: [googleChinese] // Default to Chinese
+        });
+
+        // Add layer control to allow switching if one fails
+        const baseMaps = {
+            "中文地圖 (Google)": googleChinese,
+            "英文地圖 (CartoDB)": cartoEnglish
+        };
+
+        L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        let currentLayer = null;
+
+        // --- 3. Interaction Logic ---
+        
+        function loadPeriodList() {
+            const container = document.getElementById('period-list');
+            
+            periods.forEach((p, index) => {
+                const btn = document.createElement('div');
+                btn.className = `period-btn p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 transition-colors`;
+                btn.onclick = () => selectPeriod(index);
+                
+                const dot = `<span class="inline-block w-3 h-3 rounded-full mr-2" style="background-color: ${p.color};"></span>`;
+                
+                // Simplified display in sidebar, detailed in overlay
+                const displayBooks = p.books.length > 3 ? p.books.slice(0, 3).join(', ') + '...' : p.books.join(', ');
+
+                btn.innerHTML = `
+                    <div class="font-bold text-gray-800 flex items-center">${dot}${p.title}</div>
+                    <div class="text-xs text-gray-500 mt-1 truncate">${displayBooks}</div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectPeriod(index) {
+            const p = periods[index];
+            
+            document.querySelectorAll('.period-btn').forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('active');
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            if (currentLayer) {
+                map.removeLayer(currentLayer);
+            }
+
+            currentLayer = L.polygon(p.polygon, {
+                color: p.color,
+                fillColor: p.color,
+                fillOpacity: 0.3,
+                weight: 2
+            }).addTo(map);
+
+            map.flyToBounds(currentLayer.getBounds(), {
+                padding: [50, 50],
+                duration: 1.5
+            });
+
+            updateOverlay(p);
+        }
+
+        function updateOverlay(p) {
+            const overlay = document.getElementById('info-overlay');
+            const title = document.getElementById('overlay-title');
+            const desc = document.getElementById('overlay-desc');
+            const booksContainer = document.getElementById('overlay-books');
+
+            title.innerText = p.title;
+            title.style.color = p.color === '#ca8a04' ? '#b45309' : p.color;
+            desc.innerText = p.desc;
+            
+            booksContainer.innerHTML = '';
+            p.books.forEach(book => {
+                const span = document.createElement('span');
+                span.className = 'book-tag';
+                span.innerText = book;
+                booksContainer.appendChild(span);
+            });
+
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+        }
+
+        function closeOverlay() {
+            const overlay = document.getElementById('info-overlay');
+            overlay.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- Init ---
+        loadPeriodList();
+
+    </script>
+</body>
+</html>
