@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>大衛王：詩人與戰士的私密手稿</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* =========================================
+           核心變數設定 (Theme Variables)
+           ========================================= */
+        :root {
+            /* 深色模式 (Dark / Night) */
+            --bg-color: #0c0a09;
+            --bg-gradient-start: rgba(28, 25, 23, 0.95);
+            --bg-gradient-end: rgba(0, 0, 0, 1);
+            
+            --sidebar-bg: #151412;
+            --sidebar-border: rgba(255, 255, 255, 0.05);
+            --sidebar-text-main: #d6d3d1;
+            --sidebar-text-sub: #78716c;
+            --sidebar-hover: rgba(255, 255, 255, 0.03);
+            --sidebar-active-bg: rgba(231, 229, 228, 0.08);
+            --sidebar-active-text: #f5f5f4;
+            --sidebar-active-icon: #d6d3d1;
+            
+            --parchment-bg: #dccfb8; /* 更深沉陳舊的紙色 */
+            --parchment-shadow: rgba(0, 0, 0, 0.9);
+            --parchment-edge: rgba(60, 40, 30, 0.8);
+            
+            --ink-color: #291d18;
+            --date-color: #9f483f; 
+            --accent-line: rgba(93, 64, 55, 0.5);
+            
+            --scrollbar-thumb: rgba(90, 70, 60, 0.4);
+            --atmosphere-light: rgba(200, 150, 100, 0.05);
+            --psalm-bg: rgba(62, 39, 35, 0.1);
+            
+            --modal-bg: rgba(20, 18, 16, 0.95);
+            --modal-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 淺色模式 (Light / Day) */
+        [data-theme="light"] {
+            --bg-color: #f0f0ed;
+            --bg-gradient-start: rgba(245, 245, 244, 0.8);
+            --bg-gradient-end: rgba(220, 218, 215, 0.9);
+            
+            --sidebar-bg: #e5e5e0;
+            --sidebar-border: rgba(0, 0, 0, 0.05);
+            --sidebar-text-main: #44403c;
+            --sidebar-text-sub: #78716c;
+            --sidebar-hover: rgba(0, 0, 0, 0.03);
+            --sidebar-active-bg: rgba(68, 64, 60, 0.05);
+            --sidebar-active-text: #292524;
+            --sidebar-active-icon: #57534e;
+            
+            --parchment-bg: #fdf6e3;
+            --parchment-shadow: rgba(0, 0, 0, 0.2);
+            --parchment-edge: rgba(168, 162, 158, 0.3);
+            
+            --ink-color: #1c1917;
+            --date-color: #b91c1c; 
+            --accent-line: rgba(28, 25, 23, 0.2);
+            
+            --scrollbar-thumb: rgba(120, 113, 108, 0.2);
+            --atmosphere-light: rgba(255, 255, 255, 0.6);
+            --psalm-bg: rgba(62, 39, 35, 0.05);
+            
+            --modal-bg: rgba(245, 245, 240, 0.95);
+            --modal-border: rgba(0, 0, 0, 0.1);
+        }
+
+        /* =========================================
+           特效樣式 (FX Styles)
+           ========================================= */
+        .fx-smear {
+            position: relative; color: rgba(40, 30, 25, 0.25); text-decoration: none; user-select: none;
+            text-shadow: 0 0 2px rgba(45, 27, 21, 0.5);
+        }
+        .fx-smear::after {
+            content: ""; position: absolute; left: -5%; top: 50%;
+            transform: translateY(-50%) rotate(-1deg); width: 110%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 15 Q 20 5 40 15 T 80 15 T 120 15 T 160 15 T 195 15 M10 18 Q 30 8 50 18 T 90 18 T 130 18 T 170 18' stroke='%232e1a12' stroke-width='10' fill='none' stroke-linecap='square' opacity='0.95' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-size: 100% 100%; background-repeat: no-repeat;
+            mix-blend-mode: multiply; filter: blur(0.4px) contrast(120%); opacity: 0.9;
+        }
+
+        .fx-wet-stain {
+            position: absolute; display: block; pointer-events: none; z-index: 0;
+            top: var(--y, 0px); left: var(--x, 0px); width: var(--w, 30px); height: var(--h, 30px);
+            background: radial-gradient(closest-side, rgba(60, 40, 20, 0.15) 0%, rgba(60, 40, 20, 0.05) 70%, transparent 100%);
+            border-radius: var(--shape, 40% 60% 70% 30% / 40% 50% 60% 50%);
+            filter: blur(4px); mix-blend-mode: multiply; transform: rotate(var(--rot, 0deg));
+        }
+
+        .fx-tear-text {
+            position: relative; display: inline-block; color: rgba(40, 25, 20, 0.7);
+            text-shadow: 0 0 3px rgba(40, 25, 20, 0.5), 0 0 8px rgba(40, 25, 20, 0.2);
+            filter: blur(0.6px);
+            background-image: radial-gradient(closest-side, rgba(60, 40, 20, 0.08) 0%, transparent 100%);
+            border-radius: 50%; padding: 4px;
+        }
+
+        /* 手寫草稿風格特效 (Natural Messy Draft) */
+        .fx-messy-hand {
+            font-family: 'Ma Shan Zheng', cursive; 
+            font-weight: bold;
+            font-size: 1.1em;
+            display: inline-block;
+            position: relative;
+            color: #1a0f0a;
+            letter-spacing: 0.1em;
+            text-shadow: 1px 0px 0px rgba(0,0,0,0.5); 
+            transform: rotate(-2deg);
+        }
+        
+        .fx-messy-hand::after {
+            content: "";
+            position: absolute;
+            left: -5%;
+            bottom: -5px;
+            width: 110%;
+            height: 15px;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q 50 15 100 8 T 200 12' stroke='%233e2723' stroke-width='2' fill='none' stroke-linecap='round' opacity='0.8'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        /* =========================================
+           基礎樣式 & 響應式調整
+           ========================================= */
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 40%, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 85%), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            background-repeat: no-repeat, repeat; background-size: cover, 100px 100px;
+            color: var(--ink-color); transition: background-color 0.5s ease;
+            height: 100dvh; /* 使用 dynamic viewport height */
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .handwritten-mode {
+            font-family: "KaiTi", "STKaiti", "BiauKai", "AR PL UKai TW", "Michroma", "Ma Shan Zheng", cursive, serif !important;
+            font-weight: 600; letter-spacing: 1px; line-height: 2 !important;
+        }
+
+        .psalm-quote {
+            font-family: inherit; color: #3e2723; background-color: transparent;
+            padding: 0.5rem 0.5rem 0.5rem 1rem;
+            margin: 1rem 0; border-left: 3px solid rgba(141, 110, 99, 0.4);
+            font-size: 0.95em; line-height: 2 !important; position: relative;
+        }
+
+        .ancient-title { font-family: 'Ma Shan Zheng', cursive; }
+
+        main { perspective: 1200px; }
+
+        .parchment-container {
+            position: relative; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            transform: rotateX(1deg) rotateY(-0.5deg) rotateZ(0.3deg);
+            transform-style: preserve-3d; transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* 羊皮卷本體 (背景層，不捲動) */
+        .parchment {
+            position: absolute; inset: 0; background-color: var(--parchment-bg);
+            background-image: radial-gradient(circle at 80% 20%, rgba(0,0,0,0.03) 0%, transparent 20%), radial-gradient(circle at 10% 80%, rgba(60,40,20,0.04) 0%, transparent 30%), linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.15) 15%, transparent 25%), linear-gradient(90deg, transparent 75%, rgba(0,0,0,0.04) 85%, transparent 95%), url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' opacity='0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.12'/%3E%3C/svg%3E");
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            box-shadow: inset 0 0 80px rgba(60, 40, 20, 0.15), inset 2px 2px 10px rgba(255,255,255,0.3), 15px 25px 50px -10px var(--parchment-shadow);
+            overflow: hidden; transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            z-index: 1; /* 背景層級較低 */
+        }
+
+        /* *** 特殊狀態：流亡時的極致破損 (Extreme Damaged State) *** */
+        body.state-fugitive .parchment {
+            clip-path: polygon(
+                1% 1%, 10% 0%, 20% 1.5%, 30% 0%, 40% 1%, 50% 0%, 60% 1.5%, 70% 0%, 80% 1%, 90% 0%, 99% 1%,
+                100% 10%, 98.5% 20%, 100% 30%, 98.5% 40%, 100% 50%, 98.5% 60%, 100% 70%, 98.5% 80%, 100% 90%, 99% 99%,
+                90% 100%, 80% 98.5%, 70% 100%, 60% 98.5%, 50% 100%, 40% 98.5%, 30% 100%, 20% 98.5%, 10% 100%, 1% 99%,
+                0% 90%, 1.5% 80%, 0% 70%, 1.5% 60%, 0% 50%, 1.5% 40%, 0% 30%, 1.5% 20%, 0% 10%
+            );
+            filter: drop-shadow(10px 20px 30px rgba(0,0,0,0.9)) sepia(0.4) brightness(0.92) contrast(1.1);
+            border-radius: 0;
+        }
+        
+        /* 3. 流亡狀態的重度污漬層 (固定在 .parchment 上) */
+        body.state-fugitive .parchment::after {
+            content: ""; position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(circle at 30% 40%, rgba(40, 25, 10, 0.7) 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, rgba(35, 20, 5, 0.6) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(50, 30, 15, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 15% 15%, rgba(20, 10, 5, 0.9) 0%, transparent 8%),
+                radial-gradient(circle at 85% 85%, rgba(20, 10, 5, 0.9) 0%, transparent 10%),
+                url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='rough'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.03' numOctaves='5' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%231a0f0a' surfaceScale='5'%3E%3CfeDistantLight azimuth='45' elevation='30'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23rough)' opacity='0.5'/%3E%3C/svg%3E");
+            opacity: 0.55; 
+            mix-blend-mode: multiply; pointer-events: none;
+        }
+
+        .parchment::before {
+            content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 8px;
+            background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+            filter: url('#paper-edge'); pointer-events: none; transition: all 0.8s ease;
+        }
+        body.state-fugitive .parchment::before { display: none; }
+
+        .parchment-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; }
+        
+        body.state-fugitive #scroll-container {
+            padding: 3rem 4rem; 
+        }
+        @media (max-width: 768px) {
+            body.state-fugitive #scroll-container {
+                padding: 2.5rem 3rem; 
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: var(--modal-bg); border: 1px solid var(--modal-border);
+            width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto;
+            border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); padding: 1.5rem;
+            color: var(--sidebar-text-main); transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        .modal-title { font-family: 'Ma Shan Zheng', cursive; font-size: 1.5rem; margin-bottom: 1rem; color: var(--date-color); border-bottom: 1px solid var(--accent-line); padding-bottom: 0.5rem; }
+        .modal-subtitle { font-weight: bold; margin-bottom: 0.5rem; color: var(--sidebar-text-sub); text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-left: 3px solid var(--date-color); padding-left: 0.5rem; }
+        .modal-list { list-style: none; margin-bottom: 1.5rem; }
+        .modal-list li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+        .modal-list li strong { color: var(--sidebar-text-main); display: block; margin-bottom: 0.2rem; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; cursor: pointer; color: var(--sidebar-text-sub); }
+
+        /* Sidebar - Mobile Responsive */
+        aside {
+            background-color: var(--sidebar-bg) !important; border-right: 1px solid var(--sidebar-border);
+            box-shadow: 10px 0 30px -10px rgba(0,0,0,0.1); transition: all 0.5s ease;
+        }
+        
+        /* [修改] 導航項目樣式：改為 Flex 垂直排列，左對齊 */
+        .nav-item {
+            cursor: pointer; transition: all 0.3s ease; position: relative;
+            border-bottom: 1px solid var(--sidebar-border); opacity: 0.7;
+            padding: 1rem 1.5rem; 
+            /* [修改] 這裡加入了 flex-col, items-start, justify-center 來實現垂直堆疊 */
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+            white-space: nowrap;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--sidebar-hover); opacity: 1; }
+        .nav-item.active { background-color: var(--sidebar-active-bg); }
+        .nav-item span { color: var(--sidebar-text-sub); transition: color 0.3s ease; font-size: 0.875rem; }
+        .nav-item:hover span { color: var(--sidebar-text-main); }
+        .nav-item.active span { color: var(--sidebar-active-text) !important; font-weight: bold; }
+        
+        .mobile-nav-scroll::-webkit-scrollbar { height: 4px; }
+        .mobile-nav-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+        .fade-in { animation: fadeIn 1s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); filter: blur(2px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        .divider { height: 1px; background: linear-gradient(to right, transparent, var(--accent-line), transparent); margin: 25px 0 15px 0; }
+        
+        .icon-btn {
+            cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; transition: all 0.3s ease;
+            color: var(--sidebar-text-sub); border: 1px solid var(--sidebar-border);
+        }
+        .icon-btn:hover {
+            background-color: var(--sidebar-hover); color: var(--sidebar-text-main);
+        }
+        
+        .journal-date {
+            display: block; font-family: 'Ma Shan Zheng', cursive; color: var(--date-color);
+            font-size: 1.4rem; 
+            margin-top: 0 !important; 
+            padding-top: 0 !important;
+            margin-bottom: 0.8rem; 
+            width: fit-content;
+            line-height: 1.4 !important; 
+            opacity: 0.9; transform: rotate(-1deg); transition: color 0.5s ease;
+        }
+        .journal-date::after {
+            content: ''; display: block; width: 100%; height: 1px;
+            background: var(--date-color); opacity: 0.4;
+            margin-top: 2px; transition: background 0.5s ease;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col md:flex-row overflow-hidden transition-colors duration-700">
+
+    <svg style="display: none;">
+        <defs>
+            <filter id="paper-edge">
+                <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- 側邊選單 -->
+    <aside class="w-full md:w-72 flex flex-col z-20 flex-shrink-0 relative transition-colors duration-500 shadow-xl border-b md:border-b-0 md:border-r border-[var(--sidebar-border)] h-auto md:h-full">
+        <!-- 標題與按鈕區 -->
+        <div class="p-4 md:p-6 border-b border-[var(--sidebar-border)] flex items-center justify-between relative overflow-hidden">
+            <div class="flex flex-col">
+                <h1 class="text-xl md:text-2xl ancient-title text-[var(--sidebar-text-main)] mb-1 relative z-10 drop-shadow-sm tracking-wide">大衛詩篇</h1>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] relative z-10 hidden md:block">The Chronicles of David</p>
+            </div>
+            <div class="flex space-x-2 relative z-10">
+                <button onclick="toggleInfo()" class="icon-btn" title="使用說明">
+                    <i class="ph ph-info text-lg"></i>
+                </button>
+                <button onclick="toggleTheme()" class="icon-btn" title="切換深/淺模式">
+                    <i id="theme-icon" class="ph ph-moon text-lg"></i>
+                </button>
+            </div>
+            <div class="absolute inset-0 bg-black opacity-5 pointer-events-none"></div> 
+        </div>
+        
+        <!-- 導航列表 -->
+        <div class="md:flex-1 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden mobile-nav-scroll md:custom-scrollbar bg-[var(--sidebar-bg)]">
+            <div class="hidden md:block text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] mb-2 px-6 pt-4 font-semibold opacity-80">Life Chapters</div>
+            <nav id="character-list" class="flex flex-row md:flex-col space-x-0 md:space-y-1"></nav>
+        </div>
+
+        <div class="hidden md:block p-6 border-t border-[var(--sidebar-border)] text-center text-[10px] tracking-widest text-[var(--sidebar-text-sub)] opacity-60">
+            A MAN AFTER GOD'S OWN HEART
+        </div>
+    </aside>
+
+    <!-- 主要內容區 -->
+    <main class="flex-1 relative flex flex-col items-center justify-center p-2 md:p-8 lg:p-12 overflow-hidden transition-all duration-500">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] pointer-events-none transition-all duration-1000" 
+             style="background: radial-gradient(circle, var(--atmosphere-light) 0%, transparent 70%);">
+        </div>
+
+        <!-- 羊皮卷容器 -->
+        <div class="parchment-container w-full max-w-4xl h-full md:h-[95%]">
+            <!-- 背景層 (含污漬，不捲動) -->
+            <div class="parchment"></div>
+            
+            <div class="parchment-content">
+                <div id="scroll-container" class="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 pt-8 md:px-16 md:pb-16 md:pt-12 relative z-10">
+                    <div id="content-area" class="fade-in max-w-3xl mx-auto leading-loose text-base md:text-xl ink-text text-justify handwritten-mode pb-10"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 資訊說明視窗 -->
+    <div id="info-modal" class="modal-overlay" onclick="toggleInfo()">
+        <div class="modal-content custom-scrollbar" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="toggleInfo()"><i class="ph ph-x text-xl"></i></button>
+            <h2 class="modal-title">關於本手稿</h2>
+            
+            <div class="modal-section">
+                <div class="modal-subtitle">使用方式</div>
+                <ul class="modal-list">
+                    <li>◈ 點擊選單切換大衛人生的不同階段。</li>
+                    <li>◈ 點擊月亮/太陽圖示切換閱讀模式。</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-subtitle">觀看目的</div>
+                <ul class="modal-list">
+                    <li><strong>走進內心，超越歷史</strong>聽見大衛在高山低谷中的真實心聲，看見神如何在人的軟弱中作王。</li>
+                    <li><strong>生命的鏡子</strong>大衛雖不完美，卻蒙神牧養與恢復。這提醒我們：在懼怕與跌倒中，同樣能被神更新。</li>
+                    <li><strong>禱告的學習</strong>詩篇是特定時刻的禱告。將其與大衛的生命對照，學習如何在困境或恩典中向神說話。</li>
+                    <li><strong>永恆的盼望</strong>從曠野到王宮，神一路扶持。祂昨日、今日、直到永遠不改變。</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-subtitle">引用詩篇 (CUNP-神版)</div>
+                <ul class="modal-list">
+                    <li><strong>牧羊少年：</strong> 詩篇 23 (耶和華是我的牧者)</li>
+                    <li><strong>流亡歲月：</strong> 詩篇 57 (在翅膀的蔭下)</li>
+                    <li><strong>榮耀君王：</strong> 詩篇 24 (榮耀的王將要進來)</li>
+                    <li><strong>罪與悔改：</strong> 詩篇 51 (憂傷痛悔的心)</li>
+                    <li><strong>王室悲劇：</strong> 詩篇 3 (耶和華是我四圍的盾牌)</li>
+                    <li><strong>夕陽餘暉：</strong> 詩篇 145 (我的神我的王啊)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const characters = [
+            {
+                id: 'youth',
+                name: '一、牧羊少年',
+                title: '伯利恆曠野的琴聲與膏油',
+                diary: `
+                    <span class="journal-date">伯利恆 • 星夜守望</span>
+                    <div class="relative">
+                        <span class="fx-wet-stain" style="--x:90%; --y:20px; --w:40px; --h:35px; --shape:40% 60% 60% 40% / 50% 50% 50% 50%;"></span>
+                        <p class="drop-cap mb-6">今晚的星空異常燦爛，羊群都睡了。我手裡的琴弦還微微顫動著，剛剛那首新歌彷彿是從天上流下來的。哥哥們總笑我整天只會對著羊唱歌，但他們不懂，在這寂靜的曠野裡，神離我有多近。今天撒母耳先知來了，他略過了高大的哥哥們，竟然將油澆在我頭上。油順著鬍鬚流下時，我感到一股熱流穿透全身。我？一個牧羊童？神啊，這究竟意味著什麼？</p>
+                    </div>
+                    <div class="psalm-quote">
+                        耶和華是我的牧者，我必不致缺乏。<br>
+                        他使我躺臥在青草地上，領我在可安歇的水邊。<br>
+                        他使我的靈魂甦醒，為自己的名引導我走義路。<br>
+                        我雖然行過死蔭的幽谷，也不怕遭害，因為你與我同在；你的杖，你的竿，都安慰我。<br>
+                        在我敵人面前，你為我擺設筵席；你用油膏了我的頭，使我的福杯滿溢。<br>
+                        我一生一世必有恩惠慈愛隨著我；我且要住在耶和華的殿中，直到永遠。
+                    </div>
+                    <div class="divider"></div>
+                    <span class="journal-date">以拉谷 • 迎戰巨人</span>
+                    <p class="mb-6">那未受割禮的歌利亞辱罵永生神的軍隊，我的骨頭裡有火在燒！<span class="fx-smear" style="--rot:-1deg;">是誰給他這膽量？</span> 掃羅王的盔甲太重了，我穿不上。我有什麼？只有這根趕羊的杖，和溪邊撿來的五顆石子。但我還有祢。我奉萬軍之耶和華的名迎戰。當石子飛出去的那一刻，世界彷彿靜止了。</p>
+                `
+            },
+            {
+                id: 'fugitive',
+                name: '二、流亡歲月',
+                title: '曠野的逃犯，洞穴中的哀歌',
+                diary: `
+                    <span class="journal-date">亞杜蘭洞 • 逃避掃羅</span>
+                    <div class="relative">
+                        <span class="fx-wet-stain" style="--x:10px; --y:60px; --w:25px; --h:30px; --rot:10deg;"></span>
+                        <p class="drop-cap mb-6">我像鷓鴣一樣被追趕，命懸一線。在這陰冷的洞穴中，我的心卻投靠祢：</p>
+                    </div>
+                    <div class="psalm-quote">
+                        神啊，求你憐憫我，憐憫我！因為我的心投靠你。我要投靠在你翅膀的蔭下，等到災害過去。<br>
+                        我要求告至高的神，就是為我成全諸事的神。<br>
+                        他必從天上求救，向我發出慈愛和誠實。那要吞吃我的人辱罵我的時候，神從天上必施恩救我。<br>
+                        我的性命在獅子中間；我躺臥在性如烈火的世人當中。他們的牙齒是槍、箭；他們的舌頭是快刀。<br>
+                        神啊，願你崇高過於諸天！願你的榮耀高過全地！<br>
+                        他們為我的腳設下網羅，壓制我的心；他們在我面前挖了坑，自己反掉在其中。<br>
+                        神啊，我心堅定，我心堅定；我要唱詩，我要歌頌！<br>
+                        我的靈啊，你當醒起！琴瑟啊，你們當醒起！我自己要極早醒起！<br>
+                        主啊，我要在萬民中稱謝你，在萬族中歌頌你！<br>
+                        因為，你的慈愛高及諸天；你的誠實達到穹蒼。<br>
+                        神啊，願你崇高過於諸天！願你的榮耀高過全地！
+                    </div>
+                    <div class="divider"></div>
+                    <span class="journal-date">隱基底 • 割袍不殺</span>
+                    <p class="mb-6">他在那裡，就在我觸手可及之處。隨從說：「這是神將仇敵交在你手裡了！」我手裡的刀舉起又放下。<span class="fx-smear" style="--rot:1deg;">殺了他，我就自由了...</span> 不！我不能伸手害耶和華的受膏者。我割下他的一角衣襟，心卻怦怦直跳，充滿了自責。掃羅啊，我的父，你為何聽信讒言追殺我呢？</p>
+                `
+            },
+            {
+                id: 'king',
+                name: '三、榮耀君王',
+                title: '耶路撒冷的建立，約櫃的歸回',
+                diary: `
+                    <span class="journal-date">耶路撒冷 • 迎回約櫃</span>
+                    <p class="drop-cap mb-6">約櫃進城了！我極力跳舞，因榮耀的王今日降臨：</p>
+                    <div class="psalm-quote">
+                        地和其中所充滿的，世界和住在其間的，都屬耶和華。<br>
+                        他把地建立在海上，安定在大水之上。<br>
+                        誰能登耶和華的山？誰能站在他的聖所？<br>
+                        就是手潔心清、不向虛妄、起誓不懷詭詐的人。<br>
+                        他必蒙耶和華賜福，又蒙救他的神使他成義。<br>
+                        這是尋求耶和華的族類，是尋求你面的雅各。<br>
+                        眾城門哪，你們要抬起頭來！永久的門戶，你們要被舉起！那榮耀的王將要進來。<br>
+                        榮耀的王是誰呢？就是有力有能的耶和華，在戰場上有能的耶和華！<br>
+                        眾城門哪，你們要抬起頭來！永久的門戶，你們要被舉起！那榮耀的王將要進來。<br>
+                        榮耀的王是誰呢？萬軍之耶和華，他是榮耀的王！
+                    </div>
+                    <div class="divider"></div>
+                    <span class="journal-date">王宮 • 建殿的心願</span>
+                    <p class="mb-6">我住在香柏木的宮殿裡，神的約櫃卻在幔子裡。這怎能行？我想要為祢建殿，一個輝煌的居所。但拿單來說：「不，大衛。你流了多人的血。」我的心沉了一下。但隨即而來的是更大的應許——不是我為神建殿，是神要為我建立家室，直到永遠。主耶和華啊，我是誰？我的家算什麼？祢竟看顧我到這地步。</p>
+                `
+            },
+            {
+                id: 'sin',
+                name: '四、罪與悔改',
+                title: '拔示巴的誘惑，破碎的靈',
+                diary: `
+                    <span class="journal-date">內室 • 拿單走後</span>
+                    <div class="relative">
+                        <span class="fx-wet-stain" style="--x:80%; --y:10px; --w:35px; --h:40px; --rot:-15deg;"></span>
+                        <span class="fx-wet-stain" style="--x:20%; --y:150px; --w:25px; --h:30px; --rot:45deg;"></span>
+                        <p class="drop-cap mb-6">我的罪常在我面前。拿單的話指出了我靈魂的污穢。我做了什麼？<span class="fx-smear">我掩蓋，我殺戮...</span> 神啊，我得罪了你：</p>
+                    </div>
+                    <div class="psalm-quote">
+                        神啊，求你按你的慈愛憐恤我！按你豐盛的慈悲塗抹我的過犯！<br>
+                        求你將我的罪孽洗除淨盡，並潔除我的罪！<br>
+                        因為，我知道我的過犯；我的罪常在我面前。<br>
+                        我向你犯罪，惟獨得罪了你；在你眼前行了這惡，以致你責備我的時候顯為公義，判斷我的時候顯為清正。<br>
+                        我是在罪孽裡生的，在我母親懷胎的時候就有了罪。<br>
+                        你所喜愛的是內裡誠實；你在我隱密處，必使我得智慧。<br>
+                        求你用牛膝草潔淨我，我就乾淨；求你洗滌我，我就比雪更白。<br>
+                        求你使我得聽歡喜快樂的聲音，使你所壓傷的骨頭可以踴躍。<br>
+                        求你掩面不看我的罪，塗抹我一切的罪孽。<br>
+                        神啊，求你為我造清潔的心，使我裡面重新有正直的靈。<br>
+                        不要丟棄我，使我離開你的面；不要從我收回你的聖靈。<br>
+                        求你使我仍得救恩之樂，賜我樂意的靈扶持我，<br>
+                        我就把你的道指教有過犯的人，罪人必歸順你。<br>
+                        神啊，你是拯救我的神；求你救我脫離流人血的罪！我的舌頭就必高聲歌唱你的公義。<br>
+                        主啊，求你使我嘴唇張開，我的口便傳揚讚美你的話！<br>
+                        你本不喜愛祭物，若喜愛，我就獻上；燔祭，你也不喜悅。<br>
+                        神所要的祭就是憂傷的靈；神啊，憂傷痛悔的心，你必不輕看。
+                    </div>
+                `
+            },
+            {
+                id: 'absalom',
+                name: '五、王室悲劇',
+                title: '押沙龍的背叛，為父的眼淚',
+                diary: `
+                    <span class="journal-date">橄欖山 • 逃避押沙龍</span>
+                    <div class="relative">
+                        <span class="fx-wet-stain" style="--x:15%; --y:30px; --w:40px; --h:45px; --shape:60% 40% 30% 70% / 60% 30% 70% 40%;"></span>
+                        <p class="drop-cap mb-6">我赤腳蒙頭，哭著上山。我的兒子尋索我的命。<span class="fx-tear-text">押沙龍，我兒啊...</span> 我所愛的兒啊，為何會走到這一步？</p>
+                    </div>
+                    <div class="psalm-quote">
+                        耶和華啊，我的敵人何其加增！有許多人起來攻擊我。<br>
+                        有許多人議論我說：「他得不著神的幫助。」<br>
+                        但你─耶和華是我四圍的盾牌，是我的榮耀，又是叫我抬起頭來的。<br>
+                        我用我的聲音求告耶和華，他就從他的聖山上應允我。<br>
+                        我躺下睡覺，我醒著，耶和華都保佑我。<br>
+                        雖有成萬的百姓來周圍攻擊我，我也不怕。<br>
+                        耶和華啊，求你起來！我的神啊，求你救我！因為你打了我一切仇敵的腮骨，敲碎了惡人的牙齒。<br>
+                        救恩屬乎耶和華；願你賜福給你的百姓。
+                    </div>
+                    <div class="divider"></div>
+                    <span class="journal-date">城門樓上 • 撕心裂肺</span>
+                    <div class="relative">
+                        <span class="fx-wet-stain" style="--x:50%; --y:0px; --w:50px; --h:50px; --shape:30% 70% 70% 30% / 30% 30% 70% 70%;"></span>
+                        <p class="mb-6">報信的人來了。叛亂平息了，但我不在乎王位！<span class="fx-messy-hand">押沙龍！我兒押沙龍啊！</span> 我恨不得替你死！你雖然背叛我，卻仍是我骨中的骨。這勝利對我而言，比死亡更苦。我的罪...最終報應在我的孩子身上。</p>
+                    </div>
+                `
+            },
+            {
+                id: 'legacy',
+                name: '六、夕陽餘暉',
+                title: '最後的詩篇，未來的聖殿',
+                diary: `
+                    <span class="journal-date">耶路撒冷 • 讚美之歌</span>
+                    <p class="drop-cap mb-6">我的身體漸漸衰殘，但我的靈卻如鷹返老還童。回首一生，雖有爭戰與眼淚，但神的慈愛從未斷絕。我要用最後的氣息尊崇祂：</p>
+                    <div class="psalm-quote">
+                        我的神、我的王啊，我要尊崇你！我要永永遠遠稱頌你的名！<br>
+                        我要天天稱頌你，也要永永遠遠讚美你的名！<br>
+                        耶和華本為大，該受大讚美；其大無法測度。<br>
+                        這代要對那代頌讚你的作為，也要傳揚你的大能。<br>
+                        我要默念你威嚴的尊榮和你奇妙的作為。<br>
+                        人要傳說你可畏之事的能力；我也要傳揚你的大德。<br>
+                        他們記念你的大恩就要傳出來，並要歌唱你的公義。<br>
+                        耶和華有恩惠，有憐憫，不輕易發怒，大有慈愛。<br>
+                        耶和華善待萬民；他的慈悲覆庇他一切所造的。<br>
+                        耶和華啊，你一切所造的都要稱謝你；你的聖民也要稱頌你，<br>
+                        傳說你國的榮耀，談論你的大能，<br>
+                        好叫世人知道你大能的作為，並你國度威嚴的榮耀。<br>
+                        你的國是永遠的國！你執掌的權柄存到萬代！<br>
+                        凡跌倒的，耶和華將他們扶持；凡被壓下的，將他們扶起。<br>
+                        萬民都舉目仰望你；你隨時給他們食物。<br>
+                        你張手，使有生氣的都隨願飽足。<br>
+                        耶和華在他一切所行的，無不公義；在他一切所做的都有慈愛。<br>
+                        凡求告耶和華的，就是誠心求告他的，耶和華便與他們相近。<br>
+                        敬畏他的，他必成就他們的心願，也必聽他們的呼求，拯救他們。<br>
+                        耶和華保護一切愛他的人，卻要滅絕一切的惡人。<br>
+                        我的口要說出讚美耶和華的話；惟願凡有血氣的，都永永遠遠稱頌他的聖名。
+                    </div>
+                `
+            }
+        ];
+
+        // 狀態管理
+        let currentCharacterId = 'youth'; 
+        let currentTheme = 'dark'; 
+
+        // DOM 元素
+        const charListEl = document.getElementById('character-list');
+        const contentAreaEl = document.getElementById('content-area');
+        const themeIcon = document.getElementById('theme-icon');
+        const modal = document.getElementById('info-modal');
+
+        function init() {
+            renderNav();
+            checkFugitiveState(currentCharacterId);
+            renderContent(false);
+            const savedTheme = localStorage.getItem('bible-journal-theme');
+            if (savedTheme) setTheme(savedTheme);
+            
+            // 自動開啟說明視窗
+            setTimeout(() => {
+                modal.classList.add('open');
+            }, 800);
+        }
+
+        window.toggleTheme = function() {
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        };
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('bible-journal-theme', theme);
+            if (theme === 'dark') {
+                themeIcon.classList.remove('ph-sun');
+                themeIcon.classList.add('ph-moon');
+            } else {
+                themeIcon.classList.remove('ph-moon');
+                themeIcon.classList.add('ph-sun');
+            }
+        }
+
+        function renderNav() {
+            charListEl.innerHTML = characters.map(char => `
+                <div onclick="selectCharacter('${char.id}')" 
+                     class="nav-item pl-4 md:pl-8 pr-4 md:pr-6 py-3 md:py-4 flex flex-col items-start justify-center group ${char.id === currentCharacterId ? 'active' : ''}">
+                    <span class="font-serif text-sm tracking-[0.2em] transition-colors whitespace-nowrap">${char.name}</span>
+                    <span class="font-serif text-[10px] tracking-widest opacity-60 mt-1 hidden md:block transition-colors group-hover:text-[var(--sidebar-text-main)] group-[.active]:text-[var(--sidebar-active-text)]">${char.title}</span>
+                </div>
+            `).join('');
+        }
+
+        function checkFugitiveState(id) {
+            if (id === 'fugitive') {
+                document.body.classList.add('state-fugitive');
+            } else {
+                document.body.classList.remove('state-fugitive');
+            }
+        }
+
+        window.selectCharacter = function(id) {
+            currentCharacterId = id;
+            checkFugitiveState(id);
+            renderNav();
+            renderContent();
+            
+            const scrollContainer = document.getElementById('scroll-container');
+            if (scrollContainer) {
+                scrollContainer.scrollTop = 0;
+            }
+
+            if(window.innerWidth < 768) {
+                const mainArea = document.querySelector('main');
+                mainArea.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
+        };
+
+        function renderContent(animate = true) {
+            const char = characters.find(c => c.id === currentCharacterId);
+            if (!char) return;
+
+            const content = char.diary;
+            
+            contentAreaEl.classList.remove('fade-in');
+            contentAreaEl.classList.add('handwritten-mode');
+
+            void contentAreaEl.offsetWidth; 
+            if (animate) contentAreaEl.classList.add('fade-in');
+            contentAreaEl.innerHTML = content;
+        }
+
+        window.toggleInfo = function() {
+            modal.classList.toggle('open');
+        }
+
+        init();
+    </script>
+</body>
+</html>
