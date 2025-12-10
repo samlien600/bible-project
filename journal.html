@@ -748,10 +748,8 @@
                 scrollContainer.scrollTop = 0;
             }
 
-            if(window.innerWidth < 768) {
-                const mainArea = document.querySelector('main');
-                mainArea.scrollIntoView({behavior: 'smooth', block: 'start'});
-            }
+            // [刪除] 移除了導致手機版上捲而遮擋頂部按鈕的程式碼
+            // 原本的 scrollIntoView 邏輯在此被刪除
         };
 
         function renderContent(animate = true) {
