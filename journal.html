@@ -6,7 +6,7 @@
     <title>大衛王：詩人與戰士的私密手稿</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts 作為備援 -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Phosphor Icons -->
@@ -21,11 +21,10 @@
     </script>
     <style>
         /* =========================================
-           [新增] 自訂字體設定
+           [自訂字體] DartsFont
            ========================================= */
         @font-face {
             font-family: 'DartsFont';
-            /* 請確保 字體 位於 font 資料夾內，且該資料夾與本 HTML 檔在同一層級 */
             src: url('font/JasonHandwriting5p.ttf') format('woff');
             font-weight: normal;
             font-style: normal;
@@ -33,7 +32,7 @@
         }
 
         /* =========================================
-           核心變數設定 (Theme Variables)
+           核心變數 (Theme Variables)
            ========================================= */
         :root {
             /* 深色模式 (Dark / Night) */
@@ -50,7 +49,7 @@
             --sidebar-active-text: #f5f5f4;
             --sidebar-active-icon: #d6d3d1;
             
-            --parchment-bg: #dccfb8; /* 更深沉陳舊的紙色 */
+            --parchment-bg: #dccfb8;
             --parchment-shadow: rgba(0, 0, 0, 0.9);
             --parchment-edge: rgba(60, 40, 30, 0.8);
             
@@ -65,7 +64,6 @@
             --modal-bg: rgba(20, 18, 16, 0.95);
             --modal-border: rgba(255, 255, 255, 0.1);
             
-            /* 字體大小變數 */
             --content-font-size: 1.4rem; 
         }
 
@@ -131,31 +129,18 @@
             border-radius: 50%; padding: 4px;
         }
 
-        /* 手寫草稿風格特效 (Natural Messy Draft) */
         .fx-messy-hand {
-            font-family: 'Long Cang', cursive; /* 狂草風格 */
-            font-weight: 400;
-            font-size: 1.3em;
-            display: inline-block;
-            position: relative;
-            color: #1a0f0a;
-            letter-spacing: 0.05em;
-            text-shadow: 1px 0px 0px rgba(0,0,0,0.5); 
+            font-family: 'Long Cang', cursive; font-weight: 400; font-size: 1.3em;
+            display: inline-block; position: relative; color: #1a0f0a;
+            letter-spacing: 0.05em; text-shadow: 1px 0px 0px rgba(0,0,0,0.5); 
             transform: rotate(-2deg);
         }
         
         .fx-messy-hand::after {
-            content: "";
-            position: absolute;
-            left: -5%;
-            bottom: -5px;
-            width: 110%;
-            height: 15px;
+            content: ""; position: absolute; left: -5%; bottom: -5px; width: 110%; height: 15px;
             background-image: url("data:image/svg+xml,%3Csvg width='200' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q 50 15 100 8 T 200 12' stroke='%233e2723' stroke-width='2' fill='none' stroke-linecap='round' opacity='0.8'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-size: 100% 100%;
-            pointer-events: none;
-            mix-blend-mode: multiply;
+            background-repeat: no-repeat; background-size: 100% 100%;
+            pointer-events: none; mix-blend-mode: multiply;
         }
 
         /* =========================================
@@ -172,13 +157,12 @@
             overflow: hidden;
         }
 
-        /* [修改] 手寫字體設定：加入 !important 確保字體大小變數生效，不被 Tailwind 覆蓋 */
         .handwritten-mode {
             font-family: 'DartsFont', 'Yomogi', 'Long Cang', 'Ma Shan Zheng', cursive !important;
             font-weight: 400; 
             letter-spacing: 1px; 
             line-height: 1.8 !important;
-            font-size: var(--content-font-size) !important; /* 強制應用變數大小 */
+            font-size: var(--content-font-size) !important;
             transition: font-size 0.3s ease;
         }
 
@@ -308,6 +292,7 @@
             cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; transition: all 0.3s ease;
             color: var(--sidebar-text-sub); border: 1px solid var(--sidebar-border);
+            flex-shrink: 0; /* 防止被擠壓 */
         }
         .icon-btn:hover {
             background-color: var(--sidebar-hover); color: var(--sidebar-text-main);
@@ -341,6 +326,9 @@
         </defs>
     </svg>
 
+    <!-- [新增] 音樂播放器元素 -->
+    <audio id="bg-music" loop autoplay></audio>
+
     <!-- 側邊選單 -->
     <aside class="w-full md:w-72 flex flex-col z-20 flex-shrink-0 relative transition-colors duration-500 shadow-xl border-b md:border-b-0 md:border-r border-[var(--sidebar-border)] h-auto md:h-full">
         <!-- 標題與按鈕區 -->
@@ -350,7 +338,10 @@
                 <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] relative z-10 hidden md:block">The Chronicles of David</p>
             </div>
             <div class="flex space-x-2 relative z-10">
-                <!-- 字體大小調整按鈕 -->
+                <!-- [新增] 音樂開關按鈕 -->
+                <button onclick="toggleMusic()" class="icon-btn" title="播放/暫停音樂">
+                    <i id="music-icon" class="ph ph-speaker-high text-lg"></i>
+                </button>
                 <button onclick="toggleFontSize()" class="icon-btn" title="調整字體大小">
                     <i class="ph ph-text-aa text-lg"></i>
                 </button>
@@ -387,6 +378,9 @@
             <div class="parchment"></div>
             
             <div class="parchment-content">
+                <!-- 移除 Header 區域 -->
+                <div class="absolute right-6 top-6 text-6xl md:text-8xl opacity-[0.03] pointer-events-none select-none text-[#3e2723] ancient-title z-0">✝</div>
+
                 <div id="scroll-container" class="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 pt-8 md:px-16 md:pb-16 md:pt-12 relative z-10">
                     <div id="content-area" class="fade-in max-w-3xl mx-auto leading-loose ink-text text-justify handwritten-mode pb-10"></div>
                 </div>
@@ -406,6 +400,7 @@
                     <li>◈ 點擊選單切換大衛人生的不同階段。</li>
                     <li>◈ 點擊 Aa 圖示可調整字體大小。</li>
                     <li>◈ 點擊月亮/太陽圖示切換閱讀模式。</li>
+                    <li>◈ 點擊喇叭圖示開啟/關閉背景配樂，每個時期都有專屬音樂。</li>
                 </ul>
             </div>
 
@@ -422,23 +417,25 @@
             <div class="modal-section">
                 <div class="modal-subtitle">引用詩篇 (CUNP-神版)</div>
                 <ul class="modal-list">
-                    <li><strong>一、牧羊少年：</strong> 詩篇 23 (耶和華是我的牧者)</li>
-                    <li><strong>二、流亡歲月：</strong> 詩篇 57 (在翅膀的蔭下)</li>
-                    <li><strong>三、榮耀君王：</strong> 詩篇 24 (榮耀的王將要進來)</li>
-                    <li><strong>四、罪與悔改：</strong> 詩篇 51 (憂傷痛悔的心)</li>
-                    <li><strong>五、王室悲劇：</strong> 詩篇 3 (耶和華是我四圍的盾牌)</li>
-                    <li><strong>六、夕陽餘暉：</strong> 詩篇 145 (我的神我的王啊)</li>
+                    <li><strong>牧羊少年：</strong> 詩篇 23 (耶和華是我的牧者)</li>
+                    <li><strong>流亡歲月：</strong> 詩篇 57 (在翅膀的蔭下)</li>
+                    <li><strong>榮耀君王：</strong> 詩篇 24 (榮耀的王將要進來)</li>
+                    <li><strong>罪與悔改：</strong> 詩篇 51 (憂傷痛悔的心)</li>
+                    <li><strong>王室悲劇：</strong> 詩篇 3 (耶和華是我四圍的盾牌)</li>
+                    <li><strong>夕陽餘暉：</strong> 詩篇 145 (我的神我的王啊)</li>
                 </ul>
             </div>
         </div>
     </div>
 
     <script>
+        // [修改] 為每個角色加入音樂檔案路徑
         const characters = [
             {
                 id: 'youth',
                 name: '一、牧羊少年',
                 title: '伯利恆曠野的琴聲與膏油',
+                music: 'music/pray.mp3', // 音樂檔案
                 diary: `
                     <span class="journal-date">伯利恆 • 星夜守望</span>
                     <div class="relative">
@@ -462,6 +459,7 @@
                 id: 'fugitive',
                 name: '二、流亡歲月',
                 title: '曠野的逃犯，洞穴中的哀歌',
+                music: 'music/tears of desperado.mp3',
                 diary: `
                     <span class="journal-date">亞杜蘭洞 • 逃避掃羅</span>
                     <div class="relative">
@@ -490,6 +488,7 @@
                 id: 'king',
                 name: '三、榮耀君王',
                 title: '耶路撒冷的建立，約櫃的歸回',
+                music: 'music/3.mp3',
                 diary: `
                     <span class="journal-date">耶路撒冷 • 迎回約櫃</span>
                     <p class="drop-cap mb-6">約櫃進城了！我極力跳舞，因榮耀的王今日降臨：</p>
@@ -514,6 +513,7 @@
                 id: 'sin',
                 name: '四、罪與悔改',
                 title: '拔示巴的誘惑，破碎的靈',
+                music: 'music/road to the kingdom.mp3',
                 diary: `
                     <span class="journal-date">內室 • 拿單走後</span>
                     <div class="relative">
@@ -548,6 +548,7 @@
                 id: 'absalom',
                 name: '五、王室悲劇',
                 title: '押沙龍的背叛，為父的眼淚',
+                music: 'music/5.mp3',
                 diary: `
                     <span class="journal-date">橄欖山 • 逃避押沙龍</span>
                     <div class="relative">
@@ -556,7 +557,7 @@
                     </div>
                     <div class="psalm-quote">
                         耶和華啊，我的敵人何其加增！有許多人起來攻擊我。<br>
-                        有許多人議論我說：他得不著神的幫助。<br>
+                        有許多人議論我說：「他得不著神的幫助。」<br>
                         但你─耶和華是我四圍的盾牌，是我的榮耀，又是叫我抬起頭來的。<br>
                         我用我的聲音求告耶和華，他就從他的聖山上應允我。<br>
                         我躺下睡覺，我醒著，耶和華都保佑我。<br>
@@ -576,6 +577,7 @@
                 id: 'legacy',
                 name: '六、夕陽餘暉',
                 title: '最後的詩篇，未來的聖殿',
+                music: 'music/6.mp3',
                 diary: `
                     <span class="journal-date">耶路撒冷 • 讚美之歌</span>
                     <p class="drop-cap mb-6">我的身體漸漸衰殘，但我的靈卻如鷹返老還童。回首一生，雖有爭戰與眼淚，但神的慈愛從未斷絕。我要用最後的氣息尊崇祂：</p>
@@ -600,7 +602,7 @@
                         凡求告耶和華的，就是誠心求告他的，耶和華便與他們相近。<br>
                         敬畏他的，他必成就他們的心願，也必聽他們的呼求，拯救他們。<br>
                         耶和華保護一切愛他的人，卻要滅絕一切的惡人。<br>
-                        我的口要說出讚美耶和華的話；惟願凡有血氣的都永永遠遠稱頌他的聖名。
+                        我的口要說出讚美耶和華的話；惟願凡有血氣的，都永永遠遠稱頌他的聖名。
                     </div>
                 `
             }
@@ -609,8 +611,9 @@
         // 狀態管理
         let currentCharacterId = 'youth'; 
         let currentTheme = 'dark'; 
+        let isMusicPlaying = false; // [新增] 音樂播放狀態
 
-        // [新增] 字體大小狀態管理
+        // [字體大小狀態管理]
         let currentFontSizeIndex = 1; // 0: Small, 1: Medium (Default), 2: Large
         const fontSizes = ['1.2rem', '1.4rem', '1.6rem'];
 
@@ -619,6 +622,8 @@
         const contentAreaEl = document.getElementById('content-area');
         const themeIcon = document.getElementById('theme-icon');
         const modal = document.getElementById('info-modal');
+        const audioPlayer = document.getElementById('bg-music'); // [新增] 音頻元素
+        const musicIcon = document.getElementById('music-icon'); // [新增] 音樂圖示
 
         function init() {
             renderNav();
@@ -631,6 +636,9 @@
             setTimeout(() => {
                 modal.classList.add('open');
             }, 800);
+            
+            // [新增] 初始化音樂 (嘗試自動播放)
+            setupMusic(currentCharacterId);
         }
 
         window.toggleTheme = function() {
@@ -657,6 +665,69 @@
             document.documentElement.style.setProperty('--content-font-size', fontSizes[currentFontSizeIndex]);
         }
 
+        // [新增] 音樂開關函數
+        window.toggleMusic = function() {
+            if (isMusicPlaying) {
+                audioPlayer.pause();
+                isMusicPlaying = false;
+                musicIcon.classList.remove('ph-speaker-high');
+                musicIcon.classList.add('ph-speaker-slash');
+            } else {
+                // 如果目前沒有設定來源，先設定
+                if (!audioPlayer.src) {
+                    const char = characters.find(c => c.id === currentCharacterId);
+                    if (char && char.music) audioPlayer.src = char.music;
+                }
+                
+                audioPlayer.play().then(() => {
+                    isMusicPlaying = true;
+                    musicIcon.classList.remove('ph-speaker-slash');
+                    musicIcon.classList.add('ph-speaker-high');
+                }).catch(e => {
+                    console.log("Autoplay prevented or error:", e);
+                });
+            }
+        }
+
+        // [新增] 設定並播放音樂
+        function setupMusic(charId) {
+            const char = characters.find(c => c.id === charId);
+            if (!char || !char.music) return;
+
+            // 如果音樂檔案改變，或者尚未設定來源
+            if (audioPlayer.getAttribute('src') !== char.music) {
+                 audioPlayer.src = char.music;
+            }
+            
+            // 嘗試播放
+            const playPromise = audioPlayer.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // 自動播放成功
+                    isMusicPlaying = true;
+                    musicIcon.classList.remove('ph-speaker-slash');
+                    musicIcon.classList.add('ph-speaker-high');
+                })
+                .catch(error => {
+                    // 自動播放失敗，設定互動後播放
+                    isMusicPlaying = false;
+                    musicIcon.classList.remove('ph-speaker-high');
+                    musicIcon.classList.add('ph-speaker-slash');
+                    
+                    // [新增] 註冊一次性全域點擊事件來啟動音樂
+                    document.addEventListener('click', function playOnFirstClick() {
+                        audioPlayer.play().then(() => {
+                            isMusicPlaying = true;
+                            musicIcon.classList.remove('ph-speaker-slash');
+                            musicIcon.classList.add('ph-speaker-high');
+                        });
+                        document.removeEventListener('click', playOnFirstClick);
+                    }, { once: true });
+                });
+            }
+        }
+
         function renderNav() {
             charListEl.innerHTML = characters.map(char => `
                 <div onclick="selectCharacter('${char.id}')" 
@@ -676,8 +747,11 @@
         }
 
         window.selectCharacter = function(id) {
+            if (currentCharacterId === id) return; // 避免重複點擊
+            
             currentCharacterId = id;
             checkFugitiveState(id);
+            setupMusic(id); // [新增] 切換音樂
             renderNav();
             renderContent();
             
@@ -695,8 +769,6 @@
         function renderContent(animate = true) {
             const char = characters.find(c => c.id === currentCharacterId);
             if (!char) return;
-
-            // if (charNameEl) charNameEl.textContent = char.name; // 移除
 
             const content = char.diary;
             
