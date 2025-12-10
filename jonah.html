@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>約拿書：互動地圖故事（完整版）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;500&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            overflow: hidden; /* Prevent body scroll */
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* Layout Structure - Mobile First Optimization */
+        #app-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            /* Mobile: Map on Top (visually), Story on Bottom */
+            flex-direction: column-reverse; 
+        }
+
+        /* Sidebar (Story) */
+        #sidebar {
+            width: 100%;
+            /* Mobile Height: Give more space to text */
+            height: 60%; 
+            /* overflow-y: auto;  <-- REMOVED to prevent double scrollbars */
+            overflow: hidden; /* Ensure content stays within borders */
+            background: white;
+            z-index: 20;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            border-top-left-radius: 1.5rem; /* Rounded corners for sheet effect */
+            border-top-right-radius: 1.5rem;
+            margin-top: -1.5rem; /* Slight overlap over map */
+        }
+
+        /* Map Area */
+        #map-container {
+            width: 100%;
+            /* Mobile Height */
+            height: 45%; /* Slightly larger to allow overlap */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Desktop Styles (min-width: 768px) */
+        @media (min-width: 768px) {
+            #app-container {
+                flex-direction: row; /* Sidebar Left, Map Right */
+            }
+
+            #sidebar {
+                width: 450px; /* Fixed width sidebar */
+                height: 100%;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+                border-right: 1px solid #e2e8f0;
+                flex-shrink: 0;
+                border-radius: 0; /* Reset border radius */
+                margin-top: 0;
+            }
+
+            #map-container {
+                flex-grow: 1;
+                height: 100%;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            #sidebar {
+                width: 500px;
+            }
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Character Card Styles */
+        .character-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
+
+        .character-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        .character-monologue {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s ease-out, opacity 0.6s ease;
+            opacity: 0;
+        }
+
+        .character-card.active .character-monologue {
+            max-height: 800px;
+            opacity: 1;
+            margin-top: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .character-card.active {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            transform: scale(1.01);
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        #sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        /* Inner Content Scrollbar */
+        #scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        #scrollable-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #scrollable-content::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 3px;
+        }
+
+        /* Marker Customization */
+        .custom-marker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-size: 14px;
+        }
+        
+        /* Story Text Styling */
+        .story-text p {
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+            color: #475569;
+        }
+        
+        .story-text strong {
+            color: #1e293b;
+            font-weight: 700;
+        }
+        
+        .verse-box {
+            border-left: 4px solid #cbd5e1;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #64748b;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .btn-nav {
+            transition: all 0.2s;
+        }
+        .btn-nav:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Modal Animation */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- Left Sidebar (Bottom Sheet on Mobile) -->
+        <aside id="sidebar">
+            
+            <!-- Sticky Header inside Sidebar -->
+            <header class="bg-[#1e293b] text-white p-4 md:p-6 sticky top-0 z-30 shadow-md shrink-0">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-wider serif">約拿書</h1>
+                        <p class="text-[10px] md:text-xs text-gray-400 mt-1 uppercase tracking-widest">The Book of Jonah</p>
+                    </div>
+                    <i class="fas fa-book-open text-gray-600 text-2xl md:text-3xl"></i>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <!-- Added ID for precise scrolling targeting -->
+            <div id="scrollable-content" class="p-4 md:p-8 flex-grow overflow-y-auto scroll-smooth">
+                
+                <!-- Story Content Injection -->
+                <div id="story-container" class="mb-8">
+                    <!-- JS renders content here -->
+                </div>
+
+                <!-- Characters Section -->
+                <div id="characters-section" class="hidden border-t border-gray-200 pt-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center">
+                        <span class="w-8 h-px bg-gray-300 mr-3"></span>
+                        見證者視角
+                        <span class="flex-grow h-px bg-gray-300 ml-3"></span>
+                    </h3>
+                    <div id="characters-grid" class="flex flex-col gap-3">
+                        <!-- JS renders characters here -->
+                    </div>
+                </div>
+
+                <!-- Spacer for scrolling -->
+                <div class="h-20"></div>
+            </div>
+
+            <!-- Sticky Footer Navigation inside Sidebar -->
+            <div class="sticky bottom-0 bg-white/95 backdrop-blur border-t border-gray-200 p-3 md:p-4 z-30 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button onclick="changeChapter(-1)" 
+                    id="btn-prev"
+                    class="btn-nav flex items-center px-3 py-2 md:px-4 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed text-xs md:text-sm font-medium">
+                    <i class="fas fa-chevron-left mr-2"></i> 上一章
+                </button>
+                
+                <span class="text-xs font-mono text-gray-400 border border-gray-200 px-2 py-1 md:px-3 rounded-full" id="page-indicator">1 / 5</span>
+
+                <button onclick="changeChapter(1)" 
+                    id="btn-next"
+                    class="btn-nav flex items-center px-4 py-2 md:px-5 rounded-lg bg-[#1e293b] text-white hover:bg-[#334155] shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed text-xs md:text-sm font-medium transition-colors">
+                    下一章 <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right: Map Area (Top on Mobile) -->
+        <div id="map-container">
+            <div id="map"></div>
+            <!-- Map Overlay Info -->
+            <div class="absolute bottom-4 left-4 md:top-4 md:right-4 md:left-auto md:bottom-auto z-[500] bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-lg text-xs text-gray-600 border border-gray-100 pointer-events-none">
+                <p class="font-bold text-gray-800"><i class="fas fa-map-marked-alt mr-1"></i> 地理導覽</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Intro Modal -->
+    <div id="intro-modal" onclick="closeModal()" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 cursor-pointer">
+        <div onclick="event.stopPropagation()" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all duration-300 modal-enter-active cursor-default mx-4">
+            <div class="bg-[#1e293b] p-5 md:p-6 text-white text-center">
+                <h2 class="text-xl md:text-2xl font-bold serif mb-1">歡迎體驗《約拿書》</h2>
+                <p class="text-[10px] md:text-xs text-slate-300 uppercase tracking-widest">Interactive Bible Story Map</p>
+            </div>
+            <div class="p-6 md:p-8 overflow-y-auto max-h-[60vh]">
+                <div class="prose prose-sm prose-slate max-w-none mb-6">
+                    <p class="text-base text-slate-700 font-medium">
+                        這不僅是一個古老的故事，更是一場關於<strong>拒絕</strong>、<strong>逃避</strong>與<strong>恩典</strong>的內心旅程。
+                    </p>
+                    <p>
+                        請隨著地圖的移動，聆聽約拿的自白，並點擊每章下方的「見證者視角」卡片，探索不同角色眼中的神蹟。
+                    </p>
+                    
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                        <h4 class="text-xs text-slate-500 uppercase font-bold mb-2 flex items-center">
+                            <i class="fas fa-history mr-2"></i>歷史背景：
+                        </h4>
+                        <p class="mb-2 text-sm">
+                            時間回到公元前八世紀。當時的<strong>亞述帝國</strong>如日中天，其首都尼尼微是近東的恐怖象徵。他們以極度殘忍聞名——將戰俘剝皮、堆疊成頭骨塔。
+                        </p>
+                        <p class="mb-0 text-sm">
+                            對於北國以色列而言，亞述是屬靈上純粹邪惡的化身。要求一個以色列先知去祝福尼尼微，無異於在二戰時要求一個猶太拉比去納粹柏林傳講恩典。這就是為什麼約拿的反應如此激烈。
+                        </p>
+                    </div>
+                </div>
+
+                <button onclick="closeModal()" class="w-full bg-[#1e293b] hover:bg-[#334155] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center text-sm md:text-base">
+                    <span>開始體驗旅程</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <script>
+        // --- Data Definitions ---
+
+        const chapters = [
+            {
+                id: 1,
+                title: "第一章：違命與逃跑",
+                locationName: "約帕港 -> 地中海",
+                coords: [32.0536, 34.7556], // Jaffa
+                zoom: 7,
+                color: "text-blue-900",
+                icon: "fa-anchor",
+                content: `
+                    <div class="story-text prose prose-slate max-w-none text-sm md:text-base">
+                        <p class="mt-2 text-lg">
+                            耶和華的話臨到我說：「<strong>你起來往尼尼微大城去，向其中的居民呼喊，因為他們的惡達到我面前。</strong>」
+                        </p>
+                        <div class="verse-box">
+                            「但我，約拿，希西家的兒子，做了一個決定：我要逃跑。」
+                        </div>
+                        <p>
+                            我聽得一清二楚，但我無法接受。這不是因為恐懼，如果只是去宣告審判，我求之不得。我逃跑是因為我<strong>厭惡</strong>這個命令。
+                        </p>
+                        <p>
+                            我太了解我的神了。如果我去了，萬一他們悔改怎麼辦？萬一那位有憐憫的神真的饒恕了這些殺人魔怎麼辦？我絕不允許這種事發生！我寧願違抗神的命令，也不願看見我的敵人得救。
+                        </p>
+                        <p>
+                            於是我下到<strong>約帕</strong>，這是以色列主要的港口。我找到了一隻船，付了船價。我要去<strong>他施</strong>（位於今日的西班牙，那是當時已知世界的盡頭）。我的計劃很簡單：我要逃出應許之地，逃到一個連耶和華的聲音都追不到的地方。我認為，只要地理位置夠遠，就能擺脫先知的身份。
+                        </p>
+                        <p>
+                            然而，人無法逃避造物主。耶和華使海中起大風，海就狂風大作，船幾乎破壞。這不是普通的自然現象，這是一場針對我的神聖風暴。
+                        </p>
+                        <p>
+                            船上的水手們各人哀求自己的神，他們將貨物拋在海中。而我？我卻在底艙呼呼大睡。那不是安詳的睡眠，那是逃避現實的麻木沉睡。直到船主把我搖醒，直到我們摯籤，籤落在了我的頭上。
+                        </p>
+                        <p>
+                            這是我最後的倔強——寧願死在海裡，也不去尼尼微。我對他們說：「將我拋在海中，海就平靜了。」被拋入冰冷海水的那一刻，我直下到山根，地的門將我永遠關住。我以為這就是終結。
+                        </p>
+                        <p class="font-bold text-slate-800 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            但神安排了一條大魚吞了我。我在魚腹中三日三夜。在那深不見底的黑暗中，時間彷彿停止了。這既是審判的監牢，卻也是神保守我性命的方舟。
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                title: "第二章：深淵的禱告",
+                locationName: "大魚腹中 (The Deep)",
+                coords: [33.0, 33.0], // Slightly off coast
+                zoom: 8,
+                color: "text-teal-900",
+                icon: "fa-water",
+                content: `
+                    <div class="story-text prose prose-slate max-w-none text-sm md:text-base">
+                        <p>
+                            你能想像在魚腹中的感覺嗎？那是全然的黑暗，空氣中充滿了腐臭，海草像繩索一樣纏繞著我的頭。深淵圍住我，我感覺自己已經被世界遺忘，甚至被神遺棄。
+                        </p>
+                        <p>
+                            在這裡，沒有方向，沒有光線，我無法再逃跑了。我被迫面對自己，面對那位我試圖躲避的神。在這極限的壓迫與幽閉中，我終於低頭了。
+                        </p>
+                        <div class="verse-box">
+                            「我遭遇患難求告耶和華，你就應允我；從陰間的深處呼求，你就聽我的聲音... 我想，我受了管教。」
+                        </div>
+                        <p>
+                            我開始回想聖殿，回想我曾事奉的那一位。我意識到，那些信奉虛無之神的人，是離棄了憐愛他們的主；但我，即便在深淵中，仍要仰望祂。
+                        </p>
+                        <p>
+                            這不是一個求生的禱告，這是一個<strong>悔改與順服</strong>的禱告。我終於承認了一個真理：「救恩出於耶和華」。我有什麼資格決定誰該得救、誰不該得救呢？
+                        </p>
+                        <p>
+                            耶和華吩咐魚，魚就把我吐在旱地上。當陽光再次照在我的臉上，我帶著一身洗不掉的魚腥味，重生了。
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                title: "第三章：不可能的悔改",
+                locationName: "尼尼微 (Nineveh)",
+                coords: [36.3585, 43.1507], // Mosul
+                zoom: 9,
+                color: "text-purple-900",
+                icon: "fa-city",
+                content: `
+                    <div class="story-text prose prose-slate max-w-none text-sm md:text-base">
+                        <p>
+                            耶和華的話二次臨到我：「你起來！往尼尼微大城去，向其中的居民宣告我所吩咐你的話。」這一次，我沒有逃。帶著魚腹的經歷，我踏上了前往亞述的長路。
+                        </p>
+                        <p>
+                            尼尼微是一座極大的城，要走三天才能走完。我進城走了一日，看著那些宏偉的建築和強壯的士兵，我心中沒有恐懼，只有一種冷酷的執行力。我沒有發表什麼神學辯證，也沒有給出任何希望的應許，我只用希伯來文冷冷地喊了五個字：
+                        </p>
+                        <div class="verse-box font-bold text-center text-xl">
+                            「再等四十日，尼尼微必傾覆了！」
+                        </div>
+                        <p>
+                            這是我期待的判決，也是神給我的信息。我以為他們會嘲笑我，或者把我抓起來殺掉。但緊接著，發生了令我震驚的事。
+                        </p>
+                        <p>
+                            這句話像野火一樣傳遍了全城。尼尼微人竟然信服神！這消息傳到尼尼微王的耳中，他下了寶座，脫下華麗的朝服，披上粗糙的麻布，坐在灰中。他下令全城禁食，連牲畜都不許吃草喝水，人人都切切求告神，並<strong>丟棄手中一切的殘暴與罪行</strong>。
+                        </p>
+                        <p class="font-bold text-slate-800">
+                            我看著這一切，心中充滿了不安。果然，神察看他們的行為，見他們離開惡道，就後悔，不把所說的災禍降與他們了。我的預言落空了——因為神的憐憫勝利了。這簡直是個神學上的醜聞！
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                title: "第四章：憤怒與憐憫",
+                locationName: "尼尼微城東高地",
+                coords: [36.3585, 43.2507], // East of Mosul
+                zoom: 11,
+                color: "text-orange-800",
+                icon: "fa-sun",
+                content: `
+                    <div class="story-text prose prose-slate max-w-none text-sm md:text-base">
+                        <p>
+                            這事讓我大大不悅，我發怒了！我直接對神抗議，把我心裡的實話全說了出來：
+                        </p>
+                        <div class="verse-box">
+                            「耶和華啊，這不就是我還在本國的時候所說的嗎？我知道祢是有恩典、有憐憫的神，不輕易發怒，有豐盛的慈愛，並且後悔不降所說的災。所以我才要逃往他施啊！」
+                        </p>
+                        </div>
+                        <p>
+                            我不希望這些壞人得救，這不公平！他們殺了那麼多人，憑什麼只要披上麻布就能被饒恕？既然祢這麼慈愛，那還要我這個先知做什麼？我求祢取我的性命吧！
+                        </p>
+                        <p>
+                            神只問了我一句：「你這樣發怒合乎理嗎？」我沒有回答，我出城坐在東邊，搭了一座棚，我要看著這座城，或許神還會改變心意把它燒了。
+                        </p>
+                        <p>
+                            神安排一棵<strong>蓖麻</strong>一夜長大遮蓋我的頭，擋住了烈日，我大大喜樂。但次日黎明，神卻安排<strong>蟲子</strong>咬死這樹，又安排<strong>炎熱東風</strong>曝曬我。我熱得發昏，再次求死。
+                        </p>
+                        <p>
+                            神再次問我：「你因這棵蓖麻發怒合乎理嗎？」我理直氣壯地回答：「我發怒以至於死，都合乎理！」
+                        </p>
+                        <p>
+                            故事就在這裡，神對我說了最後一段話。祂沒有給我答案，而是給了我一個問題，一個至今仍迴盪在我耳邊的問題：
+                        </p>
+                        <p class="font-bold text-lg text-slate-800 bg-orange-50 p-4 rounded-lg border border-orange-200 shadow-sm">
+                            「這蓖麻不是你栽種的，也不是你培養的；一夜發生，一夜乾死，你尚且愛惜；何況這尼尼微大城，其中不能分辨左手右手的有十二萬多人，並有許多牲畜，我豈能不愛惜呢？」
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                title: "結語：鏡中的約拿",
+                locationName: "宏觀視角",
+                coords: [34.0, 38.0], // Wide view showing both Joppa and Nineveh roughly
+                zoom: 5,
+                color: "text-slate-800",
+                icon: "fa-book-open",
+                content: `
+                    <div class="story-text prose prose-slate max-w-none text-sm md:text-base">
+                        <p class="text-lg font-medium leading-relaxed">
+                            這卷書結束得非常突然，神的問題懸在半空，沒有寫下約拿的回答。
+                            <strong>這不是作者忘記了，而是因為這個結局需要由「你」來書寫。</strong>
+                        </p>
+                        <hr class="my-6 border-slate-200">
+                        <p>
+                            《約拿書》要表達的核心信息，遠超過「大魚吞人」的神蹟。它是一面鏡子，映照出我們內心深處那種「排他」的正義感。我們常常像約拿一樣，對於神給予我們的恩典視為理所當然，甚至像是那棵蓖麻一樣，當作是我們應得的舒適。
+                        </p>
+                        <p>
+                            但當神將這份恩典延伸到我們不喜歡的人、我們的敵人、或是我們認為「不配」的人身上時，我們是否也會發怒？
+                        </p>
+                        <ul class="list-disc pl-5 space-y-2 text-slate-700 mt-4">
+                            <li><strong>關於神的屬性：</strong> 神是創造萬有的主，祂不僅是以色列的神，也是外邦人的神。祂愛惜那十二萬多不能分辨左手右手的靈魂，甚至愛惜牲畜。祂的憐憫大過審判。</li>
+                            <li><strong>關於我們的挑戰：</strong> 約拿的失敗在於他只有「公義」的熱誠，卻沒有「憐憫」的心腸。這個故事挑戰我們，是否願意跨越民族、政治、文化的藩籬，去體貼神對世人的心意？</li>
+                        </ul>
+                        <p class="mt-6 bg-slate-100 p-4 rounded-lg border-l-4 border-slate-400 italic">
+                            當你看見那些你認為「邪惡」的人竟然蒙了恩典，你會像約拿一樣坐在城外生悶氣，還是能體會天父那顆「愛惜」的心，並參與在祂的救贖計畫中？
+                        </p>
+                    </div>
+                `
+            }
+        ];
+
+        // Extensive Character List
+        const allCharacters = [
+            // Chapter 1
+            {
+                id: "captain",
+                name: "腓尼基船主",
+                chapters: [1],
+                icon: "fa-dharmachakra",
+                colorClass: "bg-slate-100 text-slate-700",
+                monologue: "「我在地中海跑船三十年了，自認見過各種風浪。但這場風暴...它不對勁，它帶著一種憤怒的意志。海浪像巨大的手掌拍打著船身，桅杆在尖叫。每個人都在哭求自己的神，唯獨那個希伯來人！他竟然在底艙睡覺？這到底是什麼樣的神經大條，還是說...他心裡有比死亡更深沉的絕望？當他醒來告訴我他的身分時，我感到了前所未有的恐懼。」"
+            },
+            {
+                id: "sailor_chief",
+                name: "老水手長",
+                chapters: [1],
+                icon: "fa-skull-crossbones",
+                colorClass: "bg-slate-100 text-slate-600",
+                monologue: "「我們真的不想殺人，為了活命我們把珍貴的貨物都拋光了，手掌划槳都磨出血了，還是靠不了岸。當籤落在那個叫約拿的人身上時，他眼裡沒有恐懼，反而有一種解脫。把一個活人丟進海裡...這罪孽會跟著我一輩子嗎？但當他一入水，海浪瞬間平息——那一刻的安靜比風暴更可怕。那是我這輩子見過最恐怖的神蹟，我們立刻向那位耶和華神獻祭。」"
+            },
+            {
+                id: "fish",
+                name: "大魚",
+                chapters: [1], 
+                icon: "fa-fish",
+                colorClass: "bg-teal-100 text-teal-700",
+                monologue: "「深淵中有一道聲音臨到，不是耳朵聽見的，而是穿透海水、直落我心：『去。』我便前行。我張開大口，把那個沉入海中的人吞入腹中。他在我裡面驚惶、翻動，後來慢慢安靜。深海恢復黑暗，我則承載著他，在水裡行走，等候那聲音再次臨到。」"
+            },
+            
+            // Chapter 2
+            {
+                id: "seaweed",
+                name: "纏頭的海草",
+                chapters: [2],
+                icon: "fa-leaf",
+                colorClass: "bg-green-100 text-green-800",
+                monologue: "「我是深淵的居民，隨著暗流漂動。當這個人沉下來時，我順著水流緊緊纏住了他的頭。我感覺到他的掙扎漸漸微弱，生命的氣息正從他身上流失。就在死寂即將吞沒他時，一股巨大的水流將他和我都吸入了那個龐然大物的口中。在黑暗中，我成了他祈禱時唯一的聽眾。」"
+            },
+             {
+                id: "fish_vomit",
+                name: "大魚 (吐出)",
+                chapters: [2], 
+                icon: "fa-fish",
+                colorClass: "bg-teal-100 text-teal-700",
+                monologue: "「三天後，那聲音又來了：『游向岸邊，吐出來。』我就照做了。那個在我腹中發出奇怪震動（你們人類稱為禱告）的人終於離開了。他全身黏液，狼狽不堪，但我感覺到他變了。真是個奇怪的任務，現在我可以游回深海去吃些正常的磷蝦了。」"
+            },
+
+            // Chapter 3
+            {
+                id: "king",
+                name: "亞述王",
+                chapters: [3],
+                icon: "fa-crown",
+                colorClass: "bg-purple-100 text-purple-800",
+                monologue: "「我不怕埃及的戰車，也不怕巴比倫的弓箭手。但這個希伯來人...他渾身散發著異味，眼裡卻有一種讓我戰慄的東西。他只說了五個字，沒有威脅，沒有談判，就像是已經定案的判決。我感到一種來自至高處的威嚴壓在心頭，那是超越馬爾杜克或亞述神的力量。把我的紫袍拿走！給我麻布！如果我們還有萬分之一的機會，我們必須立刻悔改。」"
+            },
+            {
+                id: "general",
+                name: "亞述將軍",
+                chapters: [3],
+                icon: "fa-shield-alt",
+                colorClass: "bg-red-100 text-red-800",
+                monologue: "「這簡直是瘋了。我的士兵們平日殺人如麻，今天卻在街頭痛哭？國王下令連戰馬都不准吃草喝水？這座以殘暴聞名的城市，此刻卻像個受驚的孩子。我手按著劍柄，卻發現沒有敵人可以砍殺。我們的敵人是我們自己手中的暴行。那個希伯來先知站在城門口，冷冷地看著這一切，他似乎...看起來並不高興？」"
+            },
+            {
+                id: "beast",
+                name: "負重的牲畜",
+                chapters: [3],
+                icon: "fa-horse",
+                colorClass: "bg-amber-100 text-amber-800",
+                monologue: "「（低鳴）...為什麼不給我水喝？為什麼把這粗糙刺癢的麻布蓋在我背上？主人們都在哭嚎，空氣中瀰漫著恐懼的味道。我們不懂人類的神，但我們感受到了這座城市的震動。我們一同受苦，一同哀鳴，或許那位造物主也會聽見我們的聲音？」"
+            },
+
+            // Chapter 4
+            {
+                id: "plant",
+                name: "蓖麻",
+                chapters: [4],
+                icon: "fa-seedling",
+                colorClass: "bg-emerald-100 text-emerald-700",
+                monologue: "「我是為了恩典而生的。指令很簡單：『一夜長大，遮蓋他的頭。』我拼命地吸取露水，伸展葉片，為這個憤怒的人提供陰涼。我看見他在我的樹蔭下露出了久違的笑容，那是他這幾天唯一的安慰。雖然我的生命只有一天，但我完成了我的使命——讓他體會什麼是『愛惜』。」"
+            },
+            {
+                id: "worm",
+                name: "蟲子",
+                chapters: [4],
+                icon: "fa-bug",
+                colorClass: "bg-orange-100 text-orange-700",
+                monologue: "「別恨我，我也是奉命行事。黎明時分，指令傳來：『咬。』我看見那棵生機勃勃的植物，那是神所賜的恩典，但現在神要收回它。我咬斷了它的根莖，汁液乾涸。那個人因為失去了這一點點陰涼而對天大吼。人類真是奇怪，為了一棵草發怒，卻不為一座擁有十二萬靈魂的城市著急？造物主的幽默真是深奧。」"
+            },
+            {
+                id: "wind",
+                name: "炎熱東風",
+                chapters: [4],
+                icon: "fa-wind",
+                colorClass: "bg-yellow-100 text-yellow-700",
+                monologue: "「我來自沙漠，帶著審判的熱度。神呼喚我吹向那座棚子。我要烤乾這個先知的自義，逼出他內心最真實的抱怨。只有在極度的不適中，他才能聽進去神最後的那個問題。我是神手中的工具，用來試煉人心。」"
+            },
+
+            // Chapter 5 - Epilogue
+            {
+                id: "you",
+                name: "螢幕前的你",
+                chapters: [5],
+                icon: "fa-user",
+                colorClass: "bg-slate-200 text-slate-800",
+                monologue: "「約拿書沒有結局，因為你就是現在的約拿。神最後那個關於『愛惜』的問題，現在輪到你來回答了。你願意放下心中的『蓖麻』，去體貼神對萬民的心意嗎？還是你要繼續坐在城外，因別人蒙恩而發怒？」"
+            }
+        ];
+
+        // --- State Management ---
+        let currentChapterIndex = 0;
+        let map;
+        let markers = {};
+        let pathLine;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // FIX: Delay initialization slightly to ensure the Flexbox layout is computed
+            setTimeout(() => {
+                initMap();
+                renderChapter(0, true); // Pass true to verify init
+            }, 100);
+        });
+
+        // Modal Function
+        function closeModal() {
+            const modal = document.getElementById('intro-modal');
+            const content = modal.querySelector('div'); // The inner card
+            
+            // Animation for exit
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('modal-enter-active');
+            content.classList.add('modal-exit-active');
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function initMap() {
+            if(map) return;
+
+            map = L.map('map', {
+                zoomControl: false, 
+                scrollWheelZoom: true,
+                attributionControl: false
+            }).setView(chapters[0].coords, chapters[0].zoom);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+            L.control.attribution({ position: 'bottomright' }).addAttribution('&copy; Google Maps').addTo(map);
+
+            // Google Maps Tiles for Chinese Labels
+            L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            }).addTo(map);
+
+            // Create markers
+            chapters.forEach((chap, index) => {
+                const markerIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div id="marker-${index}" class="custom-marker w-8 h-8 ${index === 0 ? 'bg-red-600 scale-110 ring-4 ring-red-200' : 'bg-slate-500'} transition-all duration-500 border-2 border-white shadow-lg flex items-center justify-center rounded-full"><i class="fas ${chap.icon}"></i></div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                markers[index] = L.marker(chap.coords, { icon: markerIcon })
+                    .addTo(map)
+                    .bindPopup(`<div class="font-sans text-center font-bold text-slate-700">${chap.locationName}</div>`);
+            });
+
+            // Draw the path
+            const latlngs = chapters.map(c => c.coords);
+            pathLine = L.polyline(latlngs, {
+                color: '#1e293b',
+                weight: 3,
+                opacity: 0.6,
+                dashArray: '8, 12',
+                lineCap: 'round'
+            }).addTo(map);
+        }
+
+        // --- Core Render Logic ---
+        function renderChapter(index, isInit = false) {
+            currentChapterIndex = index;
+            const chapter = chapters[index];
+
+            // 1. Update Map
+            if (map) {
+                map.invalidateSize();
+                
+                // For initial load or if map size is problematic, use setView to avoid flyTo animation errors
+                if (isInit) {
+                    map.setView(chapter.coords, chapter.zoom);
+                } else {
+                     map.flyTo(chapter.coords, chapter.zoom, {
+                        animate: true,
+                        duration: 1.5,
+                        easeLinearity: 0.25
+                    });
+                }
+            }
+
+            // Update markers style
+            Object.keys(markers).forEach(key => {
+                const el = document.getElementById(`marker-${key}`);
+                if (el) {
+                    if (parseInt(key) === index) {
+                        el.className = `custom-marker w-12 h-12 bg-[#dc2626] scale-110 ring-4 ring-red-100 transition-all duration-500 border-2 border-white shadow-xl flex items-center justify-center rounded-full z-50 text-xl`;
+                    } else {
+                        el.className = `custom-marker w-8 h-8 bg-slate-400 opacity-60 transition-all duration-500 border-2 border-white shadow flex items-center justify-center rounded-full grayscale`;
+                    }
+                }
+            });
+
+            if (markers[index]) {
+                setTimeout(() => markers[index].openPopup(), 1500);
+            }
+
+            // 2. Update Story Content
+            const container = document.getElementById('story-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="animate-fade-in">
+                        <div class="flex items-center mb-6">
+                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full uppercase tracking-wider mr-3 border border-slate-200">
+                                Chapter ${chapter.id}
+                            </span>
+                            <span class="text-xs text-slate-400 flex items-center">
+                                <i class="fas fa-map-marker-alt mr-1"></i> ${chapter.locationName}
+                            </span>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold serif ${chapter.color} mb-8 leading-tight border-b pb-4 border-gray-100">${chapter.title}</h2>
+                        ${chapter.content}
+                    </div>
+                `;
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+                container.style.transition = 'all 0.5s ease-out';
+            }, 200);
+
+            // Update Page Indicator
+            document.getElementById('page-indicator').innerText = `${index + 1} / ${chapters.length}`;
+            
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            
+            btnPrev.disabled = index === 0;
+            if(index === chapters.length - 1) {
+                btnNext.innerHTML = '全劇終 <i class="fas fa-check ml-2"></i>';
+                btnNext.disabled = true;
+                btnNext.classList.add('bg-slate-300', 'text-slate-500');
+                btnNext.classList.remove('bg-[#1e293b]', 'text-white', 'shadow-lg');
+            } else {
+                btnNext.innerHTML = '下一章 <i class="fas fa-chevron-right ml-2"></i>';
+                btnNext.disabled = false;
+                btnNext.classList.remove('bg-slate-300', 'text-slate-500');
+                btnNext.classList.add('bg-[#1e293b]', 'text-white', 'shadow-lg');
+            }
+
+            // 3. Update Characters
+            renderCharacters(chapter.id);
+
+            // Scroll content to top
+            const scrollContent = document.getElementById('scrollable-content');
+            if (scrollContent) {
+                scrollContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function renderCharacters(chapterId) {
+            const grid = document.getElementById('characters-grid');
+            const section = document.getElementById('characters-section');
+            
+            const activeCharacters = allCharacters.filter(c => c.chapters.includes(chapterId));
+
+            if (activeCharacters.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            grid.innerHTML = activeCharacters.map(char => `
+                <div class="character-card bg-white rounded-xl p-4 relative overflow-hidden group" onclick="toggleMonologue(this)">
+                    <div class="flex items-start justify-between relative z-10">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl mr-4 ${char.colorClass} shadow-sm border border-white">
+                                <i class="fas ${char.icon}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-700 text-base">${char.name}</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">點擊聆聽獨白</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-300 transition-transform duration-300 text-sm mt-2 group-hover:text-slate-500"></i>
+                    </div>
+                    
+                    <div class="character-monologue">
+                        <div class="text-sm text-slate-600 relative bg-slate-50 p-4 rounded-lg mt-3 leading-relaxed border border-slate-100">
+                            <i class="fas fa-quote-left absolute top-2 left-2 text-slate-200 text-3xl -z-0"></i>
+                            <span class="relative z-10">${char.monologue}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeChapter(delta) {
+            const newIndex = currentChapterIndex + delta;
+            if (newIndex >= 0 && newIndex < chapters.length) {
+                renderChapter(newIndex);
+            }
+        }
+
+        function toggleMonologue(card) {
+            // Close others
+            const allCards = document.querySelectorAll('.character-card');
+            allCards.forEach(c => {
+                if (c !== card && c.classList.contains('active')) {
+                    c.classList.remove('active');
+                    c.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Toggle current
+            card.classList.toggle('active');
+            const icon = card.querySelector('.fa-chevron-down');
+            if (card.classList.contains('active')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+    </script>
+</body>
+</html>
