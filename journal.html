@@ -2,7 +2,7 @@
 <html lang="zh-Hant" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>大衛王：詩人與戰士的私密手稿</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -43,8 +43,8 @@
             --sidebar-bg: #151412;
             --sidebar-border: rgba(255, 255, 255, 0.05);
             --sidebar-text-main: #d6d3d1;
-            --sidebar-text-sub: #78716c;
-            --sidebar-hover: rgba(255, 255, 255, 0.03);
+            --sidebar-text-sub: #a8a29e; /* [修改] 調亮副標題與圖示顏色，提升手機閱讀性 */
+            --sidebar-hover: rgba(255, 255, 255, 0.05);
             --sidebar-active-bg: rgba(231, 229, 228, 0.08);
             --sidebar-active-text: #f5f5f4;
             --sidebar-active-icon: #d6d3d1;
@@ -76,8 +76,8 @@
             --sidebar-bg: #e5e5e0;
             --sidebar-border: rgba(0, 0, 0, 0.05);
             --sidebar-text-main: #44403c;
-            --sidebar-text-sub: #78716c;
-            --sidebar-hover: rgba(0, 0, 0, 0.03);
+            --sidebar-text-sub: #57534e; /* [修改] 調深淺色模式下的副標顏色 */
+            --sidebar-hover: rgba(0, 0, 0, 0.05);
             --sidebar-active-bg: rgba(68, 64, 60, 0.05);
             --sidebar-active-text: #292524;
             --sidebar-active-icon: #57534e;
@@ -157,6 +157,7 @@
             overflow: hidden;
         }
 
+        /* 手寫字體設定 */
         .handwritten-mode {
             font-family: 'DartsFont', 'Yomogi', 'Long Cang', 'Ma Shan Zheng', cursive !important;
             font-weight: 400; 
@@ -258,12 +259,16 @@
         .modal-list li strong { color: var(--sidebar-text-main); display: block; margin-bottom: 0.2rem; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; cursor: pointer; color: var(--sidebar-text-sub); }
 
-        /* Sidebar - Mobile Responsive */
+        /* Sidebar - Mobile Responsive Fixed */
         aside {
             background-color: var(--sidebar-bg) !important; border-right: 1px solid var(--sidebar-border);
             box-shadow: 10px 0 30px -10px rgba(0,0,0,0.1); transition: all 0.5s ease;
+            
+            /* [修改] 手機版 padding 調整，避開 safe-area */
+            padding-top: env(safe-area-inset-top);
         }
         
+        /* 導航按鈕 */
         .nav-item {
             cursor: pointer; transition: all 0.3s ease; position: relative;
             border-bottom: 1px solid var(--sidebar-border); opacity: 0.7;
@@ -288,11 +293,12 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); filter: blur(2px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         .divider { height: 1px; background: linear-gradient(to right, transparent, var(--accent-line), transparent); margin: 25px 0 15px 0; }
         
+        /* [修改] 功能按鈕樣式 - 確保 flex 不被壓縮 */
         .icon-btn {
             cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; transition: all 0.3s ease;
             color: var(--sidebar-text-sub); border: 1px solid var(--sidebar-border);
-            flex-shrink: 0; /* 防止被擠壓 */
+            flex-shrink: 0; /* 防止按鈕被擠壓變形 */
         }
         .icon-btn:hover {
             background-color: var(--sidebar-hover); color: var(--sidebar-text-main);
@@ -300,12 +306,8 @@
         
         .journal-date {
             display: block; font-family: 'Ma Shan Zheng', cursive; color: var(--date-color);
-            font-size: 1.4rem; 
-            margin-top: 0 !important; 
-            padding-top: 0 !important;
-            margin-bottom: 0.8rem; 
-            width: fit-content;
-            line-height: 1.4 !important; 
+            font-size: 1.4rem; margin-top: 0 !important; padding-top: 0 !important;
+            margin-bottom: 0.8rem; width: fit-content; line-height: 1.4 !important; 
             opacity: 0.9; transform: rotate(-1deg); transition: color 0.5s ease;
         }
         .journal-date::after {
@@ -326,19 +328,20 @@
         </defs>
     </svg>
 
-    <!-- [新增] 音樂播放器元素 -->
+    <!-- 音樂播放器 -->
     <audio id="bg-music" loop autoplay></audio>
 
     <!-- 側邊選單 -->
     <aside class="w-full md:w-72 flex flex-col z-20 flex-shrink-0 relative transition-colors duration-500 shadow-xl border-b md:border-b-0 md:border-r border-[var(--sidebar-border)] h-auto md:h-full">
-        <!-- 標題與按鈕區 -->
-        <div class="p-4 md:p-6 border-b border-[var(--sidebar-border)] flex items-center justify-between relative overflow-hidden">
-            <div class="flex flex-col">
-                <h1 class="text-xl md:text-2xl ancient-title text-[var(--sidebar-text-main)] mb-1 relative z-10 drop-shadow-sm tracking-wide">大衛詩篇</h1>
+        <!-- 標題與按鈕區 - [修改] 增加 min-w-0 允許子元素縮小，防止撐開 -->
+        <div class="p-4 md:p-6 border-b border-[var(--sidebar-border)] flex items-center justify-between relative overflow-hidden shrink-0">
+            <!-- [修改] 標題區塊允許截斷 -->
+            <div class="flex flex-col min-w-0 mr-2">
+                <h1 class="text-xl md:text-2xl ancient-title text-[var(--sidebar-text-main)] mb-1 relative z-10 drop-shadow-sm tracking-wide truncate">大衛詩篇</h1>
                 <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] relative z-10 hidden md:block">The Chronicles of David</p>
             </div>
-            <div class="flex space-x-2 relative z-10">
-                <!-- [新增] 音樂開關按鈕 -->
+            <!-- 按鈕群組 -->
+            <div class="flex space-x-2 relative z-10 flex-shrink-0">
                 <button onclick="toggleMusic()" class="icon-btn" title="播放/暫停音樂">
                     <i id="music-icon" class="ph ph-speaker-high text-lg"></i>
                 </button>
@@ -374,11 +377,10 @@
 
         <!-- 羊皮卷容器 -->
         <div class="parchment-container w-full max-w-4xl h-full md:h-[95%]">
-            <!-- 背景層 (含污漬，不捲動) -->
             <div class="parchment"></div>
             
             <div class="parchment-content">
-                <!-- 移除 Header 區域 -->
+                <!-- 浮水印 -->
                 <div class="absolute right-6 top-6 text-6xl md:text-8xl opacity-[0.03] pointer-events-none select-none text-[#3e2723] ancient-title z-0">✝</div>
 
                 <div id="scroll-container" class="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 pt-8 md:px-16 md:pb-16 md:pt-12 relative z-10">
@@ -400,7 +402,7 @@
                     <li>◈ 點擊選單切換大衛人生的不同階段。</li>
                     <li>◈ 點擊 Aa 圖示可調整字體大小。</li>
                     <li>◈ 點擊月亮/太陽圖示切換閱讀模式。</li>
-                    <li>◈ 點擊喇叭圖示開啟/關閉背景配樂，每個時期都有專屬音樂。</li>
+                    <li>◈ 點擊喇叭圖示開啟/關閉背景配樂。</li>
                 </ul>
             </div>
 
@@ -417,19 +419,18 @@
             <div class="modal-section">
                 <div class="modal-subtitle">引用詩篇 (CUNP-神版)</div>
                 <ul class="modal-list">
-                    <li><strong>牧羊少年：</strong> 詩篇 23 (耶和華是我的牧者)</li>
-                    <li><strong>流亡歲月：</strong> 詩篇 57 (在翅膀的蔭下)</li>
-                    <li><strong>榮耀君王：</strong> 詩篇 24 (榮耀的王將要進來)</li>
-                    <li><strong>罪與悔改：</strong> 詩篇 51 (憂傷痛悔的心)</li>
-                    <li><strong>王室悲劇：</strong> 詩篇 3 (耶和華是我四圍的盾牌)</li>
-                    <li><strong>夕陽餘暉：</strong> 詩篇 145 (我的神我的王啊)</li>
+                    <li><strong>一、牧羊少年：</strong> 詩篇 23 (耶和華是我的牧者)</li>
+                    <li><strong>二、流亡歲月：</strong> 詩篇 57 (在翅膀的蔭下)</li>
+                    <li><strong>三、榮耀君王：</strong> 詩篇 24 (榮耀的王將要進來)</li>
+                    <li><strong>四、罪與悔改：</strong> 詩篇 51 (憂傷痛悔的心)</li>
+                    <li><strong>五、王室悲劇：</strong> 詩篇 3 (耶和華是我四圍的盾牌)</li>
+                    <li><strong>六、夕陽餘暉：</strong> 詩篇 145 (我的神我的王啊)</li>
                 </ul>
             </div>
         </div>
     </div>
 
     <script>
-        // [修改] 為每個角色加入音樂檔案路徑
         const characters = [
             {
                 id: 'youth',
@@ -463,7 +464,6 @@
                 diary: `
                     <span class="journal-date">亞杜蘭洞 • 逃避掃羅</span>
                     <div class="relative">
-                        <!-- 移除了這裡原本會跟隨文字移動的 fx-wet-stain -->
                         <p class="drop-cap mb-6">我像鷓鴣一樣被追趕，命懸一線。在這陰冷的洞穴中，我的心卻投靠祢：</p>
                     </div>
                     <div class="psalm-quote">
@@ -611,10 +611,8 @@
         // 狀態管理
         let currentCharacterId = 'youth'; 
         let currentTheme = 'dark'; 
-        let isMusicPlaying = false; // [新增] 音樂播放狀態
-
-        // [字體大小狀態管理]
-        let currentFontSizeIndex = 1; // 0: Small, 1: Medium (Default), 2: Large
+        let isMusicPlaying = false; 
+        let currentFontSizeIndex = 1; 
         const fontSizes = ['1.2rem', '1.4rem', '1.6rem'];
 
         // DOM 元素
@@ -622,8 +620,8 @@
         const contentAreaEl = document.getElementById('content-area');
         const themeIcon = document.getElementById('theme-icon');
         const modal = document.getElementById('info-modal');
-        const audioPlayer = document.getElementById('bg-music'); // [新增] 音頻元素
-        const musicIcon = document.getElementById('music-icon'); // [新增] 音樂圖示
+        const audioPlayer = document.getElementById('bg-music'); 
+        const musicIcon = document.getElementById('music-icon');
 
         function init() {
             renderNav();
@@ -632,12 +630,10 @@
             const savedTheme = localStorage.getItem('bible-journal-theme');
             if (savedTheme) setTheme(savedTheme);
             
-            // 自動開啟說明視窗
             setTimeout(() => {
                 modal.classList.add('open');
             }, 800);
             
-            // [新增] 初始化音樂 (嘗試自動播放)
             setupMusic(currentCharacterId);
         }
 
@@ -659,13 +655,11 @@
             }
         }
 
-        // [新增] 字體大小切換函數
         window.toggleFontSize = function() {
             currentFontSizeIndex = (currentFontSizeIndex + 1) % fontSizes.length;
             document.documentElement.style.setProperty('--content-font-size', fontSizes[currentFontSizeIndex]);
         }
 
-        // [新增] 音樂開關函數
         window.toggleMusic = function() {
             if (isMusicPlaying) {
                 audioPlayer.pause();
@@ -673,7 +667,6 @@
                 musicIcon.classList.remove('ph-speaker-high');
                 musicIcon.classList.add('ph-speaker-slash');
             } else {
-                // 如果目前沒有設定來源，先設定
                 if (!audioPlayer.src) {
                     const char = characters.find(c => c.id === currentCharacterId);
                     if (char && char.music) audioPlayer.src = char.music;
@@ -689,33 +682,27 @@
             }
         }
 
-        // [新增] 設定並播放音樂
         function setupMusic(charId) {
             const char = characters.find(c => c.id === charId);
             if (!char || !char.music) return;
 
-            // 如果音樂檔案改變，或者尚未設定來源
             if (audioPlayer.getAttribute('src') !== char.music) {
                  audioPlayer.src = char.music;
             }
             
-            // 嘗試播放
             const playPromise = audioPlayer.play();
 
             if (playPromise !== undefined) {
                 playPromise.then(_ => {
-                    // 自動播放成功
                     isMusicPlaying = true;
                     musicIcon.classList.remove('ph-speaker-slash');
                     musicIcon.classList.add('ph-speaker-high');
                 })
                 .catch(error => {
-                    // 自動播放失敗，設定互動後播放
                     isMusicPlaying = false;
                     musicIcon.classList.remove('ph-speaker-high');
                     musicIcon.classList.add('ph-speaker-slash');
                     
-                    // [新增] 註冊一次性全域點擊事件來啟動音樂
                     document.addEventListener('click', function playOnFirstClick() {
                         audioPlayer.play().then(() => {
                             isMusicPlaying = true;
@@ -747,11 +734,11 @@
         }
 
         window.selectCharacter = function(id) {
-            if (currentCharacterId === id) return; // 避免重複點擊
+            if (currentCharacterId === id) return;
             
             currentCharacterId = id;
             checkFugitiveState(id);
-            setupMusic(id); // [新增] 切換音樂
+            setupMusic(id); 
             renderNav();
             renderContent();
             
