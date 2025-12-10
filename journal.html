@@ -338,8 +338,9 @@
     <aside class="w-full md:w-72 flex flex-col z-20 flex-shrink-0 relative transition-colors duration-500 shadow-xl border-b md:border-b-0 md:border-r border-[var(--sidebar-border)] h-auto md:h-full">
         <!-- 標題與按鈕區 -->
         <div class="p-4 md:p-6 border-b border-[var(--sidebar-border)] flex items-center justify-between relative overflow-hidden shrink-0">
+            <!-- [修改] 移除 truncate，改用 whitespace-nowrap 並允許容器彈性調整 -->
             <div class="flex flex-col min-w-0 mr-2">
-                <h1 class="text-xl md:text-2xl ancient-title text-[var(--sidebar-text-main)] mb-1 relative z-10 drop-shadow-sm tracking-wide truncate">大衛詩篇</h1>
+                <h1 class="text-xl md:text-2xl ancient-title text-[var(--sidebar-text-main)] mb-1 relative z-10 drop-shadow-sm tracking-wide whitespace-nowrap">大衛詩篇</h1>
                 <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] relative z-10 hidden md:block">The Chronicles of David</p>
             </div>
             <div class="flex space-x-2 relative z-10 flex-shrink-0">
@@ -548,7 +549,7 @@
                 id: 'absalom',
                 name: '五、王室悲劇',
                 title: '押沙龍的背叛，為父的眼淚',
-                music: 'music/5.mp3',
+                music: 'music/If love was.mp3',
                 diary: `
                     <span class="journal-date">橄欖山 • 逃避押沙龍</span>
                     <div class="relative">
@@ -577,7 +578,7 @@
                 id: 'legacy',
                 name: '六、夕陽餘暉',
                 title: '最後的詩篇，未來的聖殿',
-                music: 'music/6.mp3',
+                music: 'music/big independence day.mp3',
                 diary: `
                     <span class="journal-date">耶路撒冷 • 讚美之歌</span>
                     <p class="drop-cap mb-6">我的身體漸漸衰殘，但我的靈卻如鷹返老還童。回首一生，雖有爭戰與眼淚，但神的慈愛從未斷絕。我要用最後的氣息尊崇祂：</p>
@@ -746,9 +747,11 @@
             if (scrollContainer) {
                 scrollContainer.scrollTop = 0;
             }
-            
-            // [刪除] 移除了導致手機版上捲而遮擋頂部按鈕的程式碼
-            // 原本的 scrollIntoView 邏輯在此被刪除
+
+            if(window.innerWidth < 768) {
+                const mainArea = document.querySelector('main');
+                mainArea.scrollIntoView({behavior: 'smooth', block: 'start'});
+            }
         };
 
         function renderContent(animate = true) {
