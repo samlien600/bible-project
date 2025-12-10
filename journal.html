@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>大衛王：詩人與戰士的私密手稿</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts 作為備援 -->
+    <link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -17,6 +20,18 @@
       gtag('config', 'G-3DFR7N5MT2');
     </script>
     <style>
+        /* =========================================
+           [新增] 自訂字體設定
+           ========================================= */
+        @font-face {
+            font-family: 'DartsFont';
+            /* 請確保 字體 位於 font 資料夾內，且該資料夾與本 HTML 檔在同一層級 */
+            src: url('font/JasonHandwriting5p.ttf') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         /* =========================================
            核心變數設定 (Theme Variables)
            ========================================= */
@@ -49,6 +64,9 @@
             
             --modal-bg: rgba(20, 18, 16, 0.95);
             --modal-border: rgba(255, 255, 255, 0.1);
+            
+            /* 字體大小變數 */
+            --content-font-size: 1.4rem; 
         }
 
         /* 淺色模式 (Light / Day) */
@@ -115,13 +133,13 @@
 
         /* 手寫草稿風格特效 (Natural Messy Draft) */
         .fx-messy-hand {
-            font-family: 'Ma Shan Zheng', cursive; 
-            font-weight: bold;
-            font-size: 1.1em;
+            font-family: 'Long Cang', cursive; /* 狂草風格 */
+            font-weight: 400;
+            font-size: 1.3em;
             display: inline-block;
             position: relative;
             color: #1a0f0a;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
             text-shadow: 1px 0px 0px rgba(0,0,0,0.5); 
             transform: rotate(-2deg);
         }
@@ -149,14 +167,19 @@
             background-image: radial-gradient(circle at 50% 40%, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 85%), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
             background-repeat: no-repeat, repeat; background-size: cover, 100px 100px;
             color: var(--ink-color); transition: background-color 0.5s ease;
-            height: 100dvh; /* 使用 dynamic viewport height */
+            height: 100dvh; 
             width: 100%;
             overflow: hidden;
         }
 
+        /* [修改] 手寫字體設定：加入 !important 確保字體大小變數生效，不被 Tailwind 覆蓋 */
         .handwritten-mode {
-            font-family: "KaiTi", "STKaiti", "BiauKai", "AR PL UKai TW", "Michroma", "Ma Shan Zheng", cursive, serif !important;
-            font-weight: 600; letter-spacing: 1px; line-height: 2 !important;
+            font-family: 'DartsFont', 'Yomogi', 'Long Cang', 'Ma Shan Zheng', cursive !important;
+            font-weight: 400; 
+            letter-spacing: 1px; 
+            line-height: 1.8 !important;
+            font-size: var(--content-font-size) !important; /* 強制應用變數大小 */
+            transition: font-size 0.3s ease;
         }
 
         .psalm-quote {
@@ -184,10 +207,10 @@
             border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
             box-shadow: inset 0 0 80px rgba(60, 40, 20, 0.15), inset 2px 2px 10px rgba(255,255,255,0.3), 15px 25px 50px -10px var(--parchment-shadow);
             overflow: hidden; transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            z-index: 1; /* 背景層級較低 */
+            z-index: 1; 
         }
 
-        /* *** 特殊狀態：流亡時的極致破損 (Extreme Damaged State) *** */
+        /* 特殊狀態：流亡時的極致破損 */
         body.state-fugitive .parchment {
             clip-path: polygon(
                 1% 1%, 10% 0%, 20% 1.5%, 30% 0%, 40% 1%, 50% 0%, 60% 1.5%, 70% 0%, 80% 1%, 90% 0%, 99% 1%,
@@ -199,7 +222,6 @@
             border-radius: 0;
         }
         
-        /* 3. 流亡狀態的重度污漬層 (固定在 .parchment 上) */
         body.state-fugitive .parchment::after {
             content: ""; position: absolute; inset: 0;
             background-image: 
@@ -258,12 +280,10 @@
             box-shadow: 10px 0 30px -10px rgba(0,0,0,0.1); transition: all 0.5s ease;
         }
         
-        /* [修改] 導航項目樣式：改為 Flex 垂直排列，左對齊 */
         .nav-item {
             cursor: pointer; transition: all 0.3s ease; position: relative;
             border-bottom: 1px solid var(--sidebar-border); opacity: 0.7;
             padding: 1rem 1.5rem; 
-            /* [修改] 這裡加入了 flex-col, items-start, justify-center 來實現垂直堆疊 */
             display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
             white-space: nowrap;
         }
@@ -330,6 +350,10 @@
                 <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sidebar-text-sub)] relative z-10 hidden md:block">The Chronicles of David</p>
             </div>
             <div class="flex space-x-2 relative z-10">
+                <!-- 字體大小調整按鈕 -->
+                <button onclick="toggleFontSize()" class="icon-btn" title="調整字體大小">
+                    <i class="ph ph-text-aa text-lg"></i>
+                </button>
                 <button onclick="toggleInfo()" class="icon-btn" title="使用說明">
                     <i class="ph ph-info text-lg"></i>
                 </button>
@@ -364,7 +388,7 @@
             
             <div class="parchment-content">
                 <div id="scroll-container" class="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6 pt-8 md:px-16 md:pb-16 md:pt-12 relative z-10">
-                    <div id="content-area" class="fade-in max-w-3xl mx-auto leading-loose text-base md:text-xl ink-text text-justify handwritten-mode pb-10"></div>
+                    <div id="content-area" class="fade-in max-w-3xl mx-auto leading-loose ink-text text-justify handwritten-mode pb-10"></div>
                 </div>
             </div>
         </div>
@@ -380,6 +404,7 @@
                 <div class="modal-subtitle">使用方式</div>
                 <ul class="modal-list">
                     <li>◈ 點擊選單切換大衛人生的不同階段。</li>
+                    <li>◈ 點擊 Aa 圖示可調整字體大小。</li>
                     <li>◈ 點擊月亮/太陽圖示切換閱讀模式。</li>
                 </ul>
             </div>
@@ -440,7 +465,7 @@
                 diary: `
                     <span class="journal-date">亞杜蘭洞 • 逃避掃羅</span>
                     <div class="relative">
-                        <span class="fx-wet-stain" style="--x:10px; --y:60px; --w:25px; --h:30px; --rot:10deg;"></span>
+                        <!-- 移除了這裡原本會跟隨文字移動的 fx-wet-stain -->
                         <p class="drop-cap mb-6">我像鷓鴣一樣被追趕，命懸一線。在這陰冷的洞穴中，我的心卻投靠祢：</p>
                     </div>
                     <div class="psalm-quote">
@@ -583,6 +608,10 @@
         let currentCharacterId = 'youth'; 
         let currentTheme = 'dark'; 
 
+        // [新增] 字體大小狀態管理
+        let currentFontSizeIndex = 1; // 0: Small, 1: Medium (Default), 2: Large
+        const fontSizes = ['1.2rem', '1.4rem', '1.6rem'];
+
         // DOM 元素
         const charListEl = document.getElementById('character-list');
         const contentAreaEl = document.getElementById('content-area');
@@ -618,6 +647,12 @@
                 themeIcon.classList.remove('ph-moon');
                 themeIcon.classList.add('ph-sun');
             }
+        }
+
+        // [新增] 字體大小切換函數
+        window.toggleFontSize = function() {
+            currentFontSizeIndex = (currentFontSizeIndex + 1) % fontSizes.length;
+            document.documentElement.style.setProperty('--content-font-size', fontSizes[currentFontSizeIndex]);
         }
 
         function renderNav() {
@@ -658,6 +693,8 @@
         function renderContent(animate = true) {
             const char = characters.find(c => c.id === currentCharacterId);
             if (!char) return;
+
+            // if (charNameEl) charNameEl.textContent = char.name; // 移除
 
             const content = char.diary;
             
