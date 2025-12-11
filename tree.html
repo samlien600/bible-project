@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>晝夜思想 - 專注引導</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;500;700&family=Zen+Maru+Gothic:wght@300;500;700&display=swap');
+
+        :root {
+            --day-bg: #FDFBF7;
+            --day-text: #4A5568;
+            --day-accent: #D69E2E;
+            --day-secondary: #EDF2F7;
+            
+            --night-bg: #1A202C;
+            --night-text: #E2E8F0;
+            --night-accent: #63B3ED;
+            --night-secondary: #2D3748;
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            transition: background-color 1s ease, color 1s ease;
+            -webkit-tap-highlight-color: transparent; /* Mobile optimize */
+        }
+
+        .serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* Day Mode */
+        body.day {
+            background-color: var(--day-bg);
+            color: var(--day-text);
+            --card-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --hover-bg: #F7FAFC;
+            --instruction-bg: #F0F4F8;
+        }
+        .day .accent-text { color: var(--day-accent); }
+        .day .border-accent { border-color: var(--day-accent); }
+        .day .bg-accent { background-color: var(--day-accent); color: white; }
+        .day .bg-accent-light { background-color: rgba(214, 158, 46, 0.1); } 
+        
+        /* Night Mode */
+        body.night {
+            background-color: var(--night-bg);
+            color: var(--night-text);
+            --card-bg: #2D3748;
+            --modal-bg: #2D3748;
+            --hover-bg: #4A5568;
+            --instruction-bg: #2A4365;
+        }
+        .night .accent-text { color: var(--night-accent); }
+        .night .border-accent { border-color: var(--night-accent); }
+        .night .bg-accent { background-color: var(--night-accent); color: #1A202C; }
+        .night .bg-accent-light { background-color: rgba(99, 179, 237, 0.15); }
+
+        /* Common Components */
+        .card {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .breathe-circle {
+            animation: breathe 8s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: var(--modal-bg);
+            max-height: 85vh;
+            overflow-y: auto;
+            width: 90%; 
+            max-width: 42rem;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @media (max-width: 640px) {
+            .mobile-touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+</head>
+<body class="day min-h-screen flex flex-col items-center p-4 md:p-8 transition-all duration-700">
+
+    <!-- Header -->
+    <header class="w-full max-w-3xl flex justify-between items-center mb-6 md:mb-10 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-current breathe-circle"></div>
+            <div class="flex flex-col">
+                <span class="text-xs tracking-widest font-bold opacity-60">PSALM 1:2</span>
+                <span class="text-lg font-bold serif">晝夜思想</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-2 md:gap-3">
+            <button onclick="openModal()" class="mobile-touch-target flex items-center gap-2 px-3 py-2 rounded-full bg-opacity-10 bg-gray-500 hover:bg-opacity-20 transition-all text-sm font-medium">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span class="hidden md:inline">經文與說明</span>
+                <span class="md:hidden">經文</span>
+            </button>
+            <button onclick="toggleMode()" class="mobile-touch-target relative p-2 rounded-full bg-opacity-10 bg-gray-500 hover:bg-opacity-20 transition-all focus:outline-none group" aria-label="切換晝夜模式">
+                <i id="mode-icon" data-lucide="sun" class="w-5 h-5"></i>
+                <span class="absolute right-0 top-full mt-2 w-max px-2 py-1 text-xs rounded bg-gray-800 text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:block z-50 pointer-events-none">
+                    切換 日間/夜間 模式
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interactive Content -->
+    <main class="w-full max-w-2xl flex flex-col gap-6 md:gap-8 relative z-10 pb-20 fade-in">
+        
+        <!-- 1. The Question (Hero) -->
+        <section class="text-center space-y-4 md:space-y-6">
+            <div class="flex items-center justify-center gap-2 opacity-60 mb-2 transition-all duration-500">
+                <i id="guide-icon" data-lucide="sun" class="w-4 h-4"></i>
+                <span id="guide-title" class="text-sm tracking-wider">今日引導</span>
+            </div>
+
+            <div class="relative px-2">
+                <i data-lucide="quote" class="absolute -top-4 -left-2 md:-left-4 w-6 h-6 md:w-8 md:h-8 opacity-10"></i>
+                <h2 id="question-text" class="text-xl md:text-3xl font-medium leading-relaxed serif px-2 md:px-4 min-h-[4rem] flex items-center justify-center">
+                    載入中...
+                </h2>
+                <i data-lucide="quote" class="absolute -bottom-4 -right-2 md:-right-4 w-6 h-6 md:w-8 md:h-8 opacity-10 rotate-180"></i>
+            </div>
+            
+            <div>
+                <button onclick="refreshQuestion()" class="mobile-touch-target text-xs opacity-50 hover:opacity-100 transition-opacity border-b border-dashed border-current pb-0.5 pt-2">
+                    換一個思考方向
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Action Challenge (Small Card) -->
+        <section class="card p-4 md:p-5 rounded-xl border-l-4 border-accent flex gap-3 md:gap-4 items-start mx-1 md:mx-0">
+            <div class="p-2 bg-accent rounded-full shrink-0 mt-0.5 shadow-sm">
+                <i data-lucide="footprints" class="w-4 h-4 text-current"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-1 opacity-80">實踐挑戰</h4>
+                <p id="action-text" class="text-sm leading-relaxed">
+                    載入行動建議...
+                </p>
+            </div>
+        </section>
+
+        <!-- 3. Journaling (Seamless) -->
+        <section class="space-y-3 pt-4 border-t border-gray-500 border-opacity-10">
+            <div class="flex justify-between items-end px-2">
+                <label for="reflection" class="text-sm font-bold opacity-70">靈修筆記</label>
+                <span id="save-status" class="text-xs opacity-40 italic">自動儲存中...</span>
+            </div>
+            
+            <div class="relative group">
+                <textarea 
+                    id="reflection" 
+                    class="w-full p-4 md:p-6 rounded-xl card resize-none focus:outline-none focus:ring-1 transition-all text-base md:text-lg leading-relaxed h-60 md:h-80 font-serif bg-transparent placeholder-opacity-40"
+                    placeholder="在這裡記下聖靈給你的感動，或是與神的對話..."
+                    style="--tw-ring-color: var(--day-accent);"
+                ></textarea>
+                
+                <div class="absolute bottom-3 right-3 md:bottom-4 md:right-4 flex gap-2 opacity-60 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="copyText()" class="mobile-touch-target p-2 rounded-lg bg-gray-500 bg-opacity-10 hover:bg-opacity-20 text-xs flex items-center justify-center" title="複製文字">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal -->
+    <div id="scripture-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0 transition-opacity"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4" onclick="if(event.target === this) closeModal()">
+            <div class="modal-content rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 duration-300 flex flex-col" id="modal-box">
+                
+                <div class="sticky top-0 bg-inherit z-20 p-5 md:p-6 border-b border-gray-500 border-opacity-10 flex justify-between items-center shrink-0">
+                    <h3 class="text-lg md:text-xl font-bold serif flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5 accent-text"></i>
+                        使用說明與經文
+                    </h3>
+                    <button onclick="closeModal()" class="p-2 -mr-2 rounded-full hover:bg-gray-500 hover:bg-opacity-10 mobile-touch-target">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="p-5 md:p-8 space-y-8 overflow-y-auto custom-scroll">
+                    
+                    <div class="p-4 rounded-xl" style="background-color: var(--instruction-bg);">
+                        <h4 class="text-sm font-bold mb-3 flex items-center gap-2 opacity-90">
+                            <i data-lucide="info" class="w-4 h-4"></i> 如何使用此工具
+                        </h4>
+                        <ul class="space-y-2 text-sm opacity-80">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="sun" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                                <span><strong>日間模式：</strong> 當你需要力量與方向時使用。點擊右上角太陽圖示切換。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="moon" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                                <span><strong>夜間模式：</strong> 當你需要省察與安息時使用。程式會於晚上6點自動切換。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="pen-tool" class="w-4 h-4 mt-0.5 shrink-0"></i>
+                                <span><strong>自動儲存：</strong> 你的靈修筆記會自動保存在這台裝置上。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <hr class="border-gray-500 border-opacity-10">
+
+                    <div class="space-y-4 text-lg leading-loose serif">
+                        <p class="opacity-80"><sup class="text-xs opacity-50 mr-1">1</sup>不從惡人的計謀，不站罪人的道路，不坐褻慢人的座位，</p>
+                        <p class="text-xl font-medium py-3 px-4 rounded bg-accent-light border-l-4 border-accent">
+                            <sup class="text-xs opacity-50 mr-1">2</sup>惟喜愛耶和華的律法，<br>
+                            <span class="font-bold accent-text">晝夜思想</span>，這人便為有福！
+                        </p>
+                        <p class="opacity-80"><sup class="text-xs opacity-50 mr-1">3</sup>他要像一棵樹栽在溪水旁，按時候結果子，葉子也不枯乾。凡他所做的盡都順利。</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold opacity-60 uppercase tracking-widest mb-4">關鍵字詞深究</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-lg bg-gray-500 bg-opacity-5">
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <span class="font-bold accent-text">有福 (Ashrey)</span>
+                                    <span class="text-xs font-serif opacity-50">אַשְׁרֵי</span>
+                                </div>
+                                <p class="text-sm opacity-80">驚嘆語氣：「多麼快樂啊！」指走在正路上、內心充滿確據的深層喜悅。</p>
+                            </div>
+                            <div class="p-4 rounded-lg bg-gray-500 bg-opacity-5">
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <span class="font-bold accent-text">思想 (Hagah)</span>
+                                    <span class="text-xs font-serif opacity-50">הָגָה</span>
+                                </div>
+                                <p class="text-sm opacity-80">原意為「低聲沈吟」。如同鴿子咕咕叫，意味著將神的話語在口中、心中反覆咀嚼。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center p-4 bg-accent bg-opacity-10 rounded-xl mb-4">
+                        <p class="text-sm font-bold mb-1">💡 開始默想</p>
+                        <button onclick="closeModal()" class="mt-2 text-xs px-4 py-2 rounded-full border border-current opacity-70 hover:opacity-100 hover:bg-white hover:bg-opacity-20 transition-all">
+                            關閉並回答今日問題
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentMode = 'day';
+
+        // Extensive Data (Expanded for variety)
+        // Note: Using "Remaining" arrays to track usage and ensure no repetition
+        
+        const originalDayContent = {
+            questions: [
+                "今天早晨，你最想把神的哪一句話放在心裡，成為你一整天的力量？",
+                "「喜愛」神的律法意味著什麼？你今天如何在忙碌中找到這份喜樂？",
+                "如果把你的生命比喻成一棵樹，你覺得現在的根扎在哪裡？是溪水旁，還是乾旱地？",
+                "今天可能會遇到什麼「惡人的計謀」或負面的聲音？你打算如何拒絕它？",
+                "「凡他所做的盡都順利」不代表沒有困難。對你而言，今天的「順利」定義是什麼？",
+                "試著默想一個神的屬性（如：信實、慈愛），這會如何改變你今天待人的態度？",
+                "想像你今天是一棵結實累累的樹，誰是你想要分享果子（恩典）的對象？",
+                "「葉子也不枯乾」：在今天繁重的工作或學業中，你如何保持心靈的滋潤？",
+                "不坐「褻慢人的座位」：今天若遇到八卦或批評的場合，你打算如何回應？",
+                "思想神的話語像是在「吃」靈糧。你今天打算什麼時候享用這頓大餐？",
+                "今天的行程中，哪一個時段最容易讓你感到焦慮？試著先為那個時刻禱告。",
+                "「這人便為有福」：試著定義你今天的「福氣」，不以物質，而以神的同在為標準。",
+                "如果你今天只能專注實踐神的一個命令（如：愛人如己、喜樂），那會是什麼？",
+                "樹木不會因為風吹而移動，因為根深。今天什麼事可能會動搖你的心？",
+                "神的話語是你腳前的燈。今天有沒有哪件事你需要求神照亮指引？",
+                "「按時候結果子」提醒我們要有耐心。今天有什麼事是你需要耐心等候的？",
+                "試著把今天的待辦事項看作是神交給你的「園子」，你要如何忠心地耕種它？",
+                "今天遇到困難時，試著不要先抱怨，而是先「思想」神的應許。",
+                "你的言語反映了你晝夜思想的內容。今天你想讓你的口說出什麼樣的造就之言？",
+                "在今天的忙碌中，如何創造一個微小的「Selah（暫停）」時刻來親近神？",
+                "如果耶穌今天整天都陪著你工作/上學，你會用什麼不同的方式做事？",
+                "對於今天即將遇見的一位難相處的人，神的話語如何教導你去看待他？",
+                "「惟喜愛」代表一種熱情。你對神的熱情如何能感染身邊的人？",
+                "今天你有機會做一個正確但不討好的決定（不站罪人的道路）嗎？",
+                "試著用「感恩」作為今天所有對話的開場白。",
+                "想像你的心是一個容器，今天你想裝滿什麼？是憂慮，還是應許？",
+                "神的話語是活潑的。今天留意一下，神是否透過環境或他人對你說話？",
+                "「溪水旁」意味著源源不絕的供應。今天你在哪方面最需要這份供應？",
+                "今天的挑戰可能是為了修剪你這棵樹，使你結更多果子。你願意順服嗎？",
+                "出門前，先對鏡中的自己宣告：我是蒙神賜福的，我有基督的馨香之氣。"
+            ],
+            actions: [
+                "試著在接下來的一小時，每當感到焦慮時，就深呼吸並默念：「主啊，祢是我的溪水。」",
+                "今天在一個例行的休息時間（如午休），讀這段經文一次，代替滑手機。",
+                "寫下一句這篇詩篇的經文，貼在電腦螢幕或顯眼處。",
+                "找一個具體的時刻，為一個讓你感到困擾的人祝福，不坐褻慢人的座位。",
+                "在走路或通勤時，試著用哼唱的方式背誦這節經文。",
+                "今天刻意對一位服務人員（店員、司機）真誠地說謝謝，傳遞祝福。",
+                "在喝水時，提醒自己：若不是連接於活水泉源，我就會乾渴。",
+                "今天嘗試「禁食」抱怨。每當想抱怨時，改為說一句感謝的話。",
+                "設定一個鬧鐘，在下午三點時，停下來做 1 分鐘的深呼吸禱告。",
+                "將今天最困難的一項工作，在開始前先獻上禱告，求神加添智慧。",
+                "今天不看任何社群媒體，把那些時間用來安靜或閱讀。",
+                "觀察路邊的一棵樹，思想它如何安靜地生長，並為它的生命力感謝神。",
+                "選一句經文，傳訊息鼓勵一位正在經歷困難的朋友。",
+                "今天嘗試快快地聽，慢慢地說，特別是在意見不合的時候。",
+                "在午餐前，先讀一小段詩篇，餵養你的靈魂。",
+                "刻意走一條不同的路，或抬頭看天空，讚嘆神的創造。",
+                "如果在對話中聽到批評或論斷，試著轉移話題或保持沈默。",
+                "今天為你的上司、老師或國家的領袖做一個簡短的祝福禱告。",
+                "寫下一件你今天期待神成就的事，放在口袋裡。",
+                "給自己一個微笑，因為你是神所愛的，是被栽種在好土裡的。"
+            ]
+        };
+
+        const originalNightContent = {
+            questions: [
+                "回顧今天，你在哪些時刻看見了神如同溪水般的供應？",
+                "今天是否有什麼重擔讓你感到枯乾？試著在禱告中將它交給神。",
+                "「晝夜思想」神的話語。在這寂靜的夜晚，神想對你的心說些什麼？",
+                "你覺得今天結出了什麼果子（即使是微小的忍耐或善意）？為此感謝神。",
+                "在這人便為有福。今晚，你覺得自己在哪方面是「有福」的？",
+                "今天是否有無意中站了「罪人的道路」或隨波逐流？求主赦免並洗淨。",
+                "樹木在夜間也在生長。你相信即使在睡夢中，神也在修剪與建造你嗎？",
+                "「葉子也不枯乾」。為了明天，你今晚需要什麼樣的屬靈滋潤？",
+                "將今天所有的對話與行動交給神，求祂保守那些是出於祂的果子。",
+                "安靜下來，聆聽自己的呼吸。想像這就是聖靈在你裡面的氣息。",
+                "今天有什麼事情讓你失去了平安？現在把它帶到耶穌腳前。",
+                "思想今天的一個失敗或過錯，並領受神完全的接納與赦免。",
+                "如果有任何人今天得罪了你，你願意在睡前釋放他，不讓苦毒過夜嗎？",
+                "回想今天一個讓你笑出來的時刻，那是神給你的禮物。",
+                "「惟喜愛」耶和華的律法。今晚入睡前，哪一句經文最能安慰你的心？",
+                "如果明天神要接你去，你今天有什麼遺憾嗎？如果沒有，為這份平安感謝。",
+                "看著窗外的夜空（或想像夜空），思想造天地的神也是看顧你的父。",
+                "你今天是否太過依賴自己的聰明，而忘記了倚靠神？",
+                "在今天的人際互動中，你是否有活出基督的樣式？",
+                "為著今天身體的運作（呼吸、行走、看見）獻上感謝，這不是理所當然的。",
+                "今天有什麼事情是你「盡都順利」的？歸榮耀給神。",
+                "今天有什麼事情是「不順利」的？相信神在其中有美好的旨意。",
+                "你的心現在像平靜的溪水，還是翻騰的海浪？求主對你的心說「住了吧，靜了吧」。",
+                "思想神的信實：以前祂如何帶領你度過難關，今晚祂也必照樣看顧。",
+                "今天是否有哪一句話說得太急躁？求聖靈在夢中潔淨你的口。",
+                "如果可以給今天的自己一個擁抱，你會對自己說什麼？",
+                "放下明天的待辦清單。神不睡覺，所以你可以安心睡覺。",
+                "想像耶穌此刻就坐在你的床邊，祂會用什麼樣的眼神看著你？",
+                "為著一個今天幫助過你的人禱告，求神親自報答他。",
+                "在結束這一天之前，再次宣告：我是屬神的，我的一生在祂手中。"
+            ],
+            actions: [
+                "睡前不看手機，而是閉上眼默想「有福」這兩個字入睡。",
+                "為今天發生的一件感恩的小事，向神獻上短短的讚美。",
+                "將明天的待辦事項清單交託給神，宣告「凡他所做的盡都順利」在於神的主權。",
+                "躺在床上時，想像自己被栽種在慈愛的溪水旁，根部正吸取水分。",
+                "做三次深呼吸。吸氣時說「領受恩典」，吐氣時說「放下重擔」。",
+                "雙手掌心向上放在大腿上，象徵將一切交託給神。",
+                "讀一遍詩篇 23 篇，然後安心入睡。",
+                "如果在床上翻來覆去睡不著，試著為你認識的人一一提名禱告。",
+                "把手機放在房間外面（或遠離床頭），讓今晚的最後一個意念是神的話。",
+                "跪在床邊（或心中跪下），做一個簡短的認罪與感恩禱告。",
+                "聽一首安靜的詩歌，讓歌詞充滿你的房間。",
+                "寫下三件今天值得感恩的事，即使是非常微小的事。",
+                "對著黑暗宣告：神是我的光，我不怕遭害。",
+                "想像把今天的焦慮打包成一個包裹，親手交給耶穌。",
+                "用手按在心口，為自己的心求平安。",
+                "如果有家人同住，睡前去擁抱他們一下；如果是獨居，擁抱自己並感受神的愛。",
+                "刻意放慢睡前的每一個動作（刷牙、更衣），享受當下的安息。",
+                "如果今天有憤怒的情緒，試著握緊拳頭再慢慢鬆開，象徵釋放。",
+                "為明天早晨的起床禱告，求神讓你一醒來就充滿活力。",
+                "閉上眼睛，想像自己是一隻羊，躺臥在青草地上，牧羊人在旁看顧。"
+            ]
+        };
+
+        // Arrays to track remaining items for non-repeating logic
+        let remainingDayQuestions = [...originalDayContent.questions];
+        let remainingDayActions = [...originalDayContent.actions];
+        let remainingNightQuestions = [...originalNightContent.questions];
+        let remainingNightActions = [...originalNightContent.actions];
+
+        // Helper: Get unique random item
+        function getUniqueRandomItem(currentArray, originalArray) {
+            if (currentArray.length === 0) {
+                // Refill if empty
+                currentArray.push(...originalArray);
+            }
+            const randomIndex = Math.floor(Math.random() * currentArray.length);
+            const item = currentArray[randomIndex];
+            // Remove the item so it won't be picked again until refill
+            currentArray.splice(randomIndex, 1);
+            return item;
+        }
+
+        // DOM Elements
+        const body = document.body;
+        const modeIcon = document.getElementById('mode-icon');
+        const questionText = document.getElementById('question-text');
+        const actionText = document.getElementById('action-text');
+        const reflectionInput = document.getElementById('reflection');
+        const saveStatus = document.getElementById('save-status');
+        
+        // Modal Elements
+        const modal = document.getElementById('scripture-modal');
+        const modalBox = document.getElementById('modal-box');
+
+        // Initialization
+        function init() {
+            lucide.createIcons();
+            const hour = new Date().getHours();
+            if (hour >= 18 || hour < 6) setNightMode();
+            else setDayMode();
+
+            // Load saved note
+            const savedText = localStorage.getItem('psalm1_focused_note');
+            if (savedText) {
+                reflectionInput.value = savedText;
+                saveStatus.textContent = "已載入上次筆記";
+            } else {
+                saveStatus.textContent = "";
+            }
+
+            // Auto-open Modal on Load
+            setTimeout(() => {
+                openModal();
+            }, 500);
+        }
+
+        // Modal Logic
+        function openModal() {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95', 'opacity-0');
+                modalBox.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalBox.classList.remove('scale-100', 'opacity-100');
+            modalBox.classList.add('scale-95', 'opacity-0');
+            document.body.style.overflow = '';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Mode Switching
+        function toggleMode() {
+            if (currentMode === 'night') setDayMode();
+            else setNightMode();
+        }
+
+        function setDayMode() {
+            currentMode = 'day';
+            body.classList.remove('night');
+            body.classList.add('day');
+            modeIcon.setAttribute('data-lucide', 'sun');
+            document.getElementById('guide-icon').setAttribute('data-lucide', 'sun');
+            document.getElementById('guide-title').textContent = "日間・引導";
+            refreshQuestion();
+            lucide.createIcons();
+        }
+
+        function setNightMode() {
+            currentMode = 'night';
+            body.classList.remove('day');
+            body.classList.add('night');
+            modeIcon.setAttribute('data-lucide', 'moon');
+            document.getElementById('guide-icon').setAttribute('data-lucide', 'moon');
+            document.getElementById('guide-title').textContent = "夜間・省察";
+            refreshQuestion();
+            lucide.createIcons();
+        }
+
+        // Question Engine (Updated for Non-Repeating Logic)
+        function refreshQuestion() {
+            let q, a;
+
+            if (currentMode === 'day') {
+                q = getUniqueRandomItem(remainingDayQuestions, originalDayContent.questions);
+                a = getUniqueRandomItem(remainingDayActions, originalDayContent.actions);
+            } else {
+                q = getUniqueRandomItem(remainingNightQuestions, originalNightContent.questions);
+                a = getUniqueRandomItem(remainingNightActions, originalNightContent.actions);
+            }
+
+            // Fade effect
+            questionText.style.opacity = 0;
+            actionText.style.opacity = 0;
+            
+            setTimeout(() => {
+                questionText.textContent = q;
+                actionText.textContent = a;
+                questionText.style.opacity = 1;
+                actionText.style.opacity = 1;
+            }, 300);
+        }
+
+        // Auto Save
+        let timeoutId;
+        reflectionInput.addEventListener('input', () => {
+            saveStatus.textContent = "儲存中...";
+            
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                localStorage.setItem('psalm1_focused_note', reflectionInput.value);
+                saveStatus.textContent = "已自動儲存";
+                setTimeout(() => {
+                    saveStatus.textContent = "";
+                }, 2000);
+            }, 1000);
+        });
+
+        function copyText() {
+            reflectionInput.select();
+            document.execCommand('copy');
+            const original = saveStatus.textContent;
+            saveStatus.textContent = "已複製！";
+            setTimeout(() => saveStatus.textContent = original, 2000);
+        }
+
+        // Run
+        init();
+
+    </script>
+</body>
+</html>
