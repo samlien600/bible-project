@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大衛王的一生：合神心意的人</title>
+    
+    <!-- 字體：引入 Noto Serif TC (宋體) 與 Cinzel (標題用，增添史詩感) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <!-- Leaflet 地圖 CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <style>
+        /* === 客製化字體設定 === */
+        /* 請在專案目錄下建立 fonts 資料夾，並放入您的字體檔 (例如 MyHandwriting.ttf) */
+        @font-face {
+            font-family: 'CustomHandwriting';
+            src: url('font/HanyiSentyJournal.ttf') format('truetype'),
+                 url('font/MyHandwriting.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            /* === 大衛風格色票 (預設淺色 Light Mode) === */
+            /* 背景：古卷米黃 */
+            --bg-paper: #FDFBF7; 
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            
+            /* 文字：沒藥深褐 */
+            --text-main: #3E3226; 
+            --text-light: #6B5B4E;
+
+            /* 點綴：古銅金 (榮耀/王權) */
+            --accent-gold: #B49B67;
+            --accent-gold-light: #E6D8B5;
+
+            /* 主色：皇家泰爾紫 (尊貴/受膏) */
+            --accent-purple: #4A3B52; 
+            
+            /* 強調：寶血紅 (救贖/爭戰) */
+            --accent-red: #8A3324;
+
+            /* 陰影 */
+            --shadow-soft: 0 4px 20px rgba(62, 50, 38, 0.08);
+            --modal-bg: #fffcf5;
+            --map-filter: none; /* 淺色模式地圖不加濾鏡 */
+            --nav-btn-text: #4A3B52;
+            --nav-btn-bg: transparent;
+            --nav-btn-border: #4A3B52;
+            --nav-btn-hover-bg: #4A3B52;
+            --nav-btn-hover-text: #FDFBF7;
+        }
+
+        /* === 深色模式 (Dark Mode) - 優化質感 === */
+        [data-theme="dark"] {
+            /* 背景：深色古銅/黑檀木色 (調整更暖、更有質感) */
+            --bg-paper: #2e2a26; 
+            /* 調整紋理透明度：0.07 -> 0.12，讓紙張紋理更明顯 */
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.12'/%3E%3C/svg%3E");
+            
+            /* 文字：羊皮紙白，閱讀舒適 */
+            --text-main: #e6e0d5; 
+            --text-light: #b0a496;
+
+            /* 點綴：流金，在深色背景更顯眼 */
+            --accent-gold: #dcb879; 
+            --accent-gold-light: #5c4e32;
+
+            /* 主色：淡雅紫，減少視覺疲勞 */
+            --accent-purple: #dcd0e5; 
+            --accent-red: #ff8a78;
+
+            /* 陰影：加深，增加立體感 */
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.6);
+            /* Modal 背景稍微提亮一點，與主背景區分 */
+            --modal-bg: #36322e;
+            
+            /* 地圖濾鏡：維持懷舊夜間感 */
+            --map-filter: invert(95%) hue-rotate(180deg) brightness(85%) contrast(85%) sepia(30%) saturate(150%);
+            
+            --nav-btn-text: #dcb879;
+            --nav-btn-bg: rgba(220, 184, 121, 0.1);
+            --nav-btn-border: #dcb879;
+            --nav-btn-hover-bg: #dcb879;
+            --nav-btn-hover-text: #2e2a26;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Serif TC', serif;
+            background-color: var(--bg-paper);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- 左側：故事面板 (40%) --- */
+        .story-panel {
+            width: 40%;
+            height: 100%;
+            background-color: var(--bg-paper);
+            background-image: var(--bg-texture);
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            border-right: 1px solid var(--accent-gold-light);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            z-index: 20;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        /* 頂部裝飾線 */
+        .story-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-gold), var(--accent-purple));
+        }
+
+        /* 工具列 (功能按鈕) */
+        .toolbar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: 1px solid var(--accent-gold-light);
+            color: var(--accent-gold);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: var(--bg-paper);
+        }
+
+        /* 標題區 */
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            position: relative;
+            margin-top: 10px; /* 為工具列留空間 */
+        }
+
+        .chapter-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        h1 {
+            color: var(--accent-purple);
+            margin: 0 0 10px 0;
+            font-size: 1.8em; 
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        /* 標題資訊容器 (副標題 + 經文) */
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid var(--accent-gold-light);
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: var(--text-light);
+            font-weight: 500;
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            display: inline-block;
+        }
+
+        .bible-ref-badge {
+            display: inline-block;
+            font-size: 0.75em;
+            color: var(--accent-red);
+            background: rgba(138, 51, 36, 0.1);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 0;
+        }
+
+        /* 故事內容 */
+        .story-scroll-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-bottom: 20px;
+            /* 針對深色模式調整 mask，避免文字截斷感太重 */
+            mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+        }
+        
+        /* 優化捲軸 */
+        .story-scroll-container::-webkit-scrollbar { width: 4px; }
+        .story-scroll-container::-webkit-scrollbar-thumb { background-color: var(--accent-gold-light); border-radius: 4px; }
+        .story-scroll-container::-webkit-scrollbar-track { background: transparent; }
+
+        .story-content {
+            font-size: 1.15rem;
+            line-height: 2;
+            text-align: justify;
+            color: var(--text-main);
+        }
+
+        #story-text {
+            display: block;
+        }
+
+        /* 底部按鈕區 */
+        .witness-section {
+            flex-shrink: 0;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .character-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* 人物按鈕 - 徽章風格 */
+        .char-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg-paper);
+            border: 2px solid var(--accent-gold-light);
+            color: var(--accent-purple);
+            font-family: 'Noto Serif TC', serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .char-btn span.char-icon { font-size: 1.4em; line-height: 1; margin-bottom: 2px; }
+        .char-btn span.char-name { font-size: 0.65em; line-height: 1; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; padding: 0 4px;}
+
+        /* 按鈕互動 */
+        .char-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 8px 20px rgba(180, 155, 103, 0.3);
+            color: var(--accent-gold);
+            background: var(--bg-paper); /* 保持背景與主題一致 */
+            filter: brightness(1.1);
+        }
+        
+        .char-btn:active { transform: scale(0.95); }
+
+        /* 導航按鈕容器 */
+        .nav-buttons-container {
+            flex-shrink: 0;
+            width: 100%;
+            display: flex;
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--accent-gold-light);
+        }
+
+        /* 導航按鈕 - 簡約質感 */
+        .nav-btn {
+            flex: 1;
+            padding: 12px; 
+            background: var(--nav-btn-bg);
+            color: var(--nav-btn-text);
+            border: 1px solid var(--nav-btn-border);
+            font-family: 'Noto Serif TC', serif; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 8px;
+            visibility: visible;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--nav-btn-hover-bg);
+            color: var(--nav-btn-hover-text);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn.next {
+            background-color: var(--nav-btn-hover-bg);
+            color: var(--nav-btn-hover-text);
+        }
+        .nav-btn.next:hover {
+            background-color: #352a3b;
+        }
+
+        /* --- 彈出視窗 (Modal) - 信箋風格 & 捲軸優化 --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(5px); 
+            z-index: 2000;
+            justify-content: center; align-items: center; 
+            animation: fadeIn 0.4s;
+        }
+
+        /* 統一彈窗樣式 (信箋) */
+        .modal-content {
+            background-color: var(--modal-bg); 
+            width: 85%; max-width: 480px; 
+            max-height: 85vh; 
+            display: flex;
+            flex-direction: column;
+            padding: 30px 40px; 
+            border-radius: 2px;
+            border: 1px solid var(--accent-gold-light);
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95); 
+            animation: popUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            text-align: center;
+            color: var(--text-main);
+            transition: all 0.3s ease; /* 增加切換樣式時的過渡 */
+        }
+        
+        /* 信箋裝飾角 */
+        .modal-content::after {
+            content: "";
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 1px solid var(--accent-gold-light);
+            pointer-events: none;
+        }
+
+        .modal-content::before {
+            content: "❝"; font-family: 'Cinzel', serif; font-size: 4rem; color: var(--accent-gold); opacity: 0.15;
+            position: absolute; top: 15px; left: 20px; line-height: 1;
+        }
+
+        /* 詩篇字體設定 */
+        .modal-content.psalm-font .modal-text {
+            /* 優先使用自訂手寫字體，若無則使用系統楷體 */
+            font-family: 'CustomHandwriting', 'Kaiti TC', '楷體', 'BiauKai', cursive, serif;
+            font-size: 1.3rem; 
+            line-height: 1.4; /* 調整行高，讓詩篇更緊湊 */
+            font-weight: 500;
+        }
+
+        /* === 關閉按鈕 === */
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 15px; font-size: 1.8rem;
+            cursor: pointer; color: var(--accent-gold); background: none; border: none;
+            transition: color 0.2s;
+            z-index: 10;
+        }
+        .modal-close-btn:hover { color: var(--accent-red); }
+
+        /* 標題區域不捲動 */
+        .modal-header {
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+
+        .modal-speaker { 
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem; 
+            color: var(--accent-purple); 
+            margin: 0 0 5px 0; 
+            font-weight: 700; 
+        }
+        
+        .modal-role-text {
+            display: inline-block; 
+            color: var(--accent-gold); 
+            font-size: 0.85rem;
+            margin-bottom: 12px; 
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 捲動區域 */
+        .modal-scroll-area {
+            overflow-y: auto;
+            flex-grow: 1; /* 佔滿剩餘空間 */
+            padding-right: 10px; /* 給捲軸預留空間 */
+            margin-bottom: 5px;
+            text-align: justify; /* 長文對齊較美觀 */
+        }
+
+        /* 彈窗捲軸樣式 */
+        .modal-scroll-area::-webkit-scrollbar { width: 4px; }
+        .modal-scroll-area::-webkit-scrollbar-thumb { background-color: var(--accent-gold-light); border-radius: 4px; }
+        .modal-scroll-area::-webkit-scrollbar-track { background: transparent; }
+
+        .modal-text { 
+            font-size: 1.1rem; 
+            line-height: 1.8; 
+            font-style: normal; 
+            color: var(--text-main); 
+            margin: 0; /* 移除預設邊距 */
+        }
+
+        /* Intro Modal 特殊樣式 */
+        #intro-modal .modal-content {
+            text-align: left;
+            max-width: 550px;
+            /* Intro modal 也可以套用捲動邏輯 */
+            display: block; 
+            overflow-y: auto;
+        }
+        #intro-modal h2 {
+            text-align: center;
+            color: var(--accent-purple);
+            margin-top: 0;
+            border-bottom: 1px solid var(--accent-gold-light);
+            padding-bottom: 10px;
+        }
+        #intro-modal h3 {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+        #intro-modal p {
+            margin: 5px 0;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        #intro-modal ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        #intro-modal li {
+            margin-bottom: 5px;
+        }
+        .intro-footer {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .start-btn {
+            background-color: var(--accent-gold);
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            transition: all 0.2s;
+        }
+        .start-btn:hover { background-color: var(--accent-purple); transform: translateY(-2px); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popUp { to { transform: scale(1); opacity: 1; } }
+
+        /* --- 右側：地圖面板 (60%) --- */
+        .map-panel {
+            width: 60%;
+            height: 100%;
+            position: relative;
+            background-color: #EFEFEF;
+        }
+
+        #map { width: 100%; height: 100%; z-index: 10; }
+        
+        /* 地圖濾鏡 (深色模式用) */
+        .leaflet-layer {
+            filter: var(--map-filter);
+        }
+
+        /* Leaflet 自定義樣式優化 */
+        .leaflet-tooltip {
+            font-family: 'Noto Serif TC', serif;
+            border: none !important;
+            border-radius: 2px !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: #3E3226 !important; /* Tooltip 保持深色文字以利閱讀，不受 Dark Mode 影響太多 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+            padding: 6px 12px !important;
+            font-size: 0.9rem;
+        }
+        .tooltip-current {
+            border-left: 3px solid var(--accent-red) !important;
+        }
+        .tooltip-past {
+            color: #6B5B4E !important;
+            opacity: 0.9;
+        }
+        
+        .chapter-tag {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75em;
+            color: var(--accent-gold);
+            font-weight: bold;
+            margin-right: 6px;
+            text-transform: uppercase;
+        }
+        .tooltip-current .chapter-tag { color: var(--accent-red); }
+
+        /* [NEW] 縮放時隱藏詳細資訊的 CSS 邏輯 */
+        .map-zoomed-out .tooltip-past .tooltip-detail { display: none; }
+        .map-zoomed-out .tooltip-current .tooltip-detail { display: block; }
+        .tooltip-past:hover .tooltip-detail { display: block; }
+
+        /* 手機版 RWD 設定：更優化的比例 */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            
+            .map-panel { 
+                order: 1; 
+                width: 100%; 
+                height: 35vh; 
+                flex-shrink: 0;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                z-index: 30;
+            }
+            
+            .story-panel { 
+                order: 2; 
+                width: 100%; 
+                height: 65vh; 
+                border-right: none; 
+                border-top: none;
+                padding: 25px 20px;
+                background-image: none;
+                background-color: var(--bg-paper);
+            }
+            
+            h1 { font-size: 1.4em; } 
+            .subtitle { font-size: 1em; margin-bottom: 5px;}
+            .bible-ref-badge { font-size: 0.7em; }
+            .story-content { font-size: 1.05rem; line-height: 1.8; }
+            
+            .witness-section { margin-bottom: 10px; }
+            .nav-buttons-container { padding-top: 10px; }
+            .nav-btn { padding: 10px; font-size: 0.9rem; }
+            .toolbar { top: 15px; right: 15px; } /* 手機版調整工具列位置 */
+            
+            /* 手機版彈窗調整 */
+            .modal-content {
+                width: 90%;
+                padding: 25px 20px;
+                max-height: 80vh; /* 避免鍵盤或瀏覽器工具列遮擋 */
+            }
+            .modal-speaker { font-size: 1.4rem; }
+            .modal-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左側故事區 -->
+    <div class="story-panel">
+        
+        <!-- 工具列 -->
+        <div class="toolbar">
+            <button class="tool-btn" onclick="toggleTheme()" title="切換深/淺色模式">🌙</button>
+            <button class="tool-btn" onclick="openIntro()" title="使用說明與簡介">ℹ️</button>
+        </div>
+
+        <header>
+            <span class="chapter-label">Chapter <span id="chapter-num">1</span></span>
+            <h1 id="chapter-title">牧羊少年受膏</h1>
+            
+            <div class="header-meta">
+                <span class="subtitle" id="chapter-subtitle">被遺忘的第八子</span>
+                <span id="bible-ref" class="bible-ref-badge">撒上 16:1-13</span>
+            </div>
+        </header>
+
+        <div class="story-scroll-container">
+            <div class="story-content">
+                <div id="story-text">故事載入中...</div>
+            </div>
+        </div>
+
+        <div class="witness-section">
+            <div class="character-controls" id="char-buttons"></div>
+        </div>
+
+        <div class="nav-buttons-container">
+            <!-- 加入 ID 方便 JS 控制 -->
+            <button id="btn-prev" class="nav-btn prev" onclick="prevChapter()">
+                ← 上一章
+            </button>
+            <button id="btn-next" class="nav-btn next" onclick="nextChapter()">
+                下一章 →
+            </button>
+        </div>
+    </div>
+
+    <!-- 人物內心獨白彈窗 -->
+    <div class="modal-overlay" id="monologue-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal()">×</button>
+            
+            <!-- Header 固定 -->
+            <div class="modal-header">
+                <h2 class="modal-speaker" id="modal-name">名字</h2>
+                <div class="modal-role-text" id="modal-role">角色</div>
+            </div>
+            
+            <!-- 可捲動的文字區域 -->
+            <div class="modal-scroll-area">
+                <p class="modal-text" id="modal-text">內容...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 歡迎/說明彈窗 -->
+    <div class="modal-overlay" id="intro-modal" onclick="closeIntro(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeIntro()">×</button>
+            <div class="modal-scroll-area"> <!-- 讓說明內容也可捲動 -->
+                <h2>大衛：合神心意的人</h2>
+                
+                <p>歡迎來到大衛王的生命旅程。這是一個互動式的聖經地圖，讓您身歷其境地跟隨大衛的腳蹤，從伯利恆的牧羊場直到耶路撒冷的王座。</p>
+                
+                <h3>📜 如何使用</h3>
+                <ul>
+                    <li><b>閱讀故事</b>：左側卷軸記載了大衛一生的關鍵時刻。</li>
+                    <li><b>地圖互動</b>：右側地圖顯示事件發生地點。點擊地圖上的標籤可直接跳轉章節。</li>
+                    <li><b>聆聽心聲</b>：點擊下方的人物徽章，查看當時人物的內心獨白或大衛所寫的詩篇。</li>
+                    <li><b>深色模式</b>：點擊右上角的月亮圖示，可切換舒適的夜間閱讀模式。</li>
+                </ul>
+
+                <h3>👑 關於大衛</h3>
+                <p>以色列第二任君王，耶西之子。他是一位戰士、詩人、君王，更是一位「合神心意的人」。他的一生雖有軟弱與跌倒，但他對神的絕對信靠與真實悔改，成為後世信徒的榜樣。</p>
+
+                <div class="intro-footer">
+                    <button class="start-btn" onclick="closeIntro()">開始旅程</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側地圖區 -->
+    <div class="map-panel">
+        <div id="map"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <!-- 引入外部資料檔 -->
+    <script src="david_datas.js"></script>
+
+    <!-- === 主程式 (main.js) === -->
+    <script>
+    let currentChapterIndex = 0;
+    let map = null;
+    let markers = []; 
+    let routeLine = null;
+
+    // --- 主題切換邏輯 ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', newTheme);
+        
+        // 更新按鈕圖示
+        const btn = document.querySelector('.tool-btn[onclick="toggleTheme()"]');
+        btn.innerText = newTheme === 'light' ? '🌙' : '☀️';
+    }
+
+    // --- 歡迎彈窗邏輯 ---
+    function openIntro() {
+        document.getElementById('intro-modal').style.display = 'flex';
+    }
+
+    function closeIntro(event) {
+        // 如果是點擊背景或關閉按鈕
+        if (!event || event.target === document.getElementById('intro-modal') || event.target.classList.contains('modal-close-btn') || event.target.classList.contains('start-btn')) {
+            document.getElementById('intro-modal').style.display = 'none';
+        }
+    }
+
+    function initMap() {
+        if (map) return; 
+
+        map = L.map('map', {
+            zoomControl: false,
+            attributionControl: false 
+        }).setView([31.7683, 35.2137], 10);
+
+        // 使用 Google Maps 繁體中文圖層
+        L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', {
+            maxZoom: 20,
+            attribution: '© Google'
+        }).addTo(map);
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        // 監聽縮放事件
+        map.on('zoomend', function() {
+            const zoom = map.getZoom();
+            const mapContainer = map.getContainer();
+            if (zoom < 11) {
+                mapContainer.classList.add('map-zoomed-out');
+            } else {
+                mapContainer.classList.remove('map-zoomed-out');
+            }
+        });
+    }
+
+    const roleIcons = {
+        'david': '👑', 'prophet': '📜', 'enemy': '⚔️', 'default': '👤'
+    };
+
+    function renderChapter(index) {
+        if (typeof storyData === 'undefined') {
+            console.error("storyData 未載入");
+            return;
+        }
+
+        const data = storyData[index];
+
+        // UI 更新
+        document.getElementById('chapter-num').innerText = index + 1;
+        document.getElementById('chapter-title').innerText = data.title;
+        document.getElementById('chapter-subtitle').innerText = data.subtitle;
+        document.getElementById('bible-ref').innerText = data.bibleRef; 
+        
+        const storyText = document.getElementById('story-text');
+        storyText.style.opacity = 0;
+        setTimeout(() => { storyText.innerText = data.story; storyText.style.opacity = 1; }, 200);
+
+        // 生成人物按鈕
+        const btnContainer = document.getElementById('char-buttons');
+        btnContainer.innerHTML = ''; 
+        
+        if(data.characters && data.characters.length > 0) {
+            document.querySelector('.witness-section').style.display = 'flex';
+            data.characters.forEach(char => {
+                const btn = document.createElement('button');
+                const type = char.type || 'default';
+                btn.className = `char-btn type-${type}`;
+                btn.innerHTML = `<span class="char-icon">${roleIcons[type] || roleIcons['default']}</span><span class="char-name">${char.name}</span>`;
+                // 直接傳入 char 物件，讓 openModal 判斷是否為詩篇
+                btn.onclick = () => openModal(char);
+                btnContainer.appendChild(btn);
+            });
+        } else {
+            document.querySelector('.witness-section').style.display = 'none';
+        }
+
+        // 導航按鈕顯示/隱藏
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
+
+        if (index === 0) {
+            prevBtn.style.visibility = 'hidden';
+        } else {
+            prevBtn.style.visibility = 'visible';
+        }
+
+        if (index >= storyData.length - 1) {
+            nextBtn.style.visibility = 'hidden';
+        } else {
+            nextBtn.style.visibility = 'visible';
+        }
+
+        updateMapMarkers(index);
+    }
+
+    // 全域函式，供 Tooltip onclick 使用
+    window.jumpToChapter = function(index) {
+        currentChapterIndex = index;
+        renderChapter(index);
+    };
+
+    function updateMapMarkers(currentIndex) {
+        if (!map) initMap();
+        
+        setTimeout(() => { 
+            map.invalidateSize(); 
+
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+            if (routeLine) map.removeLayer(routeLine);
+
+            let routePoints = [];
+
+            for (let i = 0; i <= currentIndex; i++) {
+                const d = storyData[i];
+                const isCurrent = (i === currentIndex);
+                const lat = parseFloat(d?.lat);
+                const lng = parseFloat(d?.lng);
+                
+                if (isNaN(lat) || isNaN(lng)) continue;
+                
+                routePoints.push([lat, lng]);
+
+                // 樣式設定
+                const color = isCurrent ? '#8A3324' : '#B49B67'; 
+                const size = isCurrent ? 40 : 12; 
+                const zIndex = isCurrent ? 1000 : 1;
+
+                let iconSvg;
+                if (isCurrent) {
+                    iconSvg = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${color}" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+                            <circle cx="12" cy="9" r="2.5" fill="white"></circle>
+                        </svg>
+                    `;
+                } else {
+                    iconSvg = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" fill="${color}" stroke="#fff" stroke-width="3"/>
+                        </svg>
+                    `;
+                }
+                
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: iconSvg,
+                    iconSize: [size, size],
+                    iconAnchor: [size/2, isCurrent ? size : size/2],
+                    tooltipAnchor: [0, isCurrent ? -size + 5 : -size/2]
+                });
+
+                const marker = L.marker([lat, lng], { 
+                    icon: customIcon,
+                    zIndexOffset: zIndex,
+                    interactive: true 
+                }).addTo(map);
+
+                // Tooltip 內容
+                const tooltipContent = `
+                    <div style="text-align:center; cursor: pointer;" onclick="jumpToChapter(${i}); event.stopPropagation();">
+                        <span class="chapter-tag">Ch.${i + 1}</span>
+                        <div class="tooltip-detail">
+                            <b>${d.title}</b><br>
+                            <small style="color:#666">${d.locationName}</small>
+                        </div>
+                    </div>
+                `;
+
+                marker.bindTooltip(tooltipContent, {
+                    permanent: true, 
+                    direction: 'top',
+                    className: isCurrent ? 'tooltip-current' : 'tooltip-past',
+                    offset: [0, -10],
+                    interactive: true // 允許 Tooltip 接收點擊
+                });
+
+                marker.on('click', () => {
+                    currentChapterIndex = i;
+                    renderChapter(i);
+                });
+
+                if (isCurrent) {
+                    try {
+                        map.flyTo([lat, lng], 13, { duration: 1.5 });
+                    } catch (e) {
+                        map.setView([lat, lng], 13);
+                    }
+                }
+
+                markers.push(marker);
+            }
+
+            if (routePoints.length > 1) {
+                routeLine = L.polyline(routePoints, {
+                    color: '#B49B67',
+                    weight: 3,
+                    opacity: 0.6,
+                    dashArray: '6, 8',
+                    lineCap: 'round'
+                }).addTo(map);
+            }
+            
+            map.fire('zoomend');
+            
+        }, 100);
+    }
+
+    function openModal(char) {
+        const modal = document.getElementById('monologue-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // 重置樣式
+        modalContent.classList.remove('psalm-font');
+
+        // 判斷是否為詩篇，若為詩篇則套用特殊字體 class
+        if (char.name.includes("詩篇") || (char.role && char.role.includes("詩"))) {
+            modalContent.classList.add('psalm-font');
+        }
+
+        document.getElementById('modal-name').innerText = char.name;
+        document.getElementById('modal-role').innerText = char.role;
+        // 使用 innerHTML 來支援 <br> 標籤
+        document.getElementById('modal-text').innerHTML = char.monologue;
+        modal.style.display = 'flex';
+    }
+
+    function closeModal(event) {
+        const modal = document.getElementById('monologue-modal');
+        modal.style.display = 'none';
+    }
+
+    function prevChapter() {
+        if (currentChapterIndex > 0) {
+            currentChapterIndex--;
+            renderChapter(currentChapterIndex);
+        }
+    }
+
+    function nextChapter() {
+        if (currentChapterIndex < storyData.length - 1) {
+            currentChapterIndex++;
+            renderChapter(currentChapterIndex);
+        } else {
+            alert("旅程已到終點。");
+        }
+    }
+
+    window.onload = () => {
+        // 自動顯示使用說明 (可選)
+        openIntro();
+        
+        initMap();
+        setTimeout(() => {
+            renderChapter(0);
+        }, 100);
+    };
+    </script>
+
+</body>
+</html>
