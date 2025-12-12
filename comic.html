@@ -461,11 +461,12 @@
                         
                         <div class="md:col-span-4 flex flex-col gap-4">
                             <!-- Action Panel (Clickable Modal) -->
-                            <div onclick="app.openInfoModal('ACTION', '${story.actionText}', 'swords', 'text-blue-600', '${story.videoUrl || ''}')" 
+                            <!-- ⬇️ 修改：將 ACTION 改為 EPIC MOMENT -->
+                            <div onclick="app.openInfoModal('EPIC MOMENT', '${story.actionText}', 'swords', 'text-blue-600', '${story.videoUrl || ''}')" 
                                  class="comic-panel bg-blue-600 p-6 text-white text-center flex-grow flex flex-col justify-center items-center cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden group">
                                 <div>
                                     <i data-lucide="swords" width="48" height="48" class="mb-2 mx-auto"></i>
-                                    <h3 class="font-black text-2xl">ACTION</h3>
+                                    <h3 class="font-black text-2xl">EPIC MOMENT</h3>
                                     <span class="text-xs bg-black text-white px-2 py-1 mt-2 inline-block transform -rotate-2 group-hover:rotate-0 transition-transform">CLICK TO VIEW!</span>
                                 </div>
                             </div>
@@ -557,9 +558,10 @@
 
             // 開啟 Action/Faith 彈窗
             openInfoModal(type, text, iconName, colorClass, videoUrl = '') {
-                // 如果是 ACTION 類型且有影片網址，則生成影片 HTML
+                // 如果是 EPIC MOMENT 類型且有影片網址，則生成影片 HTML
                 let videoHtml = '';
-                if (type === 'ACTION' && videoUrl) {
+                // ⬇️ 修改：判斷條件更新為 EPIC MOMENT
+                if (type === 'EPIC MOMENT' && videoUrl) {
                     // 使用 HTML5 <video> 標籤
                     // ⬇️ 修改：移除 max-w-lg，保留 w-full，讓影片填滿變寬的視窗
                     // 修改：mb-6 -> mb-4 減少影片下方間距
@@ -589,7 +591,8 @@
 
                         <div class="comic-panel bg-white p-6 relative w-full transform rotate-1">
                              <span class="absolute -top-3 -left-2 bg-yellow-400 border-2 border-black px-2 py-1 text-xs font-black transform -rotate-3">
-                                ${type === 'ACTION' ? 'KEY MOMENT' : 'THE LESSON'}
+                                <!-- ⬇️ 修改：更新子標題顯示 -->
+                                ${type === 'EPIC MOMENT' ? 'THE HIGHLIGHT' : 'THE LESSON'}
                              </span>
                              <p class="text-lg md:text-2xl font-bold leading-relaxed text-gray-900" style="font-family: 'Bangers', 'Noto Sans TC';">
                                 "${text}"
