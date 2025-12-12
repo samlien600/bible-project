@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content=">BIBLE HEROES - 聖經傳奇">
+    <title>BIBLE HEROES - 聖經傳奇</title>
+    <!-- 引入 Tailwind CSS 用於佈局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: 選擇粗獷的字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>   
+    <style>
+        /* --- 美漫風格核心樣式 --- */
+        :root {
+            --marvel-red: #EC1D24;
+            --comic-yellow: #F9D048;
+            --comic-blue: #0277BD;
+            --ink-black: #121212;
+            --pure-white: #ffffff;
+            --dot-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f0f0;
+            background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+            background-size: 20px 20px; /* Ben-Day dots effect */
+            color: var(--ink-black);
+            overflow-x: hidden;
+        }
+
+        /* 標題字體 */
+        .comic-font {
+            font-family: 'Bangers', 'Noto Sans TC', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* 漫畫面板邊框 */
+        .comic-panel {
+            background: var(--pure-white);
+            border: 4px solid var(--ink-black);
+            box-shadow: 8px 8px 0px var(--ink-black);
+            transition: transform 0.2s ease;
+        }
+
+        .comic-panel:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 12px 12px 0px var(--ink-black);
+        }
+
+        /* 漫畫按鈕 */
+        .btn-comic {
+            background-color: var(--marvel-red);
+            color: white;
+            border: 3px solid var(--ink-black);
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--ink-black);
+            transition: all 0.1s;
+            clip-path: polygon(5% 0%, 100% 0%, 100% 90%, 95% 100%, 0% 100%, 0% 10%);
+        }
+
+        .btn-comic:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--ink-black);
+        }
+
+        /* 斜切風格 */
+        .skew-section {
+            transform: skewY(-2deg);
+        }
+        .unskew {
+            transform: skewY(2deg);
+        }
+
+        /* 英雄卡片 */
+        .hero-card {
+            position: relative;
+            background: linear-gradient(135deg, #222, #444);
+            border: 4px solid var(--comic-yellow);
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .hero-card:hover {
+            transform: scale(1.05) rotate(1deg);
+            z-index: 10;
+            border-color: var(--marvel-red);
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.9));
+            z-index: 1;
+        }
+
+        /* 模態框背景 */
+        .modal-overlay {
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(5px);
+        }
+
+        /* 對話氣泡 */
+        .speech-bubble {
+            background: var(--pure-white);
+            border: 3px solid var(--ink-black);
+            position: relative;
+            padding: 15px;
+            border-radius: 20px;
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 30px;
+            border-width: 15px 15px 0;
+            border-style: solid;
+            border-color: var(--ink-black) transparent;
+            display: block;
+            width: 0;
+        }
+
+        /* 狀態條 */
+        .stat-bar-bg {
+            background: #333;
+            height: 10px;
+            border: 2px solid var(--ink-black);
+        }
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--comic-yellow);
+        }
+
+        /* 動畫 */
+        @keyframes pow {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pow {
+            animation: pow 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- 頂部導航 -->
+    <header class="bg-black text-white py-4 border-b-4 border-red-600 sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="app.renderHome()">
+                <!-- 修正：將 tracking-tighter 改為 tracking-widest，增加字距 -->
+                <div class="bg-red-600 text-white font-black px-2 py-1 text-2xl border-2 border-white comic-font tracking-widest transform -rotate-2">
+                    BIBLE
+                </div>
+                <span class="text-2xl font-bold italic tracking-wider comic-font text-yellow-400">HEROES</span>
+            </div>
+            <!-- 修改：將原本的 scrollTo(0,0) 改為 app.renderHome()，並將文字改為 首頁 HOME -->
+            <button onclick="app.renderHome()" class="text-sm font-bold bg-white text-black px-3 py-1 skew-x-[-10deg] border-2 border-yellow-400 hover:bg-yellow-400">
+                <span class="skew-x-[10deg] inline-block">首頁 HOME</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main id="app-container" class="flex-grow container mx-auto px-4 py-8">
+        <!-- 內容將由 JS 動態生成 -->
+    </main>
+
+    <!-- 頁腳 -->
+    <footer class="bg-black text-gray-500 py-8 text-center border-t-8 border-yellow-400 mt-auto">
+        <p class="text-sm font-bold">THE GREATEST STORIES EVER TOLD.</p>
+        <p class="text-xs mt-2">Designed with Marvelous Style</p>
+    </footer>
+
+    <!-- 人物詳情模態框 (隱藏) -->
+    <div id="character-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="modal-overlay absolute inset-0 w-full h-full" onclick="app.closeModal()"></div>
+        <!-- ⬇️ 修改：將 max-w-2xl 改為 max-w-5xl，讓視窗變得更寬 -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-4">
+            <!-- 模態框內容 -->
+            <div id="modal-content" class="bg-white border-4 border-black shadow-[15px_15px_0px_rgba(236,29,36,1)] relative animate-pow">
+                <button onclick="app.closeModal()" class="absolute -top-6 -right-6 bg-yellow-400 hover:bg-yellow-300 border-4 border-black text-black w-12 h-12 flex items-center justify-center font-black text-xl rounded-full shadow-lg z-10">X</button>
+                <div id="modal-body" class="p-6 md:p-8 max-h-[80vh] overflow-y-auto">
+                    <!-- JS 填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ------------------------------------------
+        // 數據資料庫 (模擬 JSON)
+        // ------------------------------------------
+        const db = {
+            stories: [
+                {
+                    id: 1,
+                    title: "巨人之戰",
+                    subtitle: "THE GIANT SLAYER",
+                    coverImage: "image/comic/david.png", 
+                    coverColor: "bg-orange-600",
+                    description: "以拉谷的空氣凝結了。四十天來，非利士人的冠軍戰士——身高近三米的巨人歌利亞，如同一座移動的鋼鐵堡壘，每日在陣前咆哮，他的聲音如雷鳴般震撼著大地，讓以色列全軍在恐懼中顫抖。<br><br>沒有人敢應戰，直到一個年輕的牧羊人出現。大衛，他不穿盔甲，不拿刀劍，只帶著牧羊的杖和溪中撿來的五顆光滑石子。這是一場看似絕對不對稱的戰鬥，是血肉之軀對抗青銅重甲。<br><br>但這更是一場信仰的對決！大衛眼中的歌利亞不是無敵的巨人，而是一個膽敢羞辱永生神軍隊的狂妄之徒。當機弦在空中呼嘯，時間彷彿靜止，那顆承載著絕對信心的石子劃破長空——轟然一聲，巨人倒下，大地為之震動！",
+                    chapter: "撒母耳記上 17章",
+                    bibleUrl: "https://www.bible.com/zh-TW/bible/46/1SA.17.CUNP-%E7%A5%9E",
+                    actionText: "機弦甩石，正中眉心！巨人倒下，戰局瞬間逆轉！",
+                    videoUrl: "video/comic/david.mp4", 
+                    faithText: "真正的力量不來自於手中握有多重的兵器，也不取決於身上穿戴多厚的鎧甲。當面對生命中如巨人般無法撼動的恐懼時，致勝的關鍵不在於我們有多強大，而在於我們所倚靠的那位神有多偉大。信心，就是看見神比眼前的巨人更大！",
+                    characters: [101, 102]
+                },
+                {
+                    id: 2,
+                    title: "紅海奇蹟",
+                    subtitle: "EXODUS: THE PATH",
+                    coverImage: "image/comic/moses.png", 
+                    coverColor: "bg-blue-700",
+                    description: "絕望籠罩著以色列營地。前方是波濤洶湧、深不見底的紅海，後方是法老親率的六百輛特選戰車，馬蹄聲與車輪聲捲起漫天黃沙，如死神的腳步逼近。<br><br>百姓哭號，但在這生死存亡之際，神對摩西說：『你舉手向海伸杖！』<br><br>那一刻，天地變色。強烈的東風呼嘯了一整夜，在震耳欲聾的轟鳴聲中，海水竟然向兩側分開，立起如藍寶石般透明的高牆！海床上露出了乾地，雲柱在後方阻擋埃及軍隊的視線，火柱在前方照亮自由之路。這是一場史詩般的撤退，是人類歷史上神大能最壯麗的彰顯，宣告著從奴役走向自由的道路已經開啟！",
+                    chapter: "出埃及記 14章",
+                    bibleUrl: "https://www.bible.com/zh-TW/bible/46/EXO.14.CUNP-%E7%A5%9E",
+                    actionText: "手杖一揮，驚濤駭浪立起如牆，開出生命之路！",
+                    videoUrl: "video/comic/moses.mp4", 
+                    faithText: "當前無去路、後有追兵，人生陷入絕望的死胡同那一刻，正是神蹟即將發生的前奏。人的盡頭往往是神的起頭。我們不需要驚慌奔跑，只需要在信心裡「站住」，你將親眼看見神如何在洶湧的怒海中，為你劈開一條通往自由的康莊大道。",
+                    characters: [103, 104]
+                },
+                {
+                    id: 3,
+                    title: "獅坑中的先知",
+                    subtitle: "LIONS' DEN",
+                    coverImage: "image/comic/daniel.png", 
+                    coverColor: "bg-purple-700",
+                    description: "巴比倫的輝煌宮殿下，隱藏著致命的陰謀。嫉妒的總長們設下完美的陷阱，逼迫年邁的忠心先知在神與王之間做出選擇。禁令已下，違者必死。<br><br>但以理沒有絲毫猶豫。他依然面向耶路撒冷，一日三次雙膝跪地，窗戶開著，禱告聲如常。他被扔進了充滿飢餓猛獅的深坑，那裡的黑暗與腥臭令人窒息。封石蓋上，死亡似乎已成定局。<br><br>然而，奇蹟降臨了！神的榮光照亮了幽暗的坑底，天使封住了獅子的口。那些原本能撕碎鋼鐵的猛獸，此刻竟如溫馴的小貓般趴伏在先知腳旁。這一夜，王在宮中輾轉難眠，而先知在獅坑中安然入睡。清晨的第一縷陽光，見證了信心的勝利與全能者的保護。",
+                    chapter: "但以理書 6章",
+                    bibleUrl: "https://www.bible.com/zh-TW/bible/46/DAN.6.CUNP-%E7%A5%9E",
+                    actionText: "天使降臨，猛獅閉口！整夜安然無恙，毫髮無傷。",
+                    videoUrl: "video/comic/daniel.mp4", 
+                    faithText: "堅守信仰有時會把人帶入獅坑，但環境從不決定結局，掌權的是神。祂能封住獅子的口；祂也可允許試煉臨到。無論結果如何，神的主權從未動搖，你的一生始終在祂手中。",
+                    characters: [105, 106]
+                }
+            ],
+            characters: {
+                101: {
+                    name: "大衛",
+                    alias: "The Shepherd King",
+                    role: "英雄 / 牧羊人",
+                    portrait: "image/comic/david_char.png",
+                    stats: { faith: 100, strength: 60, courage: 95 },
+                    imageIcon: "crown",
+                    color: "text-blue-600",
+                    bio: "伯利恆耶西的最小兒子，被家人遺忘在荒野牧羊。當哥哥們練習戰技時，他在陰暗的山谷中與獅子和熊搏鬥，保護羊群。在孤獨中，他磨練出精準的甩石技巧，並彈琴讚美造物主。雖然外貌不被看重，卻被先知撒母耳膏立，因為神看重的是他那顆敬畏神勝過敬畏巨人的心。",
+                    verse: "你來攻擊我，是靠着刀槍和銅戟；我來攻擊你，是靠着萬軍之耶和華的名，就是你所怒罵帶領以色列軍隊的神。今日耶和華必將你交在我手裏。我必殺你，斬你的頭，又將非利士軍兵的屍首給空中的飛鳥、地上的野獸吃，使普天下的人都知道以色列中有神；又使這眾人知道耶和華使人得勝，不是用刀用槍，因為爭戰的勝敗全在乎耶和華。他必將你們交在我們手裏。",
+                    source: "撒母耳記上 17:45-47"
+                },
+                102: {
+                    name: "歌利亞",
+                    alias: "The Titan",
+                    role: "反派 / 戰士",
+                    portrait: "image/comic/goliath_char.png",
+                    stats: { faith: 0, strength: 100, courage: 80 },
+                    imageIcon: "sword",
+                    color: "text-red-700",
+                    bio: "來自迦特的冠軍戰士，擁有亞那族巨人的血統，身高近三米，宛如一座移動的青銅堡壘。身穿重達五千舍客勒的鱗甲，他是非利士軍事力量的巔峰象徵。從未嘗過敗績的他，視以色列軍隊如草芥。他的傲慢如同他的盾牌一樣厚重，使他看不見一個事實：在全能神面前，體型毫無意義。",
+                    verse: "你們出來擺列隊伍做甚麼呢？我不是非利士人嗎？你們不是掃羅的僕人嗎？可以從你們中間揀選一人，使他下到我這裏來。他若能與我戰鬥，將我殺死，我們就作你們的僕人；我若勝了他，將他殺死，你們就作我們的僕人，服事我們。",
+                    source: "撒母耳記上 17:8-9"
+                },
+                103: {
+                    name: "摩西",
+                    alias: "The Deliverer",
+                    role: "領袖 / 先知",
+                    portrait: "image/comic/moses_char.png",
+                    stats: { faith: 90, strength: 40, leadership: 100 },
+                    imageIcon: "waves",
+                    color: "text-cyan-600",
+                    bio: "從尼羅河被拉起，在埃及皇宮的奢華中長大，摩西活在兩個世界之間——身分是埃及王子，血統卻是希伯來奴隸。在米甸曠野流亡四十年後，他從一個衝動的殺人者轉變為謙卑的牧羊人。在燃燒的荊棘中，自有永有的神呼召了他。他不靠口才，單靠一根牧羊杖和神的應許，重返埃及挑戰地表最強大的帝國。",
+                    verse: "不要懼怕，只管站住！看耶和華今天向你們所要施行的救恩。因為，你們今天所看見的埃及人必永遠不再看見了。耶和華必為你們爭戰；你們只管靜默，不要作聲。",
+                    source: "出埃及記 14:13-14"
+                },
+                104: {
+                    name: "法老",
+                    alias: "The Tyrant",
+                    role: "反派 / 統治者",
+                    portrait: "image/comic/pharaoh_char.png",
+                    stats: { faith: 0, strength: 85, pride: 100 },
+                    imageIcon: "pyramid",
+                    color: "text-yellow-600",
+                    bio: "端坐在尼羅河畔的王座上，自視為拉神之子，地上的神明。他的心因驕傲和權力而剛硬，拒絕向奴隸的神低頭。儘管目睹尼羅河變血、蒼蠅成災、長子被殺，他仍選擇與神對抗到底。他象徵著世俗權力對抗神權的極致頑梗，寧願葬送整支軍隊，也不願承認自己並非至高無上。",
+                    verse: "耶和華是誰，使我聽他的話，容以色列人去呢？我不認識耶和華，也不容以色列人去！",
+                    source: "出埃及記 5:2"
+                },
+                105: {
+                    name: "但以理",
+                    alias: "The Wise",
+                    role: "先知 / 宰相",
+                    portrait: "image/comic/daniel_char.png",
+                    stats: { faith: 100, wisdom: 100, integrity: 95 },
+                    imageIcon: "scroll",
+                    color: "text-indigo-600",
+                    bio: "少年時期被擄至巴比倫，失去了家園卻未失去身份。在充滿巫術與奢華的異教宮廷中，他立志不以王的膳食玷污自己。神賜給他超越常人的智慧與解夢的能力，使他在歷代王朝中屹立不倒。他的正直引來了同僚的嫉妒與陷害，最終被扔入獅子坑——這是對他一生堅持每日三次向耶路撒冷禱告的終極試煉。",
+                    verse: "我的神差遣使者，封住獅子的口，叫獅子不傷我；因我在神面前無辜，我在王面前也沒有行過虧損的事。",
+                    source: "但以理書 6:22"
+                },
+                106: {
+                    name: "大流士王",
+                    alias: "The King",
+                    role: "國王 / 見證者",
+                    portrait: "image/comic/darius_char.png",
+                    stats: { faith: 50, power: 90, regret: 80 },
+                    imageIcon: "castle",
+                    color: "text-gray-600",
+                    bio: "瑪代波斯帝國的君王，雖然喜愛但以理，卻因受騙簽署了不可更改的禁令，無奈將但以理扔入獅坑。被迫將最信任的顧問送入死地後，他在宮中徹夜禁食、輾轉難眠。他的見證顯示，即便是擁有生殺大權的外邦君王，在神的大能面前也不得不降服，並最終下旨讓全地的人都敬畏但以理的神。",
+                    verse: "永生神的僕人但以理啊，你所常事奉的神能救你脫離獅子嗎？",
+                    source: "但以理書 6:20"
+                }
+            }
+        };
+
+        // ------------------------------------------
+        // 應用程式邏輯
+        // ------------------------------------------
+        const app = {
+            container: document.getElementById('app-container'),
+            modal: document.getElementById('character-modal'),
+            modalBody: document.getElementById('modal-body'),
+
+            init() {
+                this.renderHome();
+                lucide.createIcons();
+            },
+
+            // 渲染首頁：故事清單
+            renderHome() {
+                let html = `
+                    <div class="text-center mb-10 animate-pow">
+                        <h1 class="text-5xl md:text-7xl font-black italic mb-2 tracking-tighter" style="-webkit-text-stroke: 2px black; color: white; text-shadow: 5px 5px 0 #ec1d24;">
+                            CHOOSE YOUR SAGA
+                        </h1>
+                        <p class="text-xl font-bold bg-yellow-400 inline-block px-4 py-1 border-2 border-black transform -rotate-1">
+                            點擊封面閱讀故事
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                `;
+
+                db.stories.forEach(story => {
+                    // 判斷背景：如果有圖片則使用圖片，否則使用原本的顏色與網點
+                    let backgroundHtml = '';
+                    if (story.coverImage) {
+                        backgroundHtml = `
+                            <div class="absolute inset-0 z-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" 
+                                 style="background-image: url('${story.coverImage}');"></div>
+                            <!-- 黑色遮罩，確保文字清晰 -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-60 z-0"></div>
+                        `;
+                    } else {
+                        backgroundHtml = `
+                            <div class="absolute inset-0 ${story.coverColor} opacity-90 z-0"></div>
+                            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/halftone.png')] opacity-30 z-0"></div>
+                        `;
+                    }
+
+                    html += `
+                        <div onclick="app.renderStory(${story.id})" class="comic-panel cursor-pointer group relative overflow-hidden h-96 flex flex-col justify-between">
+                            <!-- 封面背景 (動態生成) -->
+                            ${backgroundHtml}
+                            
+                            <!-- 標題 -->
+                            <div class="relative z-10 p-6">
+                                <span class="bg-black text-white px-2 py-1 text-xs font-bold mb-2 inline-block">ISSUE #${story.id}</span>
+                                <h2 class="text-4xl font-black text-white uppercase italic leading-none" style="text-shadow: 3px 3px 0 #000;">${story.title}</h2>
+                                <h3 class="text-xl font-bold text-yellow-300 mt-1 uppercase">${story.subtitle}</h3>
+                            </div>
+
+                            <!-- 中間裝飾圖示 (只有在沒有背景圖時顯示，避免擋住圖片) -->
+                            ${!story.coverImage ? `
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-0 opacity-20 text-black">
+                                <i data-lucide="book-open" width="150" height="150"></i>
+                            </div>` : ''}
+
+                            <!-- 底部資訊 -->
+                            <div class="relative z-10 bg-white border-t-4 border-black p-4 skew-y-2 mt-auto transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                <div class="transform -skew-y-2 flex justify-between items-center">
+                                    <span class="font-bold text-sm text-gray-600">${story.chapter}</span>
+                                    <span class="text-red-600 font-black flex items-center gap-1">
+                                        READ NOW <i data-lucide="arrow-right-circle" width="16"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                this.container.innerHTML = html;
+                lucide.createIcons();
+                window.scrollTo(0,0);
+            },
+
+            // 渲染詳情頁
+            renderStory(id) {
+                const story = db.stories.find(s => s.id === id);
+                if (!story) return;
+
+                let html = `
+                    <!-- 導航返回 -->
+                    <button onclick="app.renderHome()" class="mb-6 btn-comic px-4 py-2 flex items-center gap-2">
+                        <i data-lucide="arrow-left" width="20"></i> BACK TO LIST
+                    </button>
+
+                    <!-- 故事標題區 -->
+                    <div class="bg-black text-white p-6 md:p-10 border-4 border-red-600 shadow-[8px_8px_0_#facc15] mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-10 opacity-10">
+                            <i data-lucide="zap" width="200" height="200" color="white"></i>
+                        </div>
+                        <h1 class="text-5xl md:text-6xl font-black italic uppercase relative z-10">${story.title}</h1>
+                        <p class="text-yellow-400 font-bold text-xl mt-2 tracking-widest relative z-10">${story.chapter}</p>
+                    </div>
+
+                    <!-- ⬇️ 新增：顯眼的閱讀聖經按鈕 -->
+                    <div class="mb-12 text-center animate-pow" style="animation-delay: 0.1s;">
+                        <a href="${story.bibleUrl}" target="_blank" class="inline-flex items-center gap-3 bg-yellow-400 text-black border-4 border-black px-8 py-4 text-2xl font-black italic transform -rotate-1 hover:rotate-0 hover:scale-110 transition-all shadow-[8px_8px_0_#000] group decoration-0">
+                            <i data-lucide="book-open-check" width="32" height="32"></i>
+                            <span>READ BIBLE / 閱讀經文</span>
+                            <i data-lucide="external-link" width="24" height="24" class="group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+
+                    <!-- 故事內容 (漫畫分鏡感) -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-16">
+                        <div class="md:col-span-8 comic-panel p-8 bg-white relative">
+                            <span class="absolute -top-4 -left-4 bg-yellow-400 border-2 border-black px-3 py-1 font-black transform -rotate-3">THE STORY</span>
+                            <!-- 使用 innerHTML 渲染描述，允許 <br> 換行 -->
+                            <p class="text-xl md:text-2xl font-bold leading-relaxed text-gray-800" style="font-family: 'Bangers', 'Noto Sans TC';">
+                                ${story.description}
+                            </p>
+                        </div>
+                        
+                        <div class="md:col-span-4 flex flex-col gap-4">
+                            <!-- Action Panel (Clickable Modal) -->
+                            <div onclick="app.openInfoModal('ACTION', '${story.actionText}', 'swords', 'text-blue-600', '${story.videoUrl || ''}')" 
+                                 class="comic-panel bg-blue-600 p-6 text-white text-center flex-grow flex flex-col justify-center items-center cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden group">
+                                <div>
+                                    <i data-lucide="swords" width="48" height="48" class="mb-2 mx-auto"></i>
+                                    <h3 class="font-black text-2xl">ACTION</h3>
+                                    <span class="text-xs bg-black text-white px-2 py-1 mt-2 inline-block transform -rotate-2 group-hover:rotate-0 transition-transform">CLICK TO VIEW!</span>
+                                </div>
+                            </div>
+
+                            <!-- Faith Panel (Clickable Modal) -->
+                            <div onclick="app.openInfoModal('FAITH', '${story.faithText}', 'heart', 'text-red-600')" 
+                                 class="comic-panel bg-red-600 p-6 text-white text-center flex-grow flex flex-col justify-center items-center cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden group">
+                                <div>
+                                    <i data-lucide="heart" width="48" height="48" class="mb-2 mx-auto"></i>
+                                    <h3 class="font-black text-2xl">FAITH</h3>
+                                    <span class="text-xs bg-black text-white px-2 py-1 mt-2 inline-block transform rotate-2 group-hover:rotate-0 transition-transform">CLICK TO VIEW!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 角色陣容標題 -->
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-1 bg-black flex-grow"></div>
+                        <h2 class="text-4xl font-black bg-white px-4 border-4 border-black transform rotate-1 shadow-[5px_5px_0_#000]">
+                            ROSTER / <span class="text-red-600">英雄圖鑑</span>
+                        </h2>
+                        <div class="h-1 bg-black flex-grow"></div>
+                    </div>
+
+                    <!-- 角色卡片區 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                `;
+
+                story.characters.forEach(charId => {
+                    const char = db.characters[charId];
+                    const iconName = char.imageIcon === 'crown' ? 'crown' : 
+                                   char.imageIcon === 'sword' ? 'sword' : 
+                                   char.imageIcon === 'waves' ? 'waves' : 
+                                   char.imageIcon === 'pyramid' ? 'triangle' : 
+                                   char.imageIcon === 'scroll' ? 'scroll' : 'user';
+
+                    // ⬇️ 新增：判斷是否有人物圖片
+                    let cardBgHtml = '';
+                    if (char.portrait) {
+                        // 有圖片：使用圖片作為滿版背景，並加上底部黑色漸層讓文字可見
+                        cardBgHtml = `
+                            <div class="absolute inset-0 z-0 bg-cover bg-top transition-transform duration-500 group-hover:scale-110" 
+                                 style="background-image: url('${char.portrait}');"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 z-10"></div>
+                        `;
+                    } else {
+                        // 無圖片：使用原本的圖示與透明度
+                        cardBgHtml = `
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-20 text-white group-hover:scale-110 transition-transform duration-500 z-0">
+                                <i data-lucide="${iconName}" width="120" height="120"></i>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                        <div onclick="app.openModal(${charId})" class="hero-card group h-80 flex flex-col justify-end p-4 border-b-8 border-r-8 overflow-hidden">
+                            <!-- 角色背景 (圖片或圖示) -->
+                            ${cardBgHtml}
+                            
+                            <div class="relative z-20">
+                                <div class="bg-yellow-400 text-black text-xs font-black inline-block px-2 mb-1 transform -skew-x-12 border border-black">
+                                    ${char.role}
+                                </div>
+                                <h3 class="text-2xl font-black text-white italic uppercase leading-none mb-1" style="text-shadow: 2px 2px 0 #000;">
+                                    ${char.name}
+                                </h3>
+                                <p class="text-xs text-gray-300 font-mono tracking-widest uppercase mb-2">${char.alias}</p>
+                                
+                                <div class="w-full bg-gray-700 h-1 mt-2">
+                                    <div class="bg-red-500 h-1" style="width: ${char.stats.faith || char.stats.pride || 50}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                
+                // 底部留白
+                html += `<div class="h-20"></div>`;
+
+                this.container.innerHTML = html;
+                lucide.createIcons();
+                window.scrollTo(0,0);
+            },
+
+            // 開啟 Action/Faith 彈窗
+            openInfoModal(type, text, iconName, colorClass, videoUrl = '') {
+                // 如果是 ACTION 類型且有影片網址，則生成影片 HTML
+                let videoHtml = '';
+                if (type === 'ACTION' && videoUrl) {
+                    // 使用 HTML5 <video> 標籤
+                    // ⬇️ 修改：移除 max-w-lg，保留 w-full，讓影片填滿變寬的視窗
+                    videoHtml = `
+                        <div class="w-full mb-6 border-4 border-black bg-black shadow-[8px_8px_0_#000] relative animate-pow">
+                            <video controls class="w-full" style="display: block; max-height: 60vh;">
+                                <source src="${videoUrl}" type="video/mp4">
+                                <source src="${videoUrl.replace('.mp4', '.webm')}" type="video/webm">
+                                您的瀏覽器不支援 HTML5 影片。
+                            </video>
+                        </div>
+                    `;
+                }
+
+                const html = `
+                    <div class="flex flex-col items-center text-center p-4">
+                        <div class="w-24 h-24 bg-black rounded-full flex items-center justify-center border-4 border-yellow-400 shadow-lg mb-6 text-white animate-pow">
+                            <i data-lucide="${iconName}" width="48" height="48"></i>
+                        </div>
+                        <h2 class="text-5xl font-black italic uppercase mb-6 ${colorClass}" style="text-shadow: 2px 2px 0px black;">${type}</h2>
+                        
+                        <!-- 影片顯示區 -->
+                        ${videoHtml}
+
+                        <div class="comic-panel bg-white p-6 relative w-full transform rotate-1">
+                             <span class="absolute -top-3 -left-2 bg-yellow-400 border-2 border-black px-2 py-1 text-xs font-black transform -rotate-3">
+                                ${type === 'ACTION' ? 'KEY MOMENT' : 'THE LESSON'}
+                             </span>
+                             <p class="text-2xl font-bold leading-relaxed text-gray-900" style="font-family: 'Bangers', 'Noto Sans TC';">
+                                "${text}"
+                             </p>
+                        </div>
+                    </div>
+                `;
+                this.modalBody.innerHTML = html;
+                this.modal.classList.remove('hidden');
+                lucide.createIcons();
+            },
+
+            // 開啟人物模態框
+            openModal(charId) {
+                const char = db.characters[charId];
+                if (!char) return;
+
+                // 準備能力值條
+                let statsHtml = '';
+                for (const [key, value] of Object.entries(char.stats)) {
+                    statsHtml += `
+                        <div class="mb-2">
+                            <div class="flex justify-between text-xs font-bold uppercase mb-1">
+                                <span>${key}</span>
+                                <span>${value}/100</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div class="stat-bar-fill" style="width: ${value}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 獲取圖示
+                const iconName = char.imageIcon === 'crown' ? 'crown' : 
+                                char.imageIcon === 'sword' ? 'sword' : 
+                                char.imageIcon === 'waves' ? 'waves' : 
+                                char.imageIcon === 'pyramid' ? 'triangle' : 
+                                char.imageIcon === 'scroll' ? 'scroll' : 'user';
+
+                // ⬇️ 新增：判斷頭像顯示
+                let avatarHtml = '';
+                if (char.portrait) {
+                    avatarHtml = `
+                        <img src="${char.portrait}" 
+                             class="w-40 h-40 rounded-full border-4 border-yellow-400 object-cover shadow-lg mb-4 bg-gray-200"
+                             alt="${char.name}">
+                    `;
+                } else {
+                    avatarHtml = `
+                        <div class="w-32 h-32 bg-black rounded-full flex items-center justify-center border-4 border-yellow-400 shadow-lg mb-4 text-white">
+                            <i data-lucide="${iconName}" width="64" height="64"></i>
+                        </div>
+                    `;
+                }
+
+                const html = `
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- 左側：頭像與數據 -->
+                        <div class="md:w-1/3 flex flex-col items-center">
+                            <!-- 頭像 (動態生成) -->
+                            ${avatarHtml}
+                            
+                            <h2 class="text-4xl font-black italic uppercase text-center ${char.color}">${char.name}</h2>
+                            <p class="font-bold text-gray-500 uppercase tracking-widest text-sm mb-4">${char.alias}</p>
+                            
+                            <div class="w-full bg-gray-100 p-4 border-2 border-black rounded shadow-sm">
+                                <h4 class="font-black text-sm mb-2 border-b-2 border-black inline-block">POWER STATS</h4>
+                                ${statsHtml}
+                            </div>
+                        </div>
+
+                        <!-- 右側：介紹與經文 -->
+                        <div class="md:w-2/3">
+                            <div class="mb-6">
+                                <span class="bg-black text-white px-2 py-1 text-xs font-bold transform -rotate-1 inline-block mb-2">ORIGIN STORY</span>
+                                <p class="text-lg font-bold leading-relaxed text-gray-800">
+                                    ${char.bio}
+                                </p>
+                            </div>
+
+                            <div class="speech-bubble mb-4">
+                                <p class="text-xl font-black italic text-center text-gray-900">
+                                    "${char.verse}"
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-red-600 bg-yellow-300 px-3 py-1 border-2 border-black text-sm transform rotate-2 inline-block shadow-md">
+                                    ${char.source}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                this.modalBody.innerHTML = html;
+                this.modal.classList.remove('hidden');
+                lucide.createIcons();
+            },
+
+            closeModal() {
+                this.modal.classList.add('hidden');
+            }
+        };
+
+        // 啟動應用
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
