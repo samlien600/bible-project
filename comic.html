@@ -230,6 +230,8 @@
                     bibleUrl: "https://www.bible.com/zh-TW/bible/46/1SA.17.CUNP-%E7%A5%9E",
                     actionText: "機弦甩石，正中眉心！巨人倒下，戰局瞬間逆轉！",
                     videoUrl: "video/comic/david.mp4", 
+                    // ⬇️ 新增：信仰配圖 (請確認 image 資料夾下有此檔案)
+                    faithImage: "image/comic/david_comic.png",
                     faithText: "真正的力量不來自於手中握有多重的兵器，也不取決於身上穿戴多厚的鎧甲。當面對生命中如巨人般無法撼動的恐懼時，致勝的關鍵不在於我們有多強大，而在於我們所倚靠的那位神有多偉大。信心，就是看見神比眼前的巨人更大！",
                     characters: [101, 102]
                 },
@@ -244,6 +246,8 @@
                     bibleUrl: "https://www.bible.com/zh-TW/bible/46/EXO.14.CUNP-%E7%A5%9E",
                     actionText: "手杖一揮，驚濤駭浪立起如牆，開出生命之路！",
                     videoUrl: "video/comic/moses.mp4", 
+                    // ⬇️ 新增：信仰配圖
+                    faithImage: "image/comic/moses_comic.png",
                     faithText: "當前無去路、後有追兵，人生陷入絕望的死胡同那一刻，正是神蹟即將發生的前奏。人的盡頭往往是神的起頭。我們不需要驚慌奔跑，只需要在信心裡「站住」，你將親眼看見神如何在洶湧的怒海中，為你劈開一條通往自由的康莊大道。",
                     characters: [103, 104]
                 },
@@ -258,6 +262,8 @@
                     bibleUrl: "https://www.bible.com/zh-TW/bible/46/DAN.6.CUNP-%E7%A5%9E",
                     actionText: "天使降臨，猛獅閉口！整夜安然無恙，毫髮無傷。",
                     videoUrl: "video/comic/daniel.mp4", 
+                    // ⬇️ 新增：信仰配圖
+                    faithImage: "image/comic/daniel_comic.png",
                     faithText: "堅守信仰有時會把人帶入獅坑，但環境從不決定結局，掌權的是神。祂能封住獅子的口；祂也可允許試煉臨到。無論結果如何，神的主權從未動搖，你的一生始終在祂手中。",
                     characters: [105, 106]
                 }
@@ -463,8 +469,8 @@
                         
                         <div class="md:col-span-4 flex flex-col gap-4">
                             <!-- Action Panel (Clickable Modal) -->
-                            <!-- ⬇️ 修改：將 ACTION 改為 EPIC MOMENT -->
-                            <div onclick="app.openInfoModal('EPIC MOMENT', '${story.actionText}', 'swords', 'text-blue-600', '${story.videoUrl || ''}')" 
+                            <!-- ⬇️ 修改：增加傳遞空字串作為圖片參數 -->
+                            <div onclick="app.openInfoModal('EPIC MOMENT', '${story.actionText}', 'swords', 'text-blue-600', '${story.videoUrl || ''}', '')" 
                                  class="comic-panel bg-blue-600 p-6 text-white text-center flex-grow flex flex-col justify-center items-center cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden group">
                                 <div>
                                     <i data-lucide="swords" width="48" height="48" class="mb-2 mx-auto"></i>
@@ -474,7 +480,8 @@
                             </div>
 
                             <!-- Faith Panel (Clickable Modal) -->
-                            <div onclick="app.openInfoModal('FAITH', '${story.faithText}', 'heart', 'text-red-600')" 
+                            <!-- ⬇️ 修改：傳遞 faithImage 參數 -->
+                            <div onclick="app.openInfoModal('FAITH', '${story.faithText}', 'heart', 'text-red-600', '', '${story.faithImage || ''}')" 
                                  class="comic-panel bg-red-600 p-6 text-white text-center flex-grow flex flex-col justify-center items-center cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden group">
                                 <div>
                                     <i data-lucide="heart" width="48" height="48" class="mb-2 mx-auto"></i>
@@ -559,15 +566,14 @@
             },
 
             // 開啟 Action/Faith 彈窗
-            openInfoModal(type, text, iconName, colorClass, videoUrl = '') {
-                // 如果是 EPIC MOMENT 類型且有影片網址，則生成影片 HTML
-                let videoHtml = '';
-                // ⬇️ 修改：判斷條件更新為 EPIC MOMENT
+            // ⬇️ 修改：新增 imageUrl 參數
+            openInfoModal(type, text, iconName, colorClass, videoUrl = '', imageUrl = '') {
+                // 定義媒體內容 HTML (影片或圖片)
+                let mediaHtml = '';
+                
+                // 1. 如果是 EPIC MOMENT 且有影片
                 if (type === 'EPIC MOMENT' && videoUrl) {
-                    // 使用 HTML5 <video> 標籤
-                    // ⬇️ 修改：移除 max-w-lg，保留 w-full，讓影片填滿變寬的視窗
-                    // 修改：mb-6 -> mb-4 減少影片下方間距
-                    videoHtml = `
+                    mediaHtml = `
                         <div class="w-full mb-4 border-4 border-black bg-black shadow-[8px_8px_0_#000] relative animate-pow">
                             <video controls class="w-full" style="display: block; max-height: 60vh;">
                                 <source src="${videoUrl}" type="video/mp4">
@@ -576,24 +582,37 @@
                             </video>
                         </div>
                     `;
+                } 
+                // 2. ⬇️ 新增：如果是 FAITH 且有圖片
+                else if (type === 'FAITH' && imageUrl) {
+                    // 修改：改為 bg-white，並加上 p-2 作為內框
+                    // 加上 cursor-zoom-in 和 onclick 事件
+                    mediaHtml = `
+                        <div class="w-full mb-4 border-4 border-black bg-white shadow-[8px_8px_0_#000] p-2 relative animate-pow flex justify-center items-center">
+                            <img src="${imageUrl}" 
+                                 class="w-full h-auto object-contain block cursor-zoom-in" 
+                                 style="max-height: 60vh;" 
+                                 alt="Faith Illustration"
+                                 onclick="window.open(this.src, '_blank')"
+                                 title="點擊放大 / Click to Zoom">
+                        </div>
+                    `;
                 }
 
                 const html = `
                     <div class="flex flex-col items-center text-center p-4">
-                        <!-- ⬇️ 修改：Icon 容器縮小 (w-16 h-16)，間距減少 (mb-2) -->
+                        <!-- Icon 容器 -->
                         <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center border-4 border-yellow-400 shadow-lg mb-2 text-white animate-pow">
-                            <!-- ⬇️ 修改：Icon 尺寸縮小 (width="24") -->
                             <i data-lucide="${iconName}" width="24" height="24"></i>
                         </div>
-                        <!-- ⬇️ 修改：標題縮小 (text-3xl)，間距減少 (mb-4) -->
+                        <!-- 標題 -->
                         <h2 class="text-3xl font-black italic uppercase mb-4 ${colorClass}" style="text-shadow: 1px 1px 0px black;">${type}</h2>
                         
-                        <!-- 影片顯示區 -->
-                        ${videoHtml}
+                        <!-- 媒體顯示區 (影片或圖片) -->
+                        ${mediaHtml}
 
                         <div class="comic-panel bg-white p-6 relative w-full transform rotate-1">
                              <span class="absolute -top-3 -left-2 bg-yellow-400 border-2 border-black px-2 py-1 text-xs font-black transform -rotate-3">
-                                <!-- ⬇️ 修改：更新子標題顯示 -->
                                 ${type === 'EPIC MOMENT' ? 'THE HIGHLIGHT' : 'THE LESSON'}
                              </span>
                              <p class="text-lg md:text-2xl font-bold leading-relaxed text-gray-900" style="font-family: 'Bangers', 'Noto Sans TC';">
@@ -638,9 +657,10 @@
                 // ⬇️ 新增：判斷頭像顯示
                 let avatarHtml = '';
                 if (char.portrait) {
+                    // 修改：使用 object-top 避免裁到頭部
                     avatarHtml = `
                         <img src="${char.portrait}" 
-                             class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-yellow-400 object-cover shadow-lg mb-4 bg-gray-200"
+                             class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-yellow-400 object-cover object-top shadow-lg mb-4 bg-gray-200"
                              alt="${char.name}">
                     `;
                 } else {
