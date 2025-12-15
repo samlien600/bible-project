@@ -80,7 +80,7 @@ const staticContent = {
                         <i class="fas fa-star"></i>
                     </span>
                     <h2 class="text-5xl font-bold text-[#2c241b] mb-6 tracking-tight">救贖的宏大拼圖</h2>
-                    <p class="text-xl text-[#8c6b48] font-serif italic">從舊約的影子到新約的實體，萬流歸宗於基督</p>
+                    <p class="text-xl text-[#8c6b48] font-serif italic">從舊約的預備，到新約的成全，一切都指向基督</p>
                     <div class="h-1 w-24 bg-[#d4af37] mx-auto mt-6"></div>
                 </div>
 
