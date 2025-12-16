@@ -2,19 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#2c241b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="先知的聲音">
     <title>先知的聲音 - 救贖的宏大敘事</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -23,104 +16,236 @@
 
       gtag('config', 'G-3DFR7N5MT2');
     </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bible-dark': '#2c241b',
+                        'bible-gold': '#d4af37',
+                        'bible-paper': '#f0ebe0',
+                        'bible-red': '#8c4848',
+                        'bible-brown': '#5c4d3c',
+                        'bible-light': '#eaddcf',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+
     <style>
+        /* 全局設定 */
         body {
             font-family: 'Noto Serif TC', serif;
             background-color: #f0ebe0;
             color: #2c241b;
-            -webkit-tap-highlight-color: transparent; /* 移除手機點擊高亮 */
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
-        
+
+        /* 介面字體優先使用黑體 */
+        .ui-font {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
         /* 紋理背景 */
         .texture-bg {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dcd3c2' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-color: #f0ebe0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+        }
+
+        /* 導航項目基礎樣式 */
+        .nav-item {
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+            overflow: hidden;
         }
         
-        /* 導航項目樣式 */
-        .nav-item {
+        .nav-item:hover {
+            background-color: rgba(140, 107, 72, 0.08);
+            padding-left: 1.75rem; 
+        }
+        .nav-item:active {
+            background-color: rgba(212, 175, 55, 0.15);
+        }
+
+        .nav-item .nav-arrow {
+            opacity: 0;
+            transform: translateX(-10px);
             transition: all 0.2s ease;
-            border-left: 4px solid transparent;
         }
-        .nav-item:active, .nav-item:hover {
-            background-color: rgba(140, 107, 72, 0.1);
+        .nav-item:hover .nav-arrow {
+            opacity: 1;
+            transform: translateX(0);
         }
+
         .nav-item.active {
             background-color: #e6dfd1;
-            border-left: 4px solid #8c4848;
-            font-weight: 700;
+            border-left-color: #8c4848;
+            color: #2c241b;
         }
+        .nav-item.active .nav-arrow {
+            opacity: 1;
+            transform: translateX(0);
+            color: #8c4848;
+        }
+        
+        /* 特殊章節 (導論/結論) */
         .nav-item.special-section {
-            background-color: #3e3226;
-            color: #dcd3c2;
-            border-left: 4px solid #cbbba0;
+            background-color: #2c241b; 
+            color: #eaddcf; 
+            border-left: 4px solid #5c4d3c;
+            margin-bottom: 1px; 
+        }
+        .nav-item.special-section:hover {
+            background-color: #3e3226; 
+            padding-left: 1.75rem;
+            color: #fff;
+        }
+        .nav-item.special-section .nav-icon-box {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
         .nav-item.special-section.active {
-            background-color: #251e17;
-            color: #fff;
-            border-left: 4px solid #d4af37;
+            background-color: #1a1510; 
+            color: #d4af37; 
+            border-left-color: #d4af37;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .nav-item.special-section.active .nav-icon-box {
+            background-color: #d4af37;
+            color: #2c241b;
+            border-color: #d4af37;
         }
 
         /* 首字放大 */
         .drop-cap::first-letter {
             float: left;
-            font-size: 3.5rem;
-            line-height: 0.85;
-            padding-right: 0.5rem;
+            font-size: 3.8rem;
+            line-height: 0.8;
+            padding-right: 0.75rem;
             padding-top: 0.2rem;
             color: #8c4848;
             font-weight: 700;
+            font-family: 'Noto Serif TC', serif;
         }
         
-        /* 背景大引號 */
+        /* 背景裝飾大引號 */
         .quote-mark {
             font-family: serif;
-            font-size: 6rem;
+            font-size: 8rem;
             position: absolute;
-            opacity: 0.08;
+            opacity: 0.05;
             color: #8c6b48;
-            top: -1rem;
-            left: 0;
+            top: -2rem;
+            left: -1rem;
             z-index: 0;
             pointer-events: none;
+            user-select: none;
         }
         
         /* 自定義捲軸 */
         .custom-scroll::-webkit-scrollbar {
-            width: 5px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scroll::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.02);
         }
         .custom-scroll::-webkit-scrollbar-thumb {
-            background: #a89f91;
-            border-radius: 3px;
+            background: #cbbba0;
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #8c6b48;
         }
 
-        /* 動畫 */
+        /* 動畫類別 */
         .fade-in-up {
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
         }
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 手機側邊欄過渡 */
+        /* 側邊欄過渡 */
         .sidebar-transition {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        /* 隱藏/顯示 Header 的過渡 */
+        .header-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .header-hidden {
+            transform: translateY(-100%);
+        }
+
+        /* iOS Safe Area */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* Modal 動畫 */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
     </style>
 </head>
-<body class="h-screen flex flex-col md:flex-row overflow-hidden texture-bg relative">
+<body class="h-[100dvh] flex flex-col md:flex-row overflow-hidden texture-bg relative">
 
     <!-- 1. 手機版頂部導航列 (Mobile Header) -->
-    <header class="md:hidden flex-shrink-0 h-16 bg-[#2c241b] text-[#f0ebe0] flex items-center justify-between px-5 shadow-lg z-30 relative border-b border-[#5c4d3c]">
+    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 h-14 bg-bible-dark text-bible-paper flex items-center justify-between px-4 shadow-lg z-30 header-transition border-b border-bible-brown">
         <div class="flex items-center gap-3">
-            <i class="fas fa-scroll text-[#d4af37]"></i>
-            <h1 class="text-lg font-bold tracking-widest uppercase">Prophetic Voices</h1>
+            <i class="fas fa-scroll text-bible-gold text-lg"></i>
+            <h1 class="text-base font-bold tracking-widest uppercase ui-font">PROPHETIC VOICES</h1>
         </div>
-        <button id="menu-btn" class="w-10 h-10 flex items-center justify-center text-[#d4af37] focus:outline-none active:scale-95 transition-transform" aria-label="Menu">
-            <i class="fas fa-bars text-2xl"></i>
+        <button id="menu-btn" class="w-10 h-10 flex items-center justify-center text-bible-gold focus:outline-none active:scale-90 transition-transform" aria-label="Menu">
+            <i class="fas fa-bars text-xl"></i>
         </button>
     </header>
 
@@ -128,18 +253,22 @@
     <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm" onclick="closeSidebar()"></div>
 
     <!-- 3. 側邊導航欄 (Sidebar) -->
-    <!-- 手機：Fixed + Translate / 電腦：Static + Visible -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-[85%] max-w-[320px] md:w-80 md:static bg-[#dfd7ca] shadow-2xl z-50 flex flex-col border-r border-[#c2b5a5] transform -translate-x-full md:translate-x-0 sidebar-transition">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-[80%] max-w-[300px] md:w-80 md:static bg-[#dfd7ca] shadow-2xl z-50 flex flex-col border-r border-[#c2b5a5] transform -translate-x-full md:translate-x-0 sidebar-transition">
         
         <!-- 側邊欄頭部 -->
-        <div class="p-6 bg-[#2c241b] text-[#f0ebe0] flex-shrink-0 relative">
-            <button onclick="closeSidebar()" class="md:hidden absolute top-4 right-4 text-[#d4af37] p-2">
+        <div class="p-6 bg-bible-dark text-bible-paper flex-shrink-0 relative">
+            <button onclick="closeSidebar()" class="md:hidden absolute top-4 right-4 text-bible-gold p-2 active:scale-90 transition-transform">
                 <i class="fas fa-times text-xl"></i>
             </button>
-            <h1 class="text-xl font-bold tracking-[0.2em] uppercase border-b border-[#5c4d3c] pb-2 mb-1">
+            <h1 class="text-xl font-bold tracking-[0.2em] uppercase border-b border-bible-brown pb-2 mb-2 ui-font">
                 先知的聲音
             </h1>
-            <p class="text-xs font-light opacity-70 text-right tracking-wider">The Prophetic Voices</p>
+            <p class="text-xs font-light opacity-60 text-right tracking-wider ui-font mb-4">Listening to God's Heart</p>
+            
+            <!-- 歷史年表按鈕 -->
+            <button onclick="openTimeline()" class="w-full py-2.5 bg-bible-gold text-bible-dark font-bold text-sm rounded flex items-center justify-center gap-2 hover:bg-[#c5a028] transition-colors ui-font shadow-md group border border-bible-brown">
+                <i class="fas fa-history group-hover:rotate-12 transition-transform"></i> 查看歷史年表
+            </button>
         </div>
 
         <!-- 導航列表 -->
@@ -149,15 +278,57 @@
     </aside>
 
     <!-- 4. 主要閱讀區 (Main Content) -->
-    <main class="flex-1 h-full w-full relative overflow-hidden bg-[#f3f0e6]">
+    <main class="flex-1 h-full w-full relative overflow-hidden bg-transparent">
         <!-- 頂部裝飾金線 -->
-        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#8c6b48] via-[#d4af37] to-[#8c6b48] opacity-60 z-10"></div>
+        <div class="fixed md:absolute top-14 md:top-0 left-0 w-full h-1 bg-gradient-to-r from-bible-red via-bible-gold to-bible-red opacity-80 z-20"></div>
         
         <!-- 內容容器 -->
-        <div id="content-container" class="h-full w-full overflow-y-auto custom-scroll p-5 md:p-12 lg:p-16 scroll-smooth pb-24 md:pb-16">
-            <!-- JS 動態注入 -->
+        <div id="content-container" class="h-full w-full overflow-y-auto custom-scroll scroll-smooth relative">
+            <!-- 預留頂部空間給 Header (僅手機) -->
+            <div class="h-14 md:hidden"></div> 
+            
+            <div id="content-inner" class="p-5 md:p-12 lg:p-20 pb-32 md:pb-20 max-w-5xl mx-auto">
+                <!-- JS 動態注入 -->
+            </div>
         </div>
     </main>
+
+    <!-- 5. 歷史年表 Modal (Gantt Style - Color Coded) -->
+    <div id="timeline-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 md:p-6">
+        <!-- 背景遮罩 -->
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeTimeline()"></div>
+        
+        <!-- 內容卡片 -->
+        <div class="relative bg-[#f9f7f2] w-full max-w-7xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden modal-enter transition-all duration-300 border-2 border-bible-gold">
+            <!-- 標題列 -->
+            <div class="bg-bible-dark text-bible-paper px-6 py-4 flex items-center justify-between border-b-4 border-bible-gold flex-shrink-0 z-30 shadow-md">
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold ui-font flex items-center gap-3">
+                        <i class="fas fa-stream text-bible-gold"></i> 歷史時間軸
+                    </h3>
+                    <p class="text-xs text-bible-gold opacity-80 mt-1">左右滑動查看完整圖表 • 點擊先知可閱讀</p>
+                </div>
+                <button onclick="closeTimeline()" class="text-bible-light hover:text-bible-gold transition-colors p-2 bg-white/10 rounded-full w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- 圖例列 (Legend) -->
+            <div class="bg-[#e6dfd1] px-4 py-2 border-b border-[#cbbba0] flex flex-wrap gap-3 items-center justify-center text-xs ui-font shadow-inner">
+                <span class="font-bold text-bible-dark">圖例：</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-500"></span><span class="text-emerald-900">北國以色列</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-blue-100 border border-blue-500"></span><span class="text-blue-900">南國猶大</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-amber-100 border border-amber-500"></span><span class="text-amber-900">外邦列國</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-rose-100 border border-rose-500"></span><span class="text-rose-900">被擄時期</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-violet-100 border border-violet-500"></span><span class="text-violet-900">歸回時期</span></span>
+            </div>
+            
+            <!-- 表格區 (使用 CSS Grid 實作甘特圖) -->
+            <div id="gantt-container" class="flex-1 overflow-auto custom-scroll bg-texture relative">
+                <!-- JS 生成內容 -->
+            </div>
+        </div>
+    </div>
 
     <!-- 載入資料庫 -->
     <script src="prophet_datas.js"></script>
@@ -166,251 +337,433 @@
         // DOM 元素
         const navList = document.getElementById('nav-list');
         const contentContainer = document.getElementById('content-container');
+        const contentInner = document.getElementById('content-inner');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('mobile-overlay');
-        const menuBtn = document.getElementById('menu-btn');
+        const mobileHeader = document.getElementById('mobile-header');
+        const timelineModal = document.getElementById('timeline-modal');
+        const ganttContainer = document.getElementById('gantt-container');
 
-        // YouVersion 書卷代碼對照表 (CUNP-神版)
+        // 狀態管理
+        let currentKey = 'intro';
+        let scrollPos = 0;
+
+        // YouVersion 書卷代碼對照表
         const bibleBookCodes = {
-            isaiah: 'ISA',
-            jeremiah: 'JER',
-            ezekiel: 'EZK',
-            daniel: 'DAN',
-            hosea: 'HOS',
-            joel: 'JOL',
-            amos: 'AMO',
-            obadiah: 'OBA',
-            jonah: 'JON',
-            micah: 'MIC',
-            nahum: 'NAM',
-            habakkuk: 'HAB',
-            zephaniah: 'ZEP',
-            haggai: 'HAG',
-            zechariah: 'ZEC',
-            malachi: 'MAL'
+            isaiah: 'ISA', jeremiah: 'JER', ezekiel: 'EZK', daniel: 'DAN',
+            hosea: 'HOS', joel: 'JOL', amos: 'AMO', obadiah: 'OBA',
+            jonah: 'JON', micah: 'MIC', nahum: 'NAM', habakkuk: 'HAB',
+            zephaniah: 'ZEP', haggai: 'HAG', zechariah: 'ZEC', malachi: 'MAL'
         };
 
-        // 狀態
-        let isMobileMenuOpen = false;
+        // --- 定義歷史時間軸結構 (Special Handling for Unrecorded Kings) ---
+        const kingsTimeline = [
+            // 南北國 Group 0
+            { period: "南北國", king: "以色列: 耶羅波安二世<br>猶大: 烏西雅", background: "北國國勢達高峰，經濟與軍事擴張；社會與宗教秩序出現問題", group: 0 }, // 0
+            { period: "南北國", king: "猶大: 約坦", background: "亞述勢力擴張，區域局勢轉趨緊張", group: 0 }, // 1
+            { period: "南北國", king: "猶大: 亞哈斯", background: "猶大轉向依附亞述，外交與權力結構出現重大變化", group: 0 }, // 2
 
-        // 初始化
+            // 南國 Group 1
+            { period: "南國", king: "猶大: 希西家", background: "北國於主前722年滅亡後，南國面對亞述壓力並調整內政", group: 1 }, // 3
+            { period: "南國", king: "猶大: 約西亞", background: "推動宗教與社會改革，試圖恢復律法制度並整頓敬拜秩序", group: 1 }, // 4
+            { period: "南國", king: "猶大: 約哈斯", background: "約西亞死後政局動盪；埃及介入，約哈斯在位短暫後被擄往埃及", group: 1 }, // 5
+            { period: "南國", king: "<span class='opacity-50 italic'>未記載</span>", background: "亞述帝國末期，尼尼微傾倒前後的國際格局快速更替", group: 1 }, // 6 (Nahum)
+
+            // 被擄時期 Group 2
+            { period: "被擄時期", king: "<span class='opacity-50 italic'>未記載</span>", background: "迦勒底（巴比倫）勢力崛起，逐步取代亞述成為區域霸權", group: 2 }, // 7 (Habakkuk)
+            { period: "被擄時期", king: "猶大: 約雅敬", background: "巴比倫第一次入侵與擄掠，部分王室與菁英被帶往巴比倫", group: 2 }, // 8 (Daniel Starts)
+            { period: "被擄時期", king: "猶大: 約雅斤", background: "巴比倫第二次擄掠，王與官長、工匠等核心人口被擄", group: 2 }, // 9 (Ezekiel Starts)
+            { period: "被擄時期", king: "猶大: 西底家", background: "巴比倫再度攻陷耶路撒冷，城與聖殿被毀，亡國局面確立", group: 2 }, // 10
+            { period: "被擄時期", king: "<span class='opacity-50 italic'>未記載</span>", background: "耶路撒冷陷落後，周邊民族與地區勢力重新分配，衝突與報復加劇", group: 2 }, // 11 (Obadiah)
+
+            // 被擄時期 (續 - 異邦統治)
+            { period: "被擄時期", king: "巴比倫: 尼布甲尼撒", background: "巴比倫政權鞏固統治，被擄群體在異地被集中安置與管理", group: 2 }, // 12
+            { period: "被擄時期", king: "巴比倫: 伯沙撒", background: "巴比倫末期政局不穩，最終遭瑪代—波斯勢力取代", group: 2 }, // 13
+            { period: "被擄時期", king: "波斯: 大利烏", background: "瑪代—波斯過渡統治階段，巴比倫地區政權完成交接", group: 2 }, // 14
+            { period: "被擄時期", king: "波斯: 居魯士", background: "波斯帝國建立後推行地方治理政策，允許被擄民族返鄉重建", group: 2 }, // 15
+
+            // 歸回時期 Group 3
+            { period: "歸回時期", king: "波斯: 大流士一世", background: "耶路撒冷重建工程持續推進，聖殿重建進入關鍵階段", group: 3 }, // 16
+            { period: "歸回時期", king: "<span class='opacity-50 italic'>未記載</span>", background: "波斯行省制度下，猶大地區由省長治理，社群秩序逐步定型", group: 3 }, // 17 (Malachi)
+
+            // 不定時期 Group 4
+            { period: "不定時期", king: "<span class='opacity-50 italic'>未記載</span>", background: "猶大地區遭遇大規模蝗災與農業災損，引發全國性危機", group: 4 } // 18 (Joel)
+        ];
+
+        // --- 定義先知覆蓋範圍 (Mapping & Color Coding by Audience/Theme) ---
+        // Color Legend:
+        // Israel(North): Emerald
+        // Judah(South): Blue
+        // Foreign: Amber
+        // Exile: Rose
+        // Return: Violet
+        const prophetSpans = [
+            { id: 'jonah', name: '約拿', start: 0, end: 0, color: 'bg-amber-100 border-amber-500 text-amber-900' }, // Foreign (Nineveh)
+            { id: 'amos', name: '阿摩司', start: 0, end: 0, color: 'bg-emerald-100 border-emerald-500 text-emerald-900' }, // Israel
+            { id: 'hosea', name: '何西阿', start: 0, end: 3, color: 'bg-emerald-100 border-emerald-500 text-emerald-900' }, // Israel
+            
+            { id: 'isaiah', name: '以賽亞', start: 0, end: 3, color: 'bg-blue-100 border-blue-500 text-blue-900' }, // Judah
+            { id: 'micah', name: '彌迦', start: 1, end: 3, color: 'bg-blue-100 border-blue-500 text-blue-900' }, // Judah
+            
+            { id: 'zephaniah', name: '西番雅', start: 4, end: 4, color: 'bg-blue-100 border-blue-500 text-blue-900' }, // Judah
+            { id: 'jeremiah', name: '耶利米', start: 4, end: 10, color: 'bg-blue-100 border-blue-500 text-blue-900' }, // Judah
+            { id: 'nahum', name: '那鴻', start: 6, end: 6, color: 'bg-amber-100 border-amber-500 text-amber-900' }, // Foreign (Nineveh)
+            
+            { id: 'habakkuk', name: '哈巴谷', start: 7, end: 7, color: 'bg-blue-100 border-blue-500 text-blue-900' }, // Judah
+            { id: 'obadiah', name: '俄巴底亞', start: 11, end: 11, color: 'bg-amber-100 border-amber-500 text-amber-900' }, // Foreign (Edom)
+            
+            { id: 'ezekiel', name: '以西結', start: 9, end: 10, color: 'bg-rose-100 border-rose-500 text-rose-900' }, // Exile
+            { id: 'daniel', name: '但以理', start: 12, end: 15, color: 'bg-rose-100 border-rose-500 text-rose-900' }, // Exile
+            
+            { id: 'haggai', name: '哈該', start: 16, end: 16, color: 'bg-violet-100 border-violet-500 text-violet-900' }, // Return
+            { id: 'zechariah', name: '撒迦利亞', start: 16, end: 16, color: 'bg-violet-100 border-violet-500 text-violet-900' }, // Return
+            
+            { id: 'malachi', name: '瑪拉基', start: 17, end: 17, color: 'bg-violet-100 border-violet-500 text-violet-900' }, // Return
+            { id: 'joel', name: '約珥', start: 18, end: 18, color: 'bg-blue-100 border-blue-500 text-blue-900' } // Judah
+        ];
+
         function init() {
             if (typeof staticContent === 'undefined' || typeof prophetsData === 'undefined') {
-                contentContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-[#8c4848] p-6 text-center">
-                        <i class="fas fa-exclamation-circle text-4xl mb-4"></i>
-                        <h2 class="text-2xl font-bold mb-2">資料載入失敗</h2>
-                        <p class="opacity-80">請確認 data.js 檔案存在且內容正確。</p>
-                    </div>`;
+                contentInner.innerHTML = `<div class="text-center p-10 text-bible-red">錯誤：無法載入 data.js</div>`;
                 return;
             }
-
             renderSidebar();
-            
-            // 綁定漢堡選單事件
-            menuBtn.addEventListener('click', openSidebar);
-
-            // 預設載入導論
-            loadSpecialContent('intro');
+            document.getElementById('menu-btn').addEventListener('click', openSidebar);
+            contentContainer.addEventListener('scroll', handleScroll);
+            loadContent('intro');
         }
 
-        // --- UI 控制 ---
+        // --- 核心：生成甘特圖 (Gantt Chart) ---
+        function generateGanttChart() {
+            if (ganttContainer.children.length > 0) return;
 
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-            // 小延遲讓 opacity transition 生效
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            isMobileMenuOpen = true;
+            // 1. 計算軌道 (Tracks) - 貪婪演算法
+            const tracks = [];
+            prophetSpans.forEach(p => {
+                let assignedTrack = -1;
+                for (let i = 0; i < tracks.length; i++) {
+                    let conflict = false;
+                    for (let span of tracks[i]) {
+                        if (!(p.end < span.start || p.start > span.end)) {
+                            conflict = true; break;
+                        }
+                    }
+                    if (!conflict) {
+                        assignedTrack = i;
+                        tracks[i].push(p);
+                        break;
+                    }
+                }
+                if (assignedTrack === -1) {
+                    tracks.push([p]);
+                    assignedTrack = tracks.length - 1;
+                }
+                p.track = assignedTrack;
+            });
+
+            // 2. 繪製 HTML
+            // 手機版欄寬調整: 100px (Period) / 160px (Kings)
+            const col1Width = 100;
+            const col2Width = 160;
+            const minGridWidth = 600;
+
+            let html = `
+                <div class="grid min-w-[${minGridWidth}px] border-collapse bg-white" style="
+                    grid-template-rows: 50px repeat(${kingsTimeline.length}, minmax(50px, auto));
+                    grid-template-columns: ${col1Width}px ${col2Width}px repeat(${tracks.length}, 1fr);
+                ">
+                    <!-- 表頭 -->
+                    <div class="sticky top-0 left-0 z-50 bg-[#e6dfd1] border-b-2 border-r border-[#cbbba0] flex items-center justify-center font-bold text-bible-dark ui-font shadow-sm px-1 text-xs md:text-sm">
+                        歷史時期
+                    </div>
+                    <div class="sticky top-0 left-[${col1Width}px] z-50 bg-[#e6dfd1] border-b-2 border-r border-[#cbbba0] flex items-center justify-center font-bold text-bible-dark ui-font shadow-sm px-1 text-xs md:text-sm">
+                        君王 / 背景
+                    </div>
+                    <div class="sticky top-0 z-40 bg-[#f0ebe0] border-b-2 border-[#cbbba0] flex items-center justify-center font-bold text-bible-brown ui-font shadow-sm text-xs md:text-sm" style="grid-column: 3 / -1;">
+                        先知活躍時間軸
+                    </div>
+            `;
+
+            // 生成左側兩欄 (時期 + 君王)
+            let currentGroup = -1;
+            kingsTimeline.forEach((time, index) => {
+                const rowStart = index + 2;
+                
+                // 時期欄位 (合併儲存格邏輯)
+                if (time.group !== currentGroup) {
+                    const groupCount = kingsTimeline.filter(t => t.group === time.group).length;
+                    const bgColor = index % 2 === 0 ? 'bg-[#faf8f5]' : 'bg-[#f4f1ea]';
+                    
+                    html += `
+                        <div class="sticky left-0 z-30 ${bgColor} border-r border-b border-[#dcd3c2] flex items-center justify-center p-2 font-bold text-bible-dark text-xs ui-font leading-relaxed text-center break-words" 
+                             style="grid-row: ${rowStart} / ${rowStart + groupCount}; grid-column: 1;">
+                            ${time.period}
+                        </div>
+                    `;
+                    currentGroup = time.group;
+                }
+
+                // 君王欄位
+                html += `
+                    <div class="sticky left-[${col1Width}px] z-20 bg-white border-r border-b border-[#dcd3c2] flex flex-col justify-center px-2 py-2 text-xs text-bible-brown ui-font font-medium" 
+                         style="grid-row: ${rowStart} / ${rowStart + 1}; grid-column: 2;">
+                        <span class="font-bold text-bible-dark block mb-1">${time.king}</span>
+                        ${time.background ? `<span class="text-[10px] opacity-80 leading-tight block text-bible-brown">${time.background}</span>` : ''}
+                    </div>
+                `;
+
+                // 背景橫線
+                html += `
+                    <div class="border-b border-[#eee] bg-white hover:bg-yellow-50 transition-colors" style="grid-row: ${rowStart} / ${rowStart + 1}; grid-column: 3 / -1;"></div>
+                `;
+            });
+
+            // 生成先知長條
+            prophetSpans.forEach(span => {
+                const rowStart = span.start + 2;
+                const rowEnd = span.end + 3; // +1 for 0-index, +1 for header, +1 for span end (exclusive)
+                const col = span.track + 3; // 1:Period, 2:King, 3+:Prophets
+
+                html += `
+                    <div onclick="jumpToProphet('${span.id}')" 
+                         class="relative z-10 m-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] hover:shadow-md transition-all border-l-[6px] flex flex-col justify-center items-center text-center p-1 ${span.color} opacity-90"
+                         style="grid-row: ${rowStart} / ${rowEnd}; grid-column: ${col};">
+                        <span class="font-bold text-xs md:text-sm leading-tight drop-shadow-sm">${span.name}</span>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            ganttContainer.innerHTML = html;
         }
 
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('opacity-0');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-            isMobileMenuOpen = false;
+        // --- 功能函式 ---
+        window.jumpToProphet = function(id) {
+            closeTimeline();
+            setTimeout(() => loadContent(id), 300);
+        };
+
+        function openTimeline() {
+            generateGanttChart();
+            timelineModal.classList.remove('hidden');
+            timelineModal.classList.add('flex');
+            requestAnimationFrame(() => {
+                timelineModal.children[1].classList.add('modal-enter-active');
+                timelineModal.children[1].classList.remove('modal-enter');
+            });
+            if (window.innerWidth < 768) closeSidebar();
         }
 
-        // 手機版點擊選項後自動關閉選單
-        function handleNavClick(element) {
-            setActive(element);
-            if (window.innerWidth < 768) {
-                closeSidebar();
-            }
+        function closeTimeline() {
+            const card = timelineModal.children[1];
+            card.classList.remove('modal-enter-active');
+            card.classList.add('modal-exit-active');
+            setTimeout(() => {
+                timelineModal.classList.add('hidden');
+                timelineModal.classList.remove('flex');
+                card.classList.remove('modal-exit-active');
+                card.classList.add('modal-enter');
+            }, 200);
         }
 
-        function setActive(element) {
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
-            
-            // 滾動到頂部
-            contentContainer.scrollTop = 0;
-        }
-
-        // --- 渲染邏輯 ---
-
+        // --- 渲染邏輯 (Sidebar) ---
         function renderSidebar() {
-            // 1. 導論
-            const introBtn = createNavItem(
-                `導論：職分與目的`, 
-                `The Purpose`, 
-                'special', 
-                () => loadSpecialContent('intro', introBtn)
-            );
-            introBtn.innerHTML = `<div class="flex items-center gap-3"><i class="fas fa-scroll"></i> <span class="font-bold">導論：職分與目的</span></div>`;
-            navList.appendChild(introBtn);
+            const createSectionTitle = (text) => {
+                const div = document.createElement('div');
+                div.className = "px-6 py-3 text-xs font-bold text-bible-red bg-[#d5cbbd] uppercase tracking-widest sticky top-0 z-10 shadow-sm ui-font opacity-90 backdrop-blur-sm border-b border-[#c2b5a5]";
+                div.textContent = text;
+                return div;
+            };
 
-            // 2. 大先知
-            addSectionTitle("大先知書 (Major Prophets)");
-            prophetsData.major.forEach(p => addProphetItem(p));
+            const introData = { id: 'intro', title: staticContent.intro.title, subtitle: 'The Purpose' };
+            navList.appendChild(createNavItem(introData, 'special'));
 
-            // 3. 小先知
-            addSectionTitle("小先知書 (Minor Prophets)");
-            prophetsData.minor.forEach(p => addProphetItem(p));
+            navList.appendChild(createSectionTitle("大先知書 Major Prophets"));
+            prophetsData.major.forEach(p => navList.appendChild(createNavItem(p, 'prophet')));
 
-            // 4. 結論
-            const outroBtn = createNavItem(
-                `結論：最終的救贖`, 
-                `Redemption`, 
-                'special', 
-                () => loadSpecialContent('redemption', outroBtn)
-            );
-            outroBtn.innerHTML = `<div class="flex items-center gap-3"><i class="fas fa-cross"></i> <span class="font-bold">結論：最終的救贖</span></div>`;
-            outroBtn.classList.add('mt-4', 'border-t', 'border-[#b8aca0]');
-            navList.appendChild(outroBtn);
+            navList.appendChild(createSectionTitle("小先知書 Minor Prophets"));
+            prophetsData.minor.forEach(p => navList.appendChild(createNavItem(p, 'prophet')));
+
+            const outroData = { id: 'redemption', title: staticContent.redemption.title, subtitle: 'Conclusion' };
+            const outroItem = createNavItem(outroData, 'special');
+            outroItem.classList.add('mt-auto', 'border-t-2', 'border-bible-brown');
+            navList.appendChild(outroItem);
         }
 
-        function createNavItem(title, subtitle, type, onClick) {
+        function createNavItem(data, type = 'special') {
             const div = document.createElement('div');
-            div.className = `nav-item px-6 py-4 cursor-pointer flex items-center gap-3 ${type === 'special' ? 'special-section' : 'text-[#5c4d3c] border-b border-[#dcd3c2]'}`;
-            div.onclick = () => {
-                onClick();
-                handleNavClick(div);
-            };
+            const isSpecial = type === 'special';
+            div.className = `nav-item px-6 py-4 cursor-pointer flex items-center justify-between group ${isSpecial ? 'special-section' : 'text-[#5c4d3c] border-b border-[#dcd3c2]'}`;
+            div.dataset.id = data.id;
+
+            if (isSpecial) {
+                const iconClass = data.id === 'intro' ? 'fa-scroll' : 'fa-cross';
+                div.innerHTML = `
+                    <div class="flex items-center gap-4 ui-font w-full">
+                        <div class="nav-icon-box w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                            <i class="fas ${iconClass} text-lg"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-base tracking-wide">${data.title}</span>
+                            <span class="text-[10px] opacity-60 uppercase tracking-widest font-light">${data.subtitle}</span>
+                        </div>
+                        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+                    </div>`;
+            } else {
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-bold text-base group-hover:text-bible-dark transition-colors ui-font flex items-center gap-2">
+                            ${data.name}
+                        </span>
+                        <span class="text-xs opacity-60 font-light truncate mt-0.5">${data.title}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-bold opacity-30 bg-bible-brown text-white px-1.5 py-0.5 rounded tracking-widest ui-font group-hover:opacity-60 transition-opacity">
+                            ${data.id.substring(0,3).toUpperCase()}
+                        </span>
+                        <i class="fas fa-chevron-right nav-arrow text-bible-gold text-xs"></i>
+                    </div>`;
+            }
+            div.onclick = () => { loadContent(data.id); if (window.innerWidth < 768) closeSidebar(); };
             return div;
         }
 
-        function addSectionTitle(text) {
-            const div = document.createElement('div');
-            div.className = "px-6 py-2 text-xs font-bold text-[#8c6b48] bg-[#d5cbbd] uppercase tracking-wider sticky top-0 z-10 shadow-sm";
-            div.textContent = text;
-            navList.appendChild(div);
-        }
+        function loadContent(key) {
+            currentKey = key;
+            updateActiveNav(key);
+            contentContainer.scrollTop = 0;
+            const specialData = staticContent[key];
+            contentInner.innerHTML = '';
+            void contentInner.offsetWidth;
 
-        function addProphetItem(data) {
-            const div = document.createElement('div');
-            div.className = "nav-item px-6 py-4 cursor-pointer text-[#5c4d3c] border-b border-[#dcd3c2] hover:pl-8 transition-all";
-            div.innerHTML = `
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-lg text-[#2c241b]">${data.name}</span>
-                    <span class="text-[10px] font-bold opacity-40 bg-[#cbbba0] px-2 py-0.5 rounded text-white tracking-widest">${data.id.substring(0,3).toUpperCase()}</span>
-                </div>
-                <div class="text-xs opacity-70 truncate font-light">${data.title}</div>
-            `;
-            div.onclick = () => {
-                loadProphetContent(data, div);
-                handleNavClick(div);
-            };
-            navList.appendChild(div);
-        }
-
-        // --- 內容載入 ---
-
-        function loadSpecialContent(key, element) {
-            // 初始化時如果沒有傳入 element，手動找第一個
-            if (!element && key === 'intro') {
-                element = document.querySelectorAll('.nav-item')[0];
+            if (specialData) {
+                contentInner.innerHTML = specialData.content;
+            } else {
+                const allProphets = [...prophetsData.major, ...prophetsData.minor];
+                const prophet = allProphets.find(p => p.id === key);
+                if (prophet) renderProphet(prophet);
             }
-            if(element) setActive(element);
-            
-            const data = staticContent[key];
-            
-            // 渲染前淡出效果 (可選，這裡直接替換以求反應速度)
-            contentContainer.innerHTML = data.content;
         }
 
-        function loadProphetContent(data, element) {
-            setActive(element);
-
-            // 取得 YouVersion 連結代碼
-            const bibleCode = bibleBookCodes[data.id] || 'GEN'; // 預設創世紀，雖然應該都有對應
+        function renderProphet(data) {
+            const bibleCode = bibleBookCodes[data.id] || 'GEN';
             const bibleUrl = `https://www.bible.com/bible/46/${bibleCode}.1.CUNP-神`;
+            
+            // Era Display Logic (Prophet Page)
+            let eraHtml = '';
+            if (data.era) {
+                const eras = Array.isArray(data.era) ? data.era : [data.era];
+                eraHtml = `
+                    <div class="flex flex-col gap-3 mb-8 w-full max-w-xl mx-auto">
+                        ${eras.map(e => `
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center bg-white bg-opacity-60 rounded-lg overflow-hidden shadow-sm border border-bible-light text-sm ui-font">
+                                <div class="bg-bible-dark text-bible-paper px-4 py-2 flex items-center justify-center sm:justify-start gap-2 sm:w-1/3 whitespace-nowrap">
+                                    <i class="fas fa-map-marker-alt text-bible-gold text-xs"></i>
+                                    <span class="font-bold tracking-wide">${e.period || e.kingdom}</span>
+                                </div>
+                                <div class="px-4 py-2 text-bible-brown flex items-center justify-center sm:justify-start gap-2 sm:w-2/3 border-t sm:border-t-0 sm:border-l border-bible-light bg-white">
+                                    <i class="fas fa-crown text-bible-red opacity-60 text-xs"></i>
+                                    <span class="font-medium text-xs leading-relaxed text-center sm:text-left">${e.kings}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
 
             const html = `
-                <div class="max-w-3xl mx-auto fade-in-up pb-10">
-                    <!-- 標題區 -->
-                    <header class="mb-10 md:mb-14 text-center relative pt-4">
-                        <span class="text-xs md:text-sm font-bold text-[#8c6b48] tracking-[0.3em] uppercase block mb-3">${data.book}</span>
-                        <h1 class="text-4xl md:text-6xl font-bold text-[#2c241b] mb-6 relative z-10 tracking-tight">${data.name}</h1>
-                        <div class="w-16 h-1 bg-[#8c6b48] mx-auto mb-6"></div>
-                        
-                        <!-- YouVersion 按鈕 -->
-                        <div class="mb-8 relative z-20">
-                            <a href="${bibleUrl}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-transparent border border-[#8c6b48] text-[#8c6b48] text-xs font-bold uppercase tracking-widest rounded hover:bg-[#8c6b48] hover:text-[#f0ebe0] transition-colors duration-300">
-                                <i class="fas fa-book-open"></i> 閱讀聖經 (YouVersion)
+                <div class="fade-in-up">
+                    <header class="text-center relative mb-12">
+                        <span class="inline-block py-1 px-3 mb-4 rounded-full border border-bible-gold text-bible-gold text-xs font-bold tracking-[0.2em] uppercase ui-font bg-white bg-opacity-80">
+                            ${data.book}
+                        </span>
+                        <h1 class="text-4xl md:text-6xl font-bold text-bible-dark mb-6 tracking-tight relative z-10 font-serif">
+                            ${data.name}
+                        </h1>
+                        ${eraHtml}
+                        <div class="flex justify-center mb-10">
+                            <a href="${bibleUrl}" target="_blank" class="group relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-bold text-bible-red transition-all duration-300 bg-transparent border-2 border-bible-red rounded-full hover:bg-bible-red hover:text-white focus:outline-none ui-font text-sm tracking-widest">
+                                <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+                                <span class="relative flex items-center gap-2"><i class="fas fa-book-open"></i> 閱讀聖經 (YouVersion)</span>
                             </a>
                         </div>
-
-                        <div class="relative px-6 md:px-12">
-                            <i class="fas fa-quote-left absolute top-0 left-0 text-[#8c6b48] opacity-30 text-xl"></i>
-                            <p class="text-xl md:text-2xl text-[#5c4d3c] font-serif italic relative z-10 leading-relaxed">
+                        <div class="relative px-4 md:px-12 py-6">
+                            <i class="fas fa-quote-left absolute top-0 left-4 text-bible-gold opacity-40 text-2xl"></i>
+                            <p class="text-xl md:text-3xl text-bible-brown font-serif italic leading-relaxed z-10 relative">
                                 ${data.quote}
                             </p>
-                            <i class="fas fa-quote-right absolute bottom-0 right-0 text-[#8c6b48] opacity-30 text-xl"></i>
+                            <i class="fas fa-quote-right absolute bottom-0 right-4 text-bible-gold opacity-40 text-2xl"></i>
                         </div>
-                        
-                        <!-- 背景裝飾字 -->
-                        <div class="quote-mark left-1/2 transform -translate-x-1/2 text-[8rem] opacity-[0.03]">"</div>
+                        <div class="quote-mark left-1/2 transform -translate-x-1/2 text-[10rem] top-[-20px] opacity-[0.03]">"</div>
                     </header>
-
-                    <!-- 自我介紹 -->
-                    <section class="mb-10 bg-white p-6 md:p-10 rounded-xl shadow-sm border-l-4 border-[#cbbba0] relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 opacity-10 text-[#8c6b48]">
-                            <i class="fas fa-user-circle text-6xl"></i>
-                        </div>
-                        <h3 class="text-[#8c6b48] font-bold text-sm tracking-widest uppercase mb-4 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-[#8c6b48]"></span> 關於我
+                    <section class="mb-10 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-bible-light relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 w-24 h-24 bg-bible-light rounded-full opacity-50 blur-xl"></div>
+                        <h3 class="text-bible-red font-bold text-sm tracking-[0.2em] uppercase mb-6 flex items-center gap-3 ui-font border-b border-bible-light pb-2">
+                            <i class="fas fa-user-circle text-lg"></i> 關於我
                         </h3>
-                        <div class="prose prose-lg text-[#4a3b2a] text-justify leading-loose">
-                            <p class="drop-cap text-lg md:text-xl">${data.intro}</p>
+                        <div class="prose prose-lg text-bible-dark text-justify leading-loose font-serif">
+                            <p class="drop-cap text-lg">${data.intro}</p>
                         </div>
                     </section>
-
-                    <!-- 神的啟示 -->
                     <section class="mb-12">
                          <div class="flex items-center mb-8 gap-4">
-                            <div class="h-px bg-[#8c6b48] flex-1 opacity-20"></div>
-                            <h3 class="text-xl md:text-2xl font-bold text-[#8c6b48] flex items-center gap-3">
-                                <i class="fas fa-pen-nib"></i> 神給我的啟示
+                            <div class="h-px bg-bible-brown flex-1 opacity-20"></div>
+                            <h3 class="text-xl font-bold text-bible-dark flex items-center gap-3 ui-font">
+                                <span class="bg-bible-dark text-bible-paper w-8 h-8 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-pen-nib text-sm"></i></span>
+                                神給我的啟示
                             </h3>
-                            <div class="h-px bg-[#8c6b48] flex-1 opacity-20"></div>
+                            <div class="h-px bg-bible-brown flex-1 opacity-20"></div>
                         </div>
-                        <div class="prose prose-lg text-[#2c241b] text-justify leading-loose md:px-4">
+                        <div class="prose prose-lg text-bible-dark text-justify leading-loose md:px-6 font-serif">
                             ${data.message}
                         </div>
                     </section>
-
-                    <!-- 金句卡片 -->
-                    <section class="mt-16 transform transition-all duration-500 hover:shadow-2xl rounded-xl">
-                        <div class="bg-gradient-to-br from-[#2c241b] to-[#3e3226] text-[#f0ebe0] p-8 md:p-12 rounded-xl shadow-xl relative overflow-hidden group border border-[#5c4d3c]">
-                            <!-- 裝飾圓圈 -->
-                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#d4af37] opacity-10 rounded-full blur-2xl"></div>
-                            
+                    <section class="mt-16 transform transition-transform hover:scale-[1.01] duration-500">
+                        <div class="bg-gradient-to-br from-[#2c241b] to-[#1a1510] text-bible-paper p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden border-t-4 border-bible-gold">
+                            <div class="absolute top-0 right-0 w-64 h-64 bg-bible-gold opacity-5 rounded-full blur-3xl -mr-20 -mt-20"></div>
                             <div class="relative z-10 flex flex-col items-center text-center">
-                                <i class="fas fa-bible text-[#d4af37] text-3xl mb-6 opacity-80"></i>
-                                <p class="text-lg md:text-2xl font-serif leading-loose tracking-wide italic">
+                                <i class="fas fa-bible text-bible-gold text-2xl mb-6 opacity-80"></i>
+                                <p class="text-lg md:text-2xl font-serif leading-loose tracking-wide italic text-bible-light">
                                     "${data.verse}"
                                 </p>
-                                <div class="mt-8 pt-4 border-t border-[#d4af37] border-opacity-30 w-full max-w-xs">
-                                    <span class="text-[#d4af37] text-xs tracking-[0.2em] uppercase">Key Verse</span>
+                                <div class="mt-8 pt-4 border-t border-bible-gold border-opacity-20">
+                                    <span class="text-bible-gold text-[10px] tracking-[0.3em] uppercase ui-font font-bold">KEY VERSE</span>
                                 </div>
                             </div>
                         </div>
                     </section>
                 </div>
             `;
-            
-            contentContainer.innerHTML = html;
+            contentInner.innerHTML = html;
+        }
+
+        function updateActiveNav(id) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if (el.dataset.id === id) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        function handleScroll() {
+            const currentScroll = contentContainer.scrollTop;
+            if (currentScroll > 50 && currentScroll > scrollPos) {
+                mobileHeader.classList.add('header-hidden');
+            } else {
+                mobileHeader.classList.remove('header-hidden');
+            }
+            scrollPos = currentScroll;
+        }
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
         }
 
         function showPrayer() {
@@ -421,13 +774,11 @@
             prayerContent.classList.remove('hidden');
             prayerContent.classList.add('fade-in-up');
             
-            // 自動捲動到禱告區塊
             setTimeout(() => {
                 prayerContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
 
-        // 啟動
         init();
     </script>
 </body>
