@@ -182,7 +182,7 @@ const staticContent = {
                         <!-- 禱告內容 (初始隱藏) -->
                         <div id="prayer-content" class="hidden mt-10 text-left bg-[#eaddcf] bg-opacity-10 p-8 md:p-10 rounded-xl border border-[#d4af37] text-[#f0ebe0]">
                             <h5 class="text-3xl font-bold mb-6 text-[#d4af37] text-center flex items-center justify-center gap-3"><i class="fas fa-pray"></i> 決志禱告</h5>
-                            <p class="mb-8 text-center opacity-80 text-lg">這不是一句魔咒，而是心靈的誠實對話。請閉上眼睛，試著用你的心，誠心地向神說：</p>
+                            <p class="mb-8 text-center opacity-80 text-lg">你不需要說得完美，只需要真實地向神說：</p>
                             <div class="font-serif italic text-xl md:text-2xl leading-loose mb-8 text-[#fff] px-4 md:px-12 border-l-4 border-[#d4af37] bg-black bg-opacity-20 py-6 rounded-r-lg">
                                 「親愛的主耶穌，<br>
                                 我承認我需要祢。我承認我是個罪人，我曾隨從自己的心意，犯了錯，得罪了祢。<br>
