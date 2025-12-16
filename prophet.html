@@ -215,14 +215,6 @@
             transition: transform 0.35s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
-        /* 隱藏/顯示 Header 的過渡 */
-        .header-transition {
-            transition: transform 0.3s ease-in-out;
-        }
-        .header-hidden {
-            transform: translateY(-100%);
-        }
-
         /* iOS Safe Area */
         .pb-safe {
             padding-bottom: env(safe-area-inset-bottom);
@@ -255,8 +247,8 @@
 <body class="h-[100dvh] flex flex-col md:flex-row overflow-hidden texture-bg relative">
 
     <!-- 1. 手機版頂部導航列 (Mobile Header) -->
-    <!-- z-40 確保覆蓋內容，pt-safe 避開瀏海，box-content 確保高度不被 padding 吃掉 -->
-    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 h-14 bg-bible-dark text-bible-paper flex items-center justify-between px-4 shadow-lg z-40 header-transition border-b border-bible-brown pt-safe box-content transition-transform duration-300">
+    <!-- Removed header-transition class to keep it fixed -->
+    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 h-14 bg-bible-dark text-bible-paper flex items-center justify-between px-4 shadow-lg z-40 border-b border-bible-brown pt-safe box-content">
         <div class="flex items-center gap-3">
             <i class="fas fa-scroll text-bible-gold text-lg"></i>
             <h1 class="text-base font-bold tracking-widest uppercase ui-font">PROPHETIC VOICES</h1>
@@ -768,14 +760,10 @@
             });
         }
 
+        // Removed auto-hide functionality to keep header fixed
         function handleScroll() {
-            const currentScroll = contentContainer.scrollTop;
-            if (currentScroll > 50 && currentScroll > scrollPos) {
-                mobileHeader.classList.add('header-hidden');
-            } else {
-                mobileHeader.classList.remove('header-hidden');
-            }
-            scrollPos = currentScroll;
+            // No-op for header hiding
+            // Future scroll logic can go here
         }
 
         function openSidebar() {
