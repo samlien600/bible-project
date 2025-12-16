@@ -282,6 +282,7 @@ const prophetsData = {
         { 
             id: "hosea", 
             name: "何西阿", 
+            book: "何西阿書 Hosea",
             title: "受苦之愛的先知", 
             era: [
                 { period: "北國以色列", kings: "耶羅波安二世" },
@@ -295,6 +296,7 @@ const prophetsData = {
         { 
             id: "joel", 
             name: "約珥", 
+            book: "約珥書 Joel",
             title: "聖靈的先知", 
             era: [
                 { period: "不定時期", kings: "未記載" }
@@ -307,6 +309,7 @@ const prophetsData = {
         { 
             id: "amos", 
             name: "阿摩司", 
+            book: "阿摩司書 Amos",
             title: "公義的先知", 
             era: [
                 { period: "北國以色列 (事奉地)", kings: "耶羅波安二世" },
@@ -319,7 +322,8 @@ const prophetsData = {
         },
         { 
             id: "obadiah", 
-            name: "俄巴底亞", 
+            name: "俄巴底亞",
+            book: "俄巴底亞書 Obadiah", 
             title: "審判以東的先知", 
             era: [
                 { period: "南國猶大", kings: "未記載 (背景：耶路撒冷遭難)" }
@@ -332,7 +336,8 @@ const prophetsData = {
         { 
             id: "jonah", 
             name: "約拿", 
-            title: "宣教的先知", 
+            book: "約拿書 Jonah", 
+            title: "約拿的先知", 
             era: [
                 { period: "北國以色列", kings: "耶羅波安二世" }
             ],
@@ -344,6 +349,7 @@ const prophetsData = {
         { 
             id: "micah", 
             name: "彌迦", 
+            book: "彌迦書 Micah", 
             title: "平民的先知", 
             era: [
                 { period: "南國猶大", kings: "約坦、亞哈斯、希西家" }
@@ -356,6 +362,7 @@ const prophetsData = {
         { 
             id: "nahum", 
             name: "那鴻", 
+            book: "那鴻書 Nahum", 
             title: "安慰的先知", 
             era: [
                 { period: "南國猶大", kings: "未記載 (背景：亞述末期)" }
@@ -368,6 +375,7 @@ const prophetsData = {
         { 
             id: "habakkuk", 
             name: "哈巴谷", 
+            book: "哈巴谷書 Habakkuk", 
             title: "信心的先知", 
             era: [
                 { period: "南國猶大", kings: "未記載 (背景：迦勒底興起)" }
@@ -380,6 +388,7 @@ const prophetsData = {
         { 
             id: "zephaniah", 
             name: "西番雅", 
+            book: "西番雅書 Zephaniah", 
             title: "耶和華日子的先知", 
             era: [
                 { period: "南國猶大", kings: "約西亞" }
@@ -392,6 +401,7 @@ const prophetsData = {
         { 
             id: "haggai", 
             name: "哈該", 
+            book: "哈該書 Haggai", 
             title: "建殿的先知", 
             era: [
                 { period: "波斯帝國 (歸回)", kings: "大流士一世 (Darius I)" }
@@ -404,6 +414,7 @@ const prophetsData = {
         { 
             id: "zechariah", 
             name: "撒迦利亞", 
+            book: "撒迦利亞書 Zechariah", 
             title: "異象的先知", 
             era: [
                 { period: "波斯帝國 (歸回)", kings: "大流士一世 (Darius I)" }
@@ -416,6 +427,7 @@ const prophetsData = {
         { 
             id: "malachi", 
             name: "瑪拉基", 
+            book: "瑪拉基亞書 Malachi", 
             title: "使者的先知", 
             era: [
                 { period: "波斯帝國 (省長治理)", kings: "未記載" }
