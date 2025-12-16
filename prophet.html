@@ -6,16 +6,8 @@
     <meta name="theme-color" content="#2c241b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="先知的聲音">
     <title>先知的聲音 - 救贖的宏大敘事</title>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-3DFR7N5MT2');
-    </script>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,6 +25,10 @@
                     fontFamily: {
                         serif: ['"Noto Serif TC"', 'serif'],
                         sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    spacing: {
+                        'safe-top': 'env(safe-area-inset-top)',
+                        'safe-bottom': 'env(safe-area-inset-bottom)',
                     }
                 }
             }
@@ -64,6 +60,7 @@
             color: #2c241b;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            overscroll-behavior-y: none; /* 防止整體頁面回彈 */
         }
 
         /* 介面字體優先使用黑體 */
@@ -75,6 +72,17 @@
         .texture-bg {
             background-color: #f0ebe0;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+        }
+
+        /* iOS Safe Area Utilities */
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .mt-safe {
+            margin-top: env(safe-area-inset-top);
         }
 
         /* 導航項目基礎樣式 */
@@ -207,14 +215,6 @@
             transform: translateY(-100%);
         }
 
-        /* iOS Safe Area */
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .pt-safe {
-            padding-top: env(safe-area-inset-top);
-        }
-
         /* Modal 動畫 */
         .modal-enter {
             opacity: 0;
@@ -239,25 +239,29 @@
 <body class="h-[100dvh] flex flex-col md:flex-row overflow-hidden texture-bg relative">
 
     <!-- 1. 手機版頂部導航列 (Mobile Header) -->
-    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 h-14 bg-bible-dark text-bible-paper flex items-center justify-between px-4 shadow-lg z-30 header-transition border-b border-bible-brown">
+    <!-- z-40 確保覆蓋內容，pt-safe 避開瀏海，box-content 確保高度不被 padding 吃掉 -->
+    <header id="mobile-header" class="md:hidden fixed top-0 left-0 right-0 h-14 bg-bible-dark text-bible-paper flex items-center justify-between px-4 shadow-lg z-40 header-transition border-b border-bible-brown pt-safe box-content transition-transform duration-300">
         <div class="flex items-center gap-3">
             <i class="fas fa-scroll text-bible-gold text-lg"></i>
             <h1 class="text-base font-bold tracking-widest uppercase ui-font">PROPHETIC VOICES</h1>
         </div>
-        <button id="menu-btn" class="w-10 h-10 flex items-center justify-center text-bible-gold focus:outline-none active:scale-90 transition-transform" aria-label="Menu">
+        <!-- 擴大點擊範圍 w-12 h-12，加入 touch-manipulation 優化觸控 -->
+        <button id="menu-btn" class="w-12 h-12 flex items-center justify-center text-bible-gold focus:outline-none active:scale-90 transition-transform cursor-pointer touch-manipulation" aria-label="Menu">
             <i class="fas fa-bars text-xl"></i>
         </button>
     </header>
 
     <!-- 2. 手機版遮罩層 (Mobile Overlay) -->
-    <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm" onclick="closeSidebar()"></div>
+    <!-- z-50 確保在 header 之上 -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-50 hidden transition-opacity duration-300 opacity-0 backdrop-blur-sm touch-none" onclick="closeSidebar()"></div>
 
     <!-- 3. 側邊導航欄 (Sidebar) -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-[80%] max-w-[300px] md:w-80 md:static bg-[#dfd7ca] shadow-2xl z-50 flex flex-col border-r border-[#c2b5a5] transform -translate-x-full md:translate-x-0 sidebar-transition">
+    <!-- z-60 最高層級，加入 pt-safe pb-safe 確保上下不被遮擋 -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-[80%] max-w-[300px] md:w-80 md:static bg-[#dfd7ca] shadow-2xl z-60 flex flex-col border-r border-[#c2b5a5] transform -translate-x-full md:translate-x-0 sidebar-transition pt-safe pb-safe">
         
         <!-- 側邊欄頭部 -->
         <div class="p-6 bg-bible-dark text-bible-paper flex-shrink-0 relative">
-            <button onclick="closeSidebar()" class="md:hidden absolute top-4 right-4 text-bible-gold p-2 active:scale-90 transition-transform">
+            <button onclick="closeSidebar()" class="md:hidden absolute top-4 right-4 text-bible-gold p-4 -mr-2 -mt-2 active:scale-90 transition-transform cursor-pointer">
                 <i class="fas fa-times text-xl"></i>
             </button>
             <h1 class="text-xl font-bold tracking-[0.2em] uppercase border-b border-bible-brown pb-2 mb-2 ui-font">
@@ -266,7 +270,7 @@
             <p class="text-xs font-light opacity-60 text-right tracking-wider ui-font mb-4">Listening to God's Heart</p>
             
             <!-- 歷史年表按鈕 -->
-            <button onclick="openTimeline()" class="w-full py-2.5 bg-bible-gold text-bible-dark font-bold text-sm rounded flex items-center justify-center gap-2 hover:bg-[#c5a028] transition-colors ui-font shadow-md group border border-bible-brown">
+            <button onclick="openTimeline()" class="w-full py-2.5 bg-bible-gold text-bible-dark font-bold text-sm rounded flex items-center justify-center gap-2 hover:bg-[#c5a028] transition-colors ui-font shadow-md group border border-bible-brown touch-manipulation">
                 <i class="fas fa-history group-hover:rotate-12 transition-transform"></i> 查看歷史年表
             </button>
         </div>
@@ -280,12 +284,16 @@
     <!-- 4. 主要閱讀區 (Main Content) -->
     <main class="flex-1 h-full w-full relative overflow-hidden bg-transparent">
         <!-- 頂部裝飾金線 -->
-        <div class="fixed md:absolute top-14 md:top-0 left-0 w-full h-1 bg-gradient-to-r from-bible-red via-bible-gold to-bible-red opacity-80 z-20"></div>
+        <!-- mt-safe 確保在瀏海下方 -->
+        <div class="fixed md:absolute top-14 md:top-0 left-0 w-full h-1 bg-gradient-to-r from-bible-red via-bible-gold to-bible-red opacity-80 z-20 mt-safe"></div>
         
         <!-- 內容容器 -->
-        <div id="content-container" class="h-full w-full overflow-y-auto custom-scroll scroll-smooth relative">
+        <!-- -webkit-overflow-scrolling: touch 確保 iOS 滑動順暢 -->
+        <div id="content-container" class="h-full w-full overflow-y-auto custom-scroll scroll-smooth relative" style="-webkit-overflow-scrolling: touch;">
             <!-- 預留頂部空間給 Header (僅手機) -->
-            <div class="h-14 md:hidden"></div> 
+            <div class="h-14 md:hidden w-full shrink-0"></div> 
+            <!-- 額外預留安全區域高度 -->
+            <div class="md:hidden w-full shrink-0" style="height: env(safe-area-inset-top);"></div>
             
             <div id="content-inner" class="p-5 md:p-12 lg:p-20 pb-32 md:pb-20 max-w-5xl mx-auto">
                 <!-- JS 動態注入 -->
@@ -293,8 +301,8 @@
         </div>
     </main>
 
-    <!-- 5. 歷史年表 Modal (Gantt Style - Color Coded) -->
-    <div id="timeline-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 md:p-6">
+    <!-- 5. 歷史年表 Modal (Gantt Style) -->
+    <div id="timeline-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-2 md:p-6 pt-safe">
         <!-- 背景遮罩 -->
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeTimeline()"></div>
         
@@ -308,13 +316,13 @@
                     </h3>
                     <p class="text-xs text-bible-gold opacity-80 mt-1">左右滑動查看完整圖表 • 點擊先知可閱讀</p>
                 </div>
-                <button onclick="closeTimeline()" class="text-bible-light hover:text-bible-gold transition-colors p-2 bg-white/10 rounded-full w-10 h-10 flex items-center justify-center">
+                <button onclick="closeTimeline()" class="text-bible-light hover:text-bible-gold transition-colors p-4 -mr-2 bg-white/10 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
             <!-- 圖例列 (Legend) -->
-            <div class="bg-[#e6dfd1] px-4 py-2 border-b border-[#cbbba0] flex flex-wrap gap-3 items-center justify-center text-xs ui-font shadow-inner">
+            <div class="bg-[#e6dfd1] px-4 py-2 border-b border-[#cbbba0] flex flex-wrap gap-3 items-center justify-center text-xs ui-font shadow-inner shrink-0">
                 <span class="font-bold text-bible-dark">圖例：</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-500"></span><span class="text-emerald-900">北國以色列</span></span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-blue-100 border border-blue-500"></span><span class="text-blue-900">南國猶大</span></span>
@@ -324,7 +332,7 @@
             </div>
             
             <!-- 表格區 (使用 CSS Grid 實作甘特圖) -->
-            <div id="gantt-container" class="flex-1 overflow-auto custom-scroll bg-texture relative">
+            <div id="gantt-container" class="flex-1 overflow-auto custom-scroll bg-texture relative" style="-webkit-overflow-scrolling: touch;">
                 <!-- JS 生成內容 -->
             </div>
         </div>
@@ -529,6 +537,7 @@
                          class="relative z-10 m-1 rounded shadow-sm cursor-pointer hover:scale-[1.03] hover:shadow-md transition-all border-l-[6px] flex flex-col justify-center items-center text-center p-1 ${span.color} opacity-90"
                          style="grid-row: ${rowStart} / ${rowEnd}; grid-column: ${col};">
                         <span class="font-bold text-xs md:text-sm leading-tight drop-shadow-sm">${span.name}</span>
+                        ${span.end > span.start ? '<i class="fas fa-arrow-down text-[10px] opacity-40 mt-0.5"></i>' : ''}
                     </div>
                 `;
             });
@@ -746,7 +755,14 @@
 
         function handleScroll() {
             const currentScroll = contentContainer.scrollTop;
-            if (currentScroll > 50 && currentScroll > scrollPos) {
+            
+            // Fix: iOS Rubber banding (負值滾動) 忽略
+            if (currentScroll < 0) return;
+
+            // Fix: 增加緩衝區，避免微小移動就隱藏
+            if (Math.abs(currentScroll - scrollPos) < 10) return;
+
+            if (currentScroll > 60 && currentScroll > scrollPos) {
                 mobileHeader.classList.add('header-hidden');
             } else {
                 mobileHeader.classList.remove('header-hidden');
