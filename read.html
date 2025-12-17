@@ -1150,7 +1150,7 @@
         let historyViewMode = 'list';
         let selectedYear = null;
         let selectedQuarter = null;
-        let lastRankIndex = -1; // 用於追蹤等級變化
+        let lastLevel = -1; // 修正：追蹤等級而非 Rank
 
         // --- 3. 初始化 ---
         function init() {
@@ -1158,7 +1158,7 @@
             applyTheme();
             checkStreak();
             renderLibrary();
-            updateGlobalStats(); // This calculates rank
+            updateGlobalStats(true); 
             generateQuote();
             renderJournal();
         }
@@ -1279,9 +1279,8 @@
 
                 // Book Completion Check
                 if (progressData[bookName].length === currentOpenBook.ch) {
-                    // 書卷完成：綠色主題
                     showBookComplete(bookName);
-                    triggerConfetti('colorful'); // 這裡使用彩色
+                    triggerConfetti('colorful'); 
                 }
             } else {
                 progressData[bookName].splice(idx, 1);
@@ -1301,7 +1300,6 @@
             if(completedArr.length === book.ch) {
                 if (!card.classList.contains('completed')) {
                     card.classList.add('completed');
-                    // Remove flash animation
                 }
             } else {
                 card.classList.remove('completed');
@@ -1309,30 +1307,28 @@
         }
 
         // Stats & Rank Up
-        function updateGlobalStats() {
+        function updateGlobalStats(isInit = false) {
             let totalRead = 0;
             
             Object.values(progressData).forEach(chapters => {
                 totalRead += chapters.length;
             });
 
-            const level = Math.floor(totalRead / 10) + 1;
-            const rankIndex = Math.min(Math.floor(level / 5), ranks.length - 1); 
+            const currentLevel = Math.floor(totalRead / 10) + 1;
+            const rankIndex = Math.min(Math.floor(currentLevel / 5), ranks.length - 1); 
             const rankName = ranks[rankIndex];
 
-            // Check Rank Up Effect (Initial load -1 avoids trigger)
-            if (lastRankIndex !== -1 && rankIndex > lastRankIndex) {
-                // 升級：金色主題
-                showRankUp(rankName);
-                triggerConfetti('gold'); // 金色彩帶
+            // 修正：依據 Level 判斷升級，而非 Rank
+            if (!isInit && lastLevel !== -1 && currentLevel > lastLevel) {
+                showLevelUpModal(currentLevel, rankName);
+                triggerConfetti('gold');
             }
-            lastRankIndex = rankIndex;
+            lastLevel = currentLevel;
 
-            // Safety Checks & Updates
+            // Update UI
             const elRank = document.getElementById('rank-title');
             if(elRank) {
-                elRank.innerText = `Lv.${level} ${rankName}`;
-                // Small pulse animation on update
+                elRank.innerText = `Lv.${currentLevel} ${rankName}`;
                 document.getElementById('rank-badge-el').classList.add('pulse');
                 setTimeout(()=>document.getElementById('rank-badge-el').classList.remove('pulse'), 500);
             }
@@ -1357,117 +1353,12 @@
             }
         }
 
-        function checkStreak() {
-            const today = new Date().toDateString();
-            if(userStats.lastLogin !== today) {
-                const yest = new Date();
-                yest.setDate(yest.getDate() - 1);
-                
-                if(userStats.lastLogin === yest.toDateString()) userStats.streak++;
-                else userStats.streak = 1;
-                
-                userStats.lastLogin = today;
-                saveData();
-            }
-        }
-
-        // Journal & Quotes
-        function generateQuote() {
-             const q = habitQuotes[Math.floor(Math.random() * habitQuotes.length)];
-             document.getElementById('daily-quote-text').innerText = `「${q.text}」`;
-             document.getElementById('daily-quote-source').innerText = `— ${q.source}`;
-        }
-
-        function getTodayString() {
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function renderJournal() {
-            const today = getTodayString();
-            document.getElementById('journal-date').innerText = today;
-            if(reflections[today]) {
-                const el = document.getElementById('journal-input');
-                el.value = reflections[today];
-                updateCharCount(el);
-            }
-        }
-
-        function updateCharCount(el) {
-            const len = el.value.length;
-            const counter = document.getElementById('char-count');
-            counter.innerText = len;
-            if(len > 500) counter.style.color = 'var(--danger-color)';
-            else if(len > 450) counter.style.color = 'var(--accent-gold)';
-            else counter.style.color = 'var(--text-tertiary)';
-        }
-
-        function saveReflection() {
-            const today = getTodayString();
-            const text = document.getElementById('journal-input').value;
-            
-            if(text.length > 500) {
-                alert("字數超過 500 字上限");
-                return;
-            }
-            if(text.trim() === "") {
-                delete reflections[today];
-                saveData();
-                showToast("🗑️ 日記已清除");
-                return;
-            }
-            reflections[today] = text;
-            saveData();
-            showToast("📝 日記已儲存");
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.display = 'flex';
-            void t.offsetWidth; // force reflow
-            t.classList.add('show');
-            setTimeout(() => {
-                t.classList.remove('show');
-                setTimeout(() => t.style.display = 'none', 500);
-            }, 2000);
-        }
-
-        // --- 特效邏輯 ---
-        
-        // 1. Confetti (支援類型：colorful 或 gold)
-        function triggerConfetti(type = 'colorful') {
-            const colorfulColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
-            const goldColors = ['#fbbf24', '#f59e0b', '#d97706', '#fffbeb', '#ffffff'];
-            
-            const palette = type === 'gold' ? goldColors : colorfulColors;
-            
-            for (let i = 0; i < 150; i++) { // 增加數量
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = palette[Math.floor(Math.random() * palette.length)];
-                
-                // 隨機大小與速度
-                const duration = Math.random() * 2 + 2; 
-                confetti.style.animation = `fall ${duration}s linear forwards`;
-                
-                document.body.appendChild(confetti);
-
-                setTimeout(() => confetti.remove(), duration * 1000);
-            }
-        }
-
-        // 2. Rank Up Overlay (Gold)
-        function showRankUp(newRank) {
+        function showLevelUpModal(level, rank) {
             const overlay = document.getElementById('rank-up-overlay');
             const nameEl = document.getElementById('rank-up-name');
-            nameEl.innerText = newRank;
+            // 顯示 Lv.X [稱號]
+            nameEl.innerText = `Lv.${level} ${rank}`;
             
-            // Random encouragement/reminder
             const reminders = [
                 "保持每日閱讀的習慣，讓生命更新。",
                 "每一個章節都是靈命的養分。",
@@ -1638,6 +1529,106 @@
             };
             reader.readAsText(file);
             input.value = '';
+        }
+        
+        function checkStreak() {
+            const today = new Date().toDateString();
+            if(userStats.lastLogin !== today) {
+                const yest = new Date();
+                yest.setDate(yest.getDate() - 1);
+                
+                if(userStats.lastLogin === yest.toDateString()) userStats.streak++;
+                else userStats.streak = 1;
+                
+                userStats.lastLogin = today;
+                saveData();
+            }
+        }
+
+        function generateQuote() {
+             const q = habitQuotes[Math.floor(Math.random() * habitQuotes.length)];
+             document.getElementById('daily-quote-text').innerText = `「${q.text}」`;
+             document.getElementById('daily-quote-source').innerText = `— ${q.source}`;
+        }
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function renderJournal() {
+            const today = getTodayString();
+            document.getElementById('journal-date').innerText = today;
+            if(reflections[today]) {
+                const el = document.getElementById('journal-input');
+                el.value = reflections[today];
+                updateCharCount(el);
+            }
+        }
+
+        function updateCharCount(el) {
+            const len = el.value.length;
+            const counter = document.getElementById('char-count');
+            counter.innerText = len;
+            if(len > 500) counter.style.color = 'var(--danger-color)';
+            else if(len > 450) counter.style.color = 'var(--accent-gold)';
+            else counter.style.color = 'var(--text-tertiary)';
+        }
+
+        function saveReflection() {
+            const today = getTodayString();
+            const text = document.getElementById('journal-input').value;
+            
+            if(text.length > 500) {
+                alert("字數超過 500 字上限");
+                return;
+            }
+            if(text.trim() === "") {
+                delete reflections[today];
+                saveData();
+                showToast("🗑️ 日記已清除");
+                return;
+            }
+            reflections[today] = text;
+            saveData();
+            showToast("📝 日記已儲存");
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'flex';
+            void t.offsetWidth; // force reflow
+            t.classList.add('show');
+            setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => t.style.display = 'none', 500);
+            }, 2000);
+        }
+
+        // --- 特效邏輯 ---
+        function triggerConfetti(type = 'colorful') {
+            const colorfulColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            const goldColors = ['#fbbf24', '#f59e0b', '#d97706', '#fffbeb', '#ffffff'];
+            
+            const palette = type === 'gold' ? goldColors : colorfulColors;
+            
+            for (let i = 0; i < 150; i++) { 
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = palette[Math.floor(Math.random() * palette.length)];
+                
+                const duration = Math.random() * 2 + 2; 
+                confetti.style.animation = `fall ${duration}s linear forwards`;
+                
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), duration * 1000);
+            }
         }
 
         function resetData() {
