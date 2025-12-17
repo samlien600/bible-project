@@ -634,14 +634,6 @@
             }
         }
 
-        /* 修正手機版 FAB 箭頭未置中問題 */
-        @media (max-width: 600px) {
-            .fab-top {
-                padding-bottom: 0;              /* 移除影響置中的 padding */
-                bottom: calc(30px + env(safe-area-inset-bottom));
-            }
-        }
-
         .modal-header {
             padding: 20px 28px;
             display: flex;
@@ -732,13 +724,20 @@
             transform: translateY(30px) scale(0.8);
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            padding-bottom: env(safe-area-inset-bottom);
+            /* 修正：移除 padding-bottom，避免安全區域擠壓內容 */
         }
         .fab-top:hover { transform: scale(1.1); }
         .fab-top.visible {
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: auto;
+        }
+
+        /* 適配 iOS Home Bar，將按鈕位置往上推 */
+        @media (max-width: 600px) {
+            .fab-top {
+                bottom: calc(30px + env(safe-area-inset-bottom));
+            }
         }
 
         /* Footer */
