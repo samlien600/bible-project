@@ -634,6 +634,14 @@
             }
         }
 
+        /* 修正手機版 FAB 箭頭未置中問題 */
+        @media (max-width: 600px) {
+            .fab-top {
+                padding-bottom: 0;              /* 移除影響置中的 padding */
+                bottom: calc(30px + env(safe-area-inset-bottom));
+            }
+        }
+
         .modal-header {
             padding: 20px 28px;
             display: flex;
@@ -1054,7 +1062,7 @@
         };
 
         const habitQuotes = [
-            // CUNP-神版 完整經文
+            // --- 聖經經文 (CUNP-神版) ---
             { text: "誰藐視這日的事為小呢？這七眼乃是耶和華的眼睛，遍察全地，見所羅巴伯手拿線鉈就歡喜。", source: "撒迦利亞書 4:10" },
             { text: "我們行善，不可喪志；若不灰心，到了時候就要收成。", source: "加拉太書 6:9" },
             { text: "殷勤籌劃的，足致豐裕；行事急躁的，都必缺乏。", source: "箴言 21:5" },
