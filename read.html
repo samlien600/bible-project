@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <!-- 加入 viewport-fit=cover 以支援全螢幕模式，並鎖定縮放 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#2c241b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,725 +17,1013 @@
       gtag('config', 'G-3DFR7N5MT2');
     </script>
     <title>聖經讀經打卡 - 養成屬靈好習慣</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* === 色彩系統 (深色模式預設 - 午夜流金) === */
-            --bg-body: #0f172a;          /* 深午夜藍背景 */
-            --bg-card: #1e293b;          /* 卡片背景 */
-            --bg-card-hover: #334155;    /* 卡片懸停 */
-            --text-primary: #f8fafc;     /* 主要文字 */
-            --text-secondary: #94a3b8;   /* 次要文字 */
-            --accent-gold: #fbbf24;      /* 流金 (強調色) */
-            --accent-glow: rgba(251, 191, 36, 0.3); /* 金色光暈 */
-            --primary-btn: linear-gradient(135deg, #6366f1, #4f46e5); /* 靛藍漸層按鈕 */
-            --success-color: #10b981;    /* 成功綠 */
-            --danger-color: #ef4444;     /* 警告紅 */
-            --border-color: rgba(255, 255, 255, 0.1);
-            --glass-bg: rgba(15, 23, 42, 0.85); /* 玻璃擬態背景 */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-glow: 0 0 15px rgba(251, 191, 36, 0.15);
-            --radius-md: 12px;
-            --radius-lg: 20px;
+            /* === 色彩系統 (深色模式 - 皇家午夜藍) === */
+            --bg-body: #0b1120;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card-hover: rgba(51, 65, 85, 0.6);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --accent-gold: #fbbf24;
+            --accent-gold-glow: rgba(251, 191, 36, 0.25);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            --glass-header: rgba(15, 23, 42, 0.85);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            
+            /* UI 參數 */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+            --shadow-md: 0 8px 16px -4px rgba(0,0,0,0.2);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+            --font-main: 'Inter', 'Noto Sans TC', sans-serif;
         }
 
-        /* === 淺色模式 (晨曦暖灰) === */
+        /* === 淺色模式 (極簡晨曦) === */
         body.light-mode {
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --accent-gold: #d97706;      /* 深琥珀色 */
-            --accent-glow: rgba(217, 119, 6, 0.2);
-            --primary-btn: linear-gradient(135deg, #4f46e5, #4338ca);
-            --success-color: #059669;
-            --danger-color: #dc2626;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 0 15px rgba(0, 0, 0, 0.05);
+            --bg-body: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-hover: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --accent-gold: #d97706;
+            --accent-gold-glow: rgba(217, 119, 6, 0.15);
+            --border-color: rgba(0, 0, 0, 0.06);
+            --border-highlight: rgba(0, 0, 0, 0.1);
+            --glass-header: rgba(248, 250, 252, 0.9);
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.05);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: var(--font-main);
             background-color: var(--bg-body);
+            /* 動態背景光暈 */
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(251, 191, 36, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
             color: var(--text-primary);
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            padding-bottom: 100px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 120px; 
+            transition: background-color 0.4s ease, color 0.3s ease;
+            overflow-x: hidden; /* 防止彩帶溢出 */
         }
 
-        /* === 頂部狀態列 (玻璃擬態) === */
+        /* === 頂部狀態列 (Glassmorphism) === */
         .status-bar {
-            background-color: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 15px 20px;
+            background-color: var(--glass-header);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            /* 適配 iOS 安全區域 */
+            padding-top: calc(12px + env(safe-area-inset-top));
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow-sm);
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px -10px rgba(0,0,0,0.1);
         }
 
-        .level-info {
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
             flex: 1;
             margin-right: 20px;
         }
 
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 6px;
-        }
-
-        .rank-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
             color: var(--accent-gold);
-            text-shadow: 0 0 10px var(--accent-glow);
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 15px var(--accent-gold-glow);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .rank-badge.pulse { animation: rankPulse 0.5s; }
+        
+        @keyframes rankPulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #fff; } 100% { transform: scale(1); } }
 
-        .progress-text {
-            font-size: 0.8rem;
+        .progress-indicator {
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            font-feature-settings: "tnum";
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
         }
 
-        .xp-track {
+        /* 能量條動畫 */
+        .xp-bar-container {
             width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
+            max-width: 180px;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
             border-radius: 10px;
             overflow: hidden;
+            position: relative;
         }
-        body.light-mode .xp-track { background: rgba(0,0,0,0.1); }
+        body.light-mode .xp-bar-container { background: rgba(0,0,0,0.08); }
 
-        .xp-fill {
+        .xp-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-gold), #f59e0b);
+            background: linear-gradient(90deg, var(--accent-gold), #fb923c);
             width: 0%;
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 10px var(--accent-gold);
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+        /* 流光效果 */
+        .xp-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer { 100% { transform: translateX(150%); } }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .stats-badges {
             display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .stat-badge {
-            font-size: 0.75rem;
-            background: rgba(255,255,255,0.05);
-            padding: 2px 8px;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-        body.light-mode .stat-badge { background: rgba(0,0,0,0.03); }
-
-        .controls-area {
-            display: flex;
             gap: 12px;
         }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+        .stat-val { font-weight: 700; color: var(--text-primary); font-size: 0.95rem; }
+        .stat-label { font-size: 0.7rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;}
 
         .icon-btn {
-            background: transparent;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.03);
             color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 1.25rem;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            touch-action: manipulation; /* 優化觸控反應 */
         }
+        .icon-btn:active { transform: scale(0.92); }
+        body.light-mode .icon-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+        body:not(.light-mode) .icon-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); border-color: var(--border-highlight); }
 
-        .icon-btn:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-            border-color: var(--text-secondary);
-        }
-
-        /* === 主要容器 === */
+        /* === 內容區塊 === */
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            animation: fadeIn 0.5s ease-out;
+            padding: 24px;
+            animation: fadeIn 0.4s ease-out; 
         }
 
-        /* 首頁標題 */
-        .app-header {
+        .hero-section {
             text-align: center;
-            margin: 30px 0 40px;
+            margin: 30px 0 50px;
         }
-        .app-header h1 {
-            font-size: 2rem;
-            margin: 0 0 10px;
-            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 12px;
+            background: linear-gradient(135deg, var(--text-primary) 20%, var(--text-secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.04em;
         }
-        .app-header p {
+        .hero-desc {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            max-width: 600px;
+            font-size: 1rem;
+            max-width: 580px;
             margin: 0 auto;
+            line-height: 1.6;
         }
 
-        /* === 卡片通用樣式 (Glass/Elevated) === */
+        /* === 卡片元件 === */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 28px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
             position: relative;
             overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-highlight);
         }
 
-        /* 每日動力卡片 */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 動力金句 */
         .quote-card {
             border-left: 4px solid var(--accent-gold);
-            background: linear-gradient(to right, rgba(251, 191, 36, 0.05), transparent);
+            background: linear-gradient(to right, rgba(251, 191, 36, 0.03), transparent);
         }
-        .quote-text {
-            font-size: 1.1rem;
+        .quote-content {
+            font-size: 1.25rem;
+            font-family: 'Times New Roman', serif; /* 襯線字體更有質感 */
             font-style: italic;
-            margin: 10px 0;
             line-height: 1.5;
+            margin-bottom: 12px;
+            color: var(--text-primary);
         }
-        .quote-source {
-            display: block;
+        .quote-author {
             text-align: right;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--accent-gold);
             font-weight: 600;
+            font-family: var(--font-main);
         }
 
-        /* 靈修日記卡片 */
-        .journal-card textarea {
+        /* 日記輸入框 */
+        .journal-input {
             width: 100%;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.15);
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
             border-radius: var(--radius-md);
-            padding: 15px;
+            padding: 18px;
+            color: var(--text-primary);
             font-size: 1rem;
-            margin-top: 15px;
+            font-family: inherit;
             resize: vertical;
-            min-height: 100px;
-            transition: border-color 0.2s, background 0.2s;
+            min-height: 140px;
+            transition: all 0.3s ease;
+            line-height: 1.6;
         }
-        body.light-mode .journal-card textarea { background: #f8fafc; }
+        body.light-mode .journal-input { background: #f1f5f9; border-color: rgba(0,0,0,0.1); }
         
-        .journal-card textarea:focus {
+        .journal-input:focus {
             outline: none;
             border-color: var(--accent-gold);
-            background: transparent;
+            background: rgba(0,0,0,0.25);
+            box-shadow: 0 0 0 4px var(--accent-gold-glow);
+        }
+        body.light-mode .journal-input:focus { background: #fff; }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
         }
 
-        .btn-primary {
-            background: var(--primary-btn);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .btn {
+            padding: 10px 24px;
             border-radius: 50px;
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-            transition: transform 0.1s, box-shadow 0.2s;
-            font-size: 0.9rem;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation; /* 優化觸控反應 */
         }
-        .btn-primary:active { transform: scale(0.96); }
+        .btn:active { transform: scale(0.95); }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--text-secondary);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);
         }
-        .btn-outline:hover {
+        .btn-primary:hover { 
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5); 
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .btn-secondary:hover {
             border-color: var(--text-primary);
             color: var(--text-primary);
             background: rgba(255,255,255,0.05);
         }
-        body.light-mode .btn-outline:hover { background: rgba(0,0,0,0.05); }
+        body.light-mode .btn-secondary:hover { background: rgba(0,0,0,0.05); }
 
-        .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        /* === 書卷網格 === */
-        .section-header {
+        /* === 書卷卡片 (Grid Tiles) === */
+        .section-separator {
             display: flex;
             align-items: center;
-            margin: 40px 0 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
+            gap: 20px;
+            margin: 50px 0 25px;
+            color: var(--text-secondary);
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
+        .section-separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border-color), transparent);
         }
-        
+
         .bible-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 12px;
+            gap: 16px;
         }
 
-        .book-btn {
+        .book-tile {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 15px 10px;
+            border-radius: var(--radius-md);
+            padding: 18px 12px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
-            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 90px;
+            touch-action: manipulation; /* 優化觸控反應 */
+        }
+        .book-tile:active { transform: scale(0.94); }
+        .book-tile:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-card-hover);
         }
 
-        .book-btn:active { transform: scale(0.96); }
-        .book-btn:hover { border-color: var(--text-secondary); transform: translateY(-2px); }
-
-        .book-btn.completed {
-            border-color: var(--accent-gold);
-            background: linear-gradient(to bottom right, rgba(251, 191, 36, 0.1), transparent);
-            box-shadow: var(--shadow-glow);
+        /* 完成狀態 - 金色微光 */
+        .book-tile.completed {
+            border-color: rgba(251, 191, 36, 0.5);
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(251, 191, 36, 0.15));
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
         }
-        .book-btn.completed::after {
-            content: "★";
-            position: absolute;
-            top: 5px;
-            right: 8px;
-            color: var(--accent-gold);
-            font-size: 10px;
+        body.light-mode .book-tile.completed {
+            background: linear-gradient(145deg, #fff, rgba(217, 119, 6, 0.1));
         }
 
-        .book-title {
+        .book-name {
+            display: block;
             font-weight: 600;
             font-size: 0.95rem;
-            display: block;
             margin-bottom: 8px;
+            z-index: 2;
         }
 
-        .mini-progress {
+        /* 圓環進度 */
+        .progress-bar-sm {
             height: 4px;
             background: rgba(128,128,128,0.2);
-            border-radius: 2px;
-            width: 80%;
+            border-radius: 4px;
+            width: 70%;
             margin: 0 auto;
             overflow: hidden;
         }
-        .mini-fill {
+        .progress-fill-sm {
             height: 100%;
             background: var(--success-color);
             width: 0%;
-            border-radius: 2px;
-            transition: width 0.3s;
+            border-radius: 4px;
+            transition: width 0.5s ease;
         }
 
-        /* === 歷史紀錄視圖 (優化版) === */
-        .history-container {
-            padding-top: 10px;
+        /* === 浮動提示 Toast (頂部) === */
+        .toast {
+            position: fixed;
+            top: 110px; /* 避開 Header */
+            left: 50%;
+            transform: translate(-50%, -30px);
+            background: var(--accent-gold);
+            color: #1a1a1a;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .nav-back {
+        .toast.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+
+        /* === 歷史紀錄視圖 === */
+        .history-container { padding-top: 10px; }
+        .history-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .back-link {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             color: var(--text-secondary);
             font-size: 1rem;
             cursor: pointer;
-            margin-bottom: 20px;
-            padding: 8px 0;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.05);
+            font-weight: 500;
+            touch-action: manipulation;
         }
-        .nav-back:hover { color: var(--accent-gold); }
+        body.light-mode .back-link { background: rgba(0,0,0,0.05); }
+        .back-link:hover { color: var(--text-primary); background: rgba(255,255,255,0.1); }
 
-        .selection-grid {
+        .year-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
         }
-
-        .selection-card {
+        .year-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 25px 15px;
+            border-radius: var(--radius-md);
+            padding: 30px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            touch-action: manipulation;
         }
-        .selection-card:hover {
+        .year-card:hover {
             border-color: var(--accent-gold);
             background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
-        
-        .sel-title { font-size: 1.4rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 5px; }
-        .sel-sub { font-size: 0.85rem; color: var(--text-secondary); }
+        .year-num { font-size: 1.8rem; font-weight: 800; color: var(--accent-gold); display: block; margin-bottom: 6px; }
+        .year-desc { font-size: 0.9rem; color: var(--text-secondary); }
 
-        /* 時間軸樣式 */
-        .timeline {
+        /* Timeline Design */
+        .timeline-item {
             position: relative;
-            padding-left: 30px;
-            margin-top: 20px;
+            padding-left: 40px;
+            margin-bottom: 32px;
+            animation: slideUp 0.4s ease-out backwards;
         }
-        .timeline::before {
+        /* 連線 */
+        .timeline-item::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
+            left: 9px;
+            top: 10px;
+            bottom: -40px;
             width: 2px;
             background: var(--border-color);
         }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 30px;
-            animation: slideUp 0.3s ease-out;
-        }
+        .timeline-item:last-child::before { display: none; }
+        
         .timeline-dot {
-            position: absolute;
-            left: -35px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            background: var(--accent-gold);
+            width: 20px;
+            height: 20px;
+            background: var(--bg-body);
+            border: 4px solid var(--accent-gold);
             border-radius: 50%;
-            border: 3px solid var(--bg-body);
-            box-shadow: 0 0 0 1px var(--accent-gold);
+            position: absolute;
+            left: 0;
+            top: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1;
         }
+        
         .timeline-date {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
         }
-        .timeline-card {
+        .timeline-content {
             background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             white-space: pre-wrap;
+            line-height: 1.7;
             box-shadow: var(--shadow-sm);
         }
 
-        /* === 底部資料管理區 === */
-        .footer-tools {
-            margin-top: 60px;
-            text-align: center;
-            padding: 30px 20px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-        .tool-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            padding: 8px 12px;
-            cursor: pointer;
-            margin: 0 5px;
-            border-radius: 6px;
-        }
-        .tool-btn:hover { background: rgba(128,128,128,0.1); color: var(--text-primary); }
-        .tool-btn.danger { color: var(--danger-color); }
-
-        /* === 彈出視窗 (Modal / Bottom Sheet) === */
+        /* === 彈出視窗 (Bottom Sheet 2.0) === */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             display: none;
-            justify-content: center;
-            align-items: center; /* Desktop Default */
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.4s;
         }
         .modal-overlay.active { opacity: 1; }
 
-        .modal-content {
-            background: var(--bg-card);
-            width: 100%;
-            max-width: 500px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .modal-container {
+            position: absolute;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            max-height: 85vh;
-            overflow: hidden;
-            transform: scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .modal-overlay.active .modal-content { transform: scale(1); }
 
-        /* 手機版 Bottom Sheet 樣式 */
+        /* Desktop Modal */
+        @media (min-width: 601px) {
+            .modal-overlay { justify-content: center; align-items: center; display: flex; }
+            .modal-container {
+                position: relative;
+                width: 90%;
+                max-width: 520px;
+                border-radius: 28px;
+                max-height: 80vh;
+                transform: scale(0.95) translateY(20px);
+                background: var(--bg-card); /* Desktop 用 Card 色 */
+            }
+            .modal-overlay.active .modal-container { transform: scale(1) translateY(0); }
+        }
+
+        /* Mobile Bottom Sheet */
         @media (max-width: 600px) {
-            .modal-overlay { align-items: flex-end; }
-            .modal-content {
-                border-radius: 24px 24px 0 0;
+            .modal-container {
+                left: 0; right: 0; bottom: 0;
+                border-radius: 32px 32px 0 0;
                 max-height: 80vh;
                 transform: translateY(100%);
-                transition: transform 0.3s ease-out;
+                padding-bottom: env(safe-area-inset-bottom);
+                background: #1e293b; /* 確保不透底 */
             }
-            .modal-overlay.active .modal-content { transform: translateY(0); }
+            body.light-mode .modal-container { background: #fff; }
+            .modal-overlay.active .modal-container { transform: translateY(0); }
             
-            .app-header h1 { font-size: 1.6rem; }
-            .stats-badges { display: none; } /* 簡化手機頂部 */
-            .bible-grid { grid-template-columns: repeat(3, 1fr); }
+            .modal-handle {
+                width: 48px;
+                height: 5px;
+                background: var(--border-color);
+                border-radius: 3px;
+                margin: 16px auto 0;
+                opacity: 0.5;
+            }
         }
 
         .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 20px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .modal-title { margin: 0; font-size: 1.2rem; color: var(--text-primary); }
-        .btn-close { background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; padding: 5px; }
-        
-        .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-title { font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text-primary); }
+        .modal-close { 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 50%; width: 36px; height: 36px; 
+            border: none; font-size: 1.4rem; color: var(--text-secondary); 
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            touch-action: manipulation;
+        }
+        body.light-mode .modal-close { background: rgba(0,0,0,0.05); }
+
+        .modal-content {
+            padding: 0 28px 40px; /* 底部加高 */
+            overflow-y: auto;
+        }
 
         /* 章節按鈕 */
         .chapter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+            gap: 12px;
         }
         .ch-btn {
             aspect-ratio: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 12px;
-            background: var(--bg-body);
+            border-radius: 14px;
             border: 1px solid var(--border-color);
             color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            background: rgba(255,255,255,0.02);
+            font-size: 1.15rem;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.1s ease;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation; /* 優化觸控反應 */
         }
+        .ch-btn:active { transform: scale(0.85); }
+        
+        /* 章節點擊特效 */
+        .ch-btn.clicked-anim::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            background: rgba(16, 185, 129, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: ripple 0.4s ease-out;
+        }
+        @keyframes ripple {
+            to { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
         .ch-btn.active {
             background: var(--success-color);
             color: white;
             border-color: var(--success-color);
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
         }
 
-        /* 回到頂部按鈕 (Floating Action Button) */
-        .scroll-top-btn {
+        /* FAB 回到頂部 */
+        .fab-top {
             position: fixed;
-            bottom: 30px; 
+            bottom: 30px;
             right: 25px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 56px;
+            height: 56px;
             background: var(--accent-gold);
-            color: var(--bg-body);
+            color: #1a1a1a;
+            border-radius: 50%;
             border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 1.2rem;
-            cursor: pointer;
-            z-index: 990;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.4rem;
+            z-index: 90;
             opacity: 0;
+            transform: translateY(30px) scale(0.8);
             pointer-events: none;
-            transform: scale(0.8) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding-bottom: env(safe-area-inset-bottom);
         }
-        
-        .scroll-top-btn.visible {
+        .fab-top:hover { transform: scale(1.1); }
+        .fab-top.visible {
             opacity: 1;
+            transform: translateY(0) scale(1);
             pointer-events: auto;
-            transform: scale(1) translateY(0);
         }
-        
-        .scroll-top-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
+        .footer-tools {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .footer-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .footer-btn:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+        .footer-btn.danger:hover { border-color: var(--danger-color); color: var(--danger-color); }
 
         /* Utility */
         .hidden { display: none !important; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* 優化：縮短動畫時間 */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* RWD 調整 */
+        @media (max-width: 600px) {
+            .status-bar { padding-left: 16px; padding-right: 16px; }
+            .rank-badge { font-size: 0.95rem; }
+            .xp-bar-container { max-width: 120px; }
+            .actions .stats-badges { display: none; } /* 手機隱藏 */
+            
+            .container { padding: 20px 16px; }
+            .hero-title { font-size: 1.8rem; }
+            .bible-grid { grid-template-columns: repeat(3, 1fr); }
+            
+            .modal-content { padding-left: 20px; padding-right: 20px; }
+        }
+
+        /* --- 特效樣式 --- */
+
+        /* Rank Up Overlay (Gold) */
+        .rank-up-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 17, 32, 0.9);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.6s;
+            backdrop-filter: blur(10px);
+        }
+        .rank-up-overlay.active { display: flex; opacity: 1; }
+        
+        .rank-up-content {
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 20px;
+        }
+        .rank-up-overlay.active .rank-up-content { transform: scale(1); }
+
+        .rank-up-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fbbf24;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+        }
+        .rank-up-badge-lg {
+            font-size: 5rem;
+            margin: 20px 0;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        
+        .rank-up-new {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        /* Book Complete Overlay (Green theme) */
+        .book-complete-overlay {
+             background: rgba(6, 78, 59, 0.95); /* 深綠色背景 */
+        }
+
+        /* Confetti Particles Animation */
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            z-index: 9999;
+            top: -20px;
+            pointer-events: none;
+            border-radius: 2px;
+        }
 
     </style>
 </head>
 <body>
 
     <!-- 頂部狀態列 -->
-    <div class="status-bar">
-        <div class="level-info">
+    <header class="status-bar">
+        <div class="user-meta">
             <div class="level-header">
-                <span class="rank-title" id="rank-title">Lv.1 尋求者</span>
-                <span class="progress-text" id="total-progress-text">0 / 1189 章</span>
-            </div>
-            <div class="xp-container">
-                <div class="xp-track">
-                    <div class="xp-fill" id="main-xp-bar"></div>
+                <div class="rank-badge" id="rank-badge-el">
+                    <span id="rank-title">Lv.1 尋求者</span>
+                </div>
+                <div class="progress-indicator">
+                    <span id="total-progress-text">0 / 1189</span>
                 </div>
             </div>
-            <div class="stats-badges">
-                <span class="stat-badge">🔥 連續 <span id="streak-count" style="color:var(--accent-gold)">0</span> 天</span>
-                <span class="stat-badge">📖 完成度 <span id="percent-text">0%</span></span>
+            <div class="xp-bar-container">
+                <div class="xp-bar-fill" id="main-xp-bar"></div>
             </div>
         </div>
-        <div class="controls-area">
-            <button class="icon-btn" onclick="toggleTheme()" title="切換深淺模式">☀️</button>
+        
+        <div class="actions">
+            <!-- 桌面版顯示數據 -->
+            <div class="stats-badges">
+                <div class="stat-item">
+                    <span class="stat-val" style="color:var(--accent-gold)" id="streak-count">0</span>
+                    <span class="stat-label">連續</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="percent-text">0%</span>
+                    <span class="stat-label">完成</span>
+                </div>
+            </div>
+            <button class="icon-btn" onclick="toggleTheme()" title="切換深淺模式">☀</button>
             <button class="icon-btn" onclick="openHelp()" title="使用說明">?</button>
         </div>
-    </div>
+    </header>
 
-    <!-- 內容容器 -->
     <div class="container">
-        
+
         <!-- 主視圖 -->
         <div id="main-view">
             
-            <div class="app-header">
-                <h1>聖經讀經打卡：養成屬靈好習慣</h1>
-                <p>每天累積一點點，讓神的話語成為力量。透過打卡與進度追蹤，幫助您克服惰性，建立終身受用的屬靈習慣。</p>
+            <div class="hero-section">
+                <h1 class="hero-title">聖經讀經打卡</h1>
+                <p class="hero-desc">養成屬靈好習慣，每天一點累積，讓神的話語成為力量。</p>
             </div>
 
-            <!-- 每日動力卡片 -->
+            <!-- 動力金句 -->
             <div class="card quote-card">
-                <h3 style="margin:0 0 10px; color:var(--text-secondary); font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">🔥 習慣養成動力</h3>
-                <div class="quote-text" id="daily-quote-text">載入中...</div>
-                <small class="quote-source" id="daily-quote-source"></small>
-                <div class="card-actions">
-                    <button class="btn-primary" onclick="generateQuote()">
-                        <span>💪</span> 獲得鼓勵
-                    </button>
+                <div class="card-header">
+                    <span class="card-title" style="color:var(--accent-gold)">🔥 習慣養成動力</span>
+                </div>
+                <div class="quote-content" id="daily-quote-text">載入中...</div>
+                <div class="quote-author" id="daily-quote-source"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateQuote()">💪 獲得鼓勵</button>
                 </div>
             </div>
 
-            <!-- 靈修日記卡片 -->
-            <div class="card journal-card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0; font-size:1.1rem;">📝 靈修日記</h3>
-                    <span id="journal-date" style="color:var(--text-secondary); font-size:0.9rem;"></span>
+            <!-- 靈修日記 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📝 靈修日記</span>
+                    <span style="font-size:0.85rem; color:var(--text-secondary); font-weight:500;" id="journal-date"></span>
                 </div>
-                <textarea id="journal-input" placeholder="記錄今天神對你說的話，或是你的禱告..."></textarea>
-                <div class="card-actions">
-                    <button class="btn-outline" onclick="showHistoryView()">📜 歷史紀錄</button>
-                    <button class="btn-primary" onclick="saveReflection()">💾 儲存筆記</button>
+                <textarea class="journal-input" id="journal-input" placeholder="記錄今天神對你說的話..." maxlength="500" oninput="updateCharCount(this)"></textarea>
+                <div style="text-align:right; font-size:0.8rem; margin-top:8px; font-weight:600; color:var(--text-tertiary);">
+                    <span id="char-count">0</span> / 500
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="showHistoryView()">📜 歷史紀錄</button>
+                    <button class="btn btn-primary" onclick="saveReflection()">💾 儲存筆記</button>
                 </div>
             </div>
 
-            <!-- 舊約區塊 -->
-            <div class="section-header">
-                <h2 class="section-title">舊約 Old Testament</h2>
-            </div>
+            <!-- 書卷列表 -->
+            <div class="section-separator">舊約 Old Testament</div>
             <div class="bible-grid" id="ot-grid"></div>
 
-            <!-- 新約區塊 -->
-            <div class="section-header">
-                <h2 class="section-title">新約 New Testament</h2>
-            </div>
+            <div class="section-separator">新約 New Testament</div>
             <div class="bible-grid" id="nt-grid"></div>
 
-            <!-- 底部工具 -->
-            <div class="footer-tools">
-                <p>資料皆儲存於本機，請定期備份。</p>
-                <button class="tool-btn" onclick="exportData()">📥 匯出備份</button>
-                <button class="tool-btn" onclick="document.getElementById('import-file').click()">📤 匯入紀錄</button>
-                <button class="tool-btn danger" onclick="resetData()">⚠️ 重置進度</button>
+            <!-- 底部功能 -->
+            <div class="footer">
+                <p>資料儲存於本機，建議定期備份。</p>
+                <div class="footer-tools">
+                    <button class="footer-btn" onclick="exportData()">📥 匯出備份</button>
+                    <button class="footer-btn" onclick="document.getElementById('import-file').click()">📤 匯入紀錄</button>
+                    <button class="footer-btn danger" onclick="resetData()">⚠️ 重置進度</button>
+                </div>
                 <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(this)">
             </div>
         </div>
 
         <!-- 歷史紀錄視圖 -->
         <div id="history-view" class="hidden history-container">
-            <div class="nav-back" onclick="navigateBackHistory()">
-                <span>←</span> <span id="history-back-text">返回主頁</span>
+            <div class="history-header">
+                <div class="back-link" onclick="navigateBackHistory()">
+                    <span>←</span> <span id="history-back-text">返回主頁</span>
+                </div>
             </div>
-            <h2 style="margin:0 0 25px; font-size:1.8rem;">📜 靈修歷史紀錄</h2>
+            <h2 style="margin:0 0 30px; font-size:1.8rem; font-weight:800; text-align:center;">📜 靈修歷史紀錄</h2>
             <div id="history-content-area"></div>
         </div>
 
     </div>
 
-    <!-- 回到頂部按鈕 -->
-    <button id="scroll-top-btn" class="scroll-top-btn" onclick="scrollToTop()" title="回到頂部">▲</button>
+    <!-- Floating Action Button -->
+    <button id="scroll-top-btn" class="fab-top" onclick="scrollToTop()">▲</button>
 
-    <!-- 章節選擇 Modal -->
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast">📝 日記已儲存</div>
+
+    <!-- 章節選單 Modal (Mobile Bottom Sheet) -->
     <div class="modal-overlay" id="chapter-modal" onclick="closeModal(event)">
-        <div class="modal-content">
+        <div class="modal-container">
+            <div class="modal-handle"></div> <!-- Mobile Handle -->
             <div class="modal-header">
                 <h3 class="modal-title" id="modal-book-title">創世記</h3>
-                <button class="btn-close" onclick="closeModalDirect('chapter-modal')">×</button>
+                <button class="modal-close" onclick="closeModalDirect('chapter-modal')">×</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="chapter-grid" id="modal-chapter-grid"></div>
             </div>
         </div>
     </div>
 
-    <!-- 幫助說明 Modal -->
+    <!-- 說明 Modal -->
     <div class="modal-overlay" id="help-modal" onclick="closeModal(event)">
-        <div class="modal-content">
+        <div class="modal-container">
+            <div class="modal-handle"></div>
             <div class="modal-header">
                 <h3 class="modal-title">📖 使用說明</h3>
-                <button class="btn-close" onclick="closeModalDirect('help-modal')">×</button>
+                <button class="modal-close" onclick="closeModalDirect('help-modal')">×</button>
             </div>
-            <div class="modal-body" style="line-height:1.8; color:var(--text-secondary);">
-                <p><strong style="color:var(--text-primary)">🌟 願景：</strong> 本工具旨在透過「視覺化反饋」與「微小習慣堆疊」，幫助使用者克服惰性，建立穩定的靈修生活。</p>
+            <div class="modal-content" style="line-height:1.8; color:var(--text-secondary);">
+                <p><strong style="color:var(--accent-gold)">養成屬靈好習慣</strong><br>本工具透過「打卡」與「視覺化進度」，幫助您建立穩定的讀經生活。</p>
                 <ul style="padding-left:20px; margin-top:10px;">
-                    <li><strong>點擊書卷：</strong> 展開章節選單進行打卡。</li>
-                    <li><strong>累積經驗：</strong> 讀經越多，等級越高，稱號也會隨之改變。</li>
-                    <li><strong>靈修日記：</strong> 每日記錄感動，並可在歷史紀錄中按年份/季度回顧。</li>
-                    <li><strong>資料安全：</strong> 資料僅存於您的瀏覽器中，請定期使用下方的「匯出備份」功能。</li>
+                    <li><strong>讀經打卡：</strong> 點擊書卷，展開章節進行勾選。</li>
+                    <li><strong>等級系統：</strong> 隨著進度累積，您的屬靈稱號會改變。</li>
+                    <li><strong>靈修日記：</strong> 記錄每日亮光，支援按年/季回顧。</li>
+                    <li><strong>資料備份：</strong> 資料存於手機中，請定期使用「匯出備份」。</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- 提示框 -->
-    <div class="toast" id="toast" style="display:none;"></div>
+    <!-- 升級特效 Modal (Gold) -->
+    <div class="rank-up-overlay" id="rank-up-overlay" onclick="closeRankUp()">
+        <div class="rank-up-content">
+            <div class="rank-up-title">LEVEL UP!</div>
+            <div class="rank-up-badge-lg">🏆</div>
+            <div class="rank-up-new" id="rank-up-name">新稱號</div>
+            <div style="color:#cbd5e1; margin-bottom: 5px;">你的屬靈身量增長了！</div>
+            <div style="color:#94a3b8; font-size: 0.9rem;" id="rank-up-reminder">保持每日閱讀的習慣，讓生命更新。</div> <!-- New Reminder -->
+            <button class="btn btn-primary" style="margin-top:30px;" onclick="closeRankUp()">繼續前行</button>
+        </div>
+    </div>
+
+    <!-- Book Complete Modal (Green) -->
+    <div class="rank-up-overlay book-complete-overlay" id="book-complete-overlay" onclick="closeBookComplete()">
+        <div class="rank-up-content">
+            <div class="rank-up-title" style="color:var(--success-color); text-shadow: 0 0 30px rgba(16, 185, 129, 0.6);">COMPLETED!</div>
+            <div class="rank-up-badge-lg">✨</div>
+            <div class="rank-up-new" id="book-complete-name" style="margin-bottom:10px;">書卷名稱</div>
+            <div style="color:#e2e8f0;">恭喜！你已經讀完了這卷書！</div>
+            <button class="btn btn-primary" style="margin-top:30px; background:var(--success-color); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);" onclick="closeBookComplete()">太棒了</button>
+        </div>
+    </div>
 
     <script>
-        // --- 1. 資料庫 ---
+        // --- 1. 資料庫 (Bible Data) ---
         const bibleData = {
             ot: [
                 { name: "創世記", ch: 50 }, { name: "出埃及記", ch: 40 }, { name: "利未記", ch: 27 }, 
@@ -765,7 +1054,7 @@
         };
 
         const habitQuotes = [
-            // --- 聖經經文 (CUNP-神版) ---
+            // CUNP-神版 完整經文
             { text: "誰藐視這日的事為小呢？這七眼乃是耶和華的眼睛，遍察全地，見所羅巴伯手拿線鉈就歡喜。", source: "撒迦利亞書 4:10" },
             { text: "我們行善，不可喪志；若不灰心，到了時候就要收成。", source: "加拉太書 6:9" },
             { text: "殷勤籌劃的，足致豐裕；行事急躁的，都必缺乏。", source: "箴言 21:5" },
@@ -846,22 +1135,22 @@
             { text: "我可以接受失敗，但我不能接受不去嘗試。", source: "喬丹" }
         ];
 
-        const totalBibleChapters = 1189;
         const ranks = [
             "尋求者", "渴慕者", "學道者", "跟隨者", "扎根者", 
             "踐行者", "見證人", "守望者", "好管家", "忠心僕人", "與神同行"
         ];
+        const totalBibleChapters = 1189;
 
-        // --- 2. 應用狀態 ---
+        // State
         let progressData = {}; 
         let userStats = { streak: 0, lastLogin: null };
         let settings = { theme: 'dark' }; 
         let reflections = {}; 
         let currentOpenBook = null;
-        
-        let historyViewMode = 'list'; // 'list' -> 'quarters' -> 'detail'
+        let historyViewMode = 'list';
         let selectedYear = null;
         let selectedQuarter = null;
+        let lastRankIndex = -1; // 用於追蹤等級變化
 
         // --- 3. 初始化 ---
         function init() {
@@ -869,7 +1158,7 @@
             applyTheme();
             checkStreak();
             renderLibrary();
-            updateGlobalStats();
+            updateGlobalStats(); // This calculates rank
             generateQuote();
             renderJournal();
         }
@@ -892,7 +1181,7 @@
             localStorage.setItem('bibleRpg_Reflections', JSON.stringify(reflections));
             updateGlobalStats();
         }
-        
+
         function toggleTheme() {
             settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
             localStorage.setItem('bibleRpg_Settings', JSON.stringify(settings));
@@ -900,11 +1189,8 @@
         }
 
         function applyTheme() {
-            if (settings.theme === 'light') {
-                document.body.classList.add('light-mode');
-            } else {
-                document.body.classList.remove('light-mode');
-            }
+            if (settings.theme === 'light') document.body.classList.add('light-mode');
+            else document.body.classList.remove('light-mode');
         }
 
         function renderLibrary() {
@@ -915,43 +1201,43 @@
         function renderSection(key, elementId) {
             const grid = document.getElementById(elementId);
             grid.innerHTML = '';
-
             bibleData[key].forEach(book => {
                 const completedArr = progressData[book.name] || [];
                 const percent = Math.round((completedArr.length / book.ch) * 100);
-                const isFullyComplete = completedArr.length === book.ch;
-
-                const card = document.createElement('div');
-                card.className = `book-btn ${isFullyComplete ? 'completed' : ''}`;
-                card.onclick = () => openBookModal(book);
-                card.id = `card-${book.name}`; 
-
-                card.innerHTML = `
-                    <span class="book-title">${book.name}</span>
-                    <div class="mini-progress">
-                        <div class="mini-fill" style="width: ${percent}%"></div>
+                const isComplete = completedArr.length === book.ch;
+                
+                const tile = document.createElement('div');
+                tile.className = `book-tile ${isComplete ? 'completed' : ''}`;
+                tile.onclick = () => openBookModal(book);
+                tile.id = `card-${book.name}`;
+                
+                tile.innerHTML = `
+                    <span class="book-name">${book.name}</span>
+                    <div class="progress-bar-sm">
+                        <div class="progress-fill-sm" style="width: ${percent}%"></div>
                     </div>
                 `;
-                grid.appendChild(card);
+                grid.appendChild(tile);
             });
         }
 
+        // Modal Logic
         function openBookModal(book) {
             currentOpenBook = book;
             document.getElementById('modal-book-title').innerText = book.name;
             const grid = document.getElementById('modal-chapter-grid');
             grid.innerHTML = '';
-
+            
             const completedArr = progressData[book.name] || [];
-
-            for (let i = 1; i <= book.ch; i++) {
+            
+            for(let i=1; i<=book.ch; i++) {
                 const btn = document.createElement('div');
                 btn.className = `ch-btn ${completedArr.includes(i) ? 'active' : ''}`;
                 btn.innerText = i;
                 btn.onclick = () => toggleChapter(i, btn);
                 grid.appendChild(btn);
             }
-
+            
             const modal = document.getElementById('chapter-modal');
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
@@ -963,55 +1249,66 @@
             requestAnimationFrame(() => modal.classList.add('active'));
         }
 
-        function toggleChapter(chapterNum, btn) {
-            const bookName = currentOpenBook.name;
-            if (!progressData[bookName]) progressData[bookName] = [];
-
-            const index = progressData[bookName].indexOf(chapterNum);
-            
-            if (index === -1) {
-                progressData[bookName].push(chapterNum);
-                btn.classList.add('active');
-            } else {
-                progressData[bookName].splice(index, 1);
-                btn.classList.remove('active');
-            }
-
-            saveData();
-            updateBookCard(currentOpenBook);
-        }
-
-        function updateBookCard(book) {
-            const card = document.getElementById(`card-${book.name}`);
-            const completedArr = progressData[book.name] || [];
-            const percent = Math.round((completedArr.length / book.ch) * 100);
-            
-            card.querySelector('.mini-fill').style.width = `${percent}%`;
-            
-            if (completedArr.length === book.ch) {
-                card.classList.add('completed');
-            } else {
-                card.classList.remove('completed');
-            }
-        }
-
         function closeModal(e) {
             if (e.target.classList.contains('modal-overlay')) {
                 e.target.classList.remove('active');
-                setTimeout(() => {
-                    e.target.style.display = 'none';
-                }, 300);
+                setTimeout(() => e.target.style.display = 'none', 300);
             }
         }
         
         function closeModalDirect(id) {
             const modal = document.getElementById(id);
             modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+            setTimeout(() => modal.style.display = 'none', 300);
         }
 
+        // Chapter Logic
+        function toggleChapter(num, btn) {
+            const bookName = currentOpenBook.name;
+            if(!progressData[bookName]) progressData[bookName] = [];
+            
+            const idx = progressData[bookName].indexOf(num);
+            if(idx === -1) {
+                // Add Chapter
+                progressData[bookName].push(num);
+                btn.classList.add('active');
+                
+                // Click Effect Animation
+                btn.classList.add('clicked-anim');
+                setTimeout(() => btn.classList.remove('clicked-anim'), 400);
+
+                // Book Completion Check
+                if (progressData[bookName].length === currentOpenBook.ch) {
+                    // 書卷完成：綠色主題
+                    showBookComplete(bookName);
+                    triggerConfetti('colorful'); // 這裡使用彩色
+                }
+            } else {
+                progressData[bookName].splice(idx, 1);
+                btn.classList.remove('active');
+            }
+            saveData();
+            updateBookTile(currentOpenBook);
+        }
+
+        function updateBookTile(book) {
+            const card = document.getElementById(`card-${book.name}`);
+            const completedArr = progressData[book.name] || [];
+            const percent = Math.round((completedArr.length / book.ch) * 100);
+            
+            card.querySelector('.progress-fill-sm').style.width = `${percent}%`;
+            
+            if(completedArr.length === book.ch) {
+                if (!card.classList.contains('completed')) {
+                    card.classList.add('completed');
+                    // Remove flash animation
+                }
+            } else {
+                card.classList.remove('completed');
+            }
+        }
+
+        // Stats & Rank Up
         function updateGlobalStats() {
             let totalRead = 0;
             
@@ -1023,57 +1320,62 @@
             const rankIndex = Math.min(Math.floor(level / 5), ranks.length - 1); 
             const rankName = ranks[rankIndex];
 
-            document.getElementById('total-progress-text').innerText = `${totalRead} / ${totalBibleChapters} 章`;
-            document.getElementById('rank-title').innerText = `Lv.${level} ${rankName}`;
+            // Check Rank Up Effect (Initial load -1 avoids trigger)
+            if (lastRankIndex !== -1 && rankIndex > lastRankIndex) {
+                // 升級：金色主題
+                showRankUp(rankName);
+                triggerConfetti('gold'); // 金色彩帶
+            }
+            lastRankIndex = rankIndex;
+
+            // Safety Checks & Updates
+            const elRank = document.getElementById('rank-title');
+            if(elRank) {
+                elRank.innerText = `Lv.${level} ${rankName}`;
+                // Small pulse animation on update
+                document.getElementById('rank-badge-el').classList.add('pulse');
+                setTimeout(()=>document.getElementById('rank-badge-el').classList.remove('pulse'), 500);
+            }
             
-            const xpInCurrentLevel = totalRead % 10;
-            const xpPercent = (xpInCurrentLevel / 10) * 100;
-            document.getElementById('main-xp-bar').style.width = `${xpPercent}%`;
-
-            const totalPercent = ((totalRead / totalBibleChapters) * 100).toFixed(1);
-            document.getElementById('percent-text').innerText = `${totalPercent}%`;
-
-            document.getElementById('streak-count').innerText = userStats.streak;
+            const elTotal = document.getElementById('total-progress-text');
+            if(elTotal) elTotal.innerText = `${totalRead} / ${totalBibleChapters}`;
+            
+            const elStreak = document.getElementById('streak-count');
+            if(elStreak) elStreak.innerText = userStats.streak;
+            
+            const elBar = document.getElementById('main-xp-bar');
+            if(elBar) {
+                const xpInLevel = totalRead % 10;
+                const xpPercent = (xpInLevel / 10) * 100;
+                elBar.style.width = `${xpPercent}%`;
+            }
+            
+            const elPercent = document.getElementById('percent-text');
+            if(elPercent) {
+                const totalPercent = ((totalRead / totalBibleChapters) * 100).toFixed(1);
+                elPercent.innerText = `${totalPercent}%`;
+            }
         }
 
         function checkStreak() {
             const today = new Date().toDateString();
-            if (userStats.lastLogin !== today) {
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
+            if(userStats.lastLogin !== today) {
+                const yest = new Date();
+                yest.setDate(yest.getDate() - 1);
                 
-                if (userStats.lastLogin === yesterday.toDateString()) {
-                    userStats.streak++;
-                } else {
-                    // 如果不是第一天登入（斷更），重置為 1
-                    if (userStats.lastLogin) userStats.streak = 1;
-                    else userStats.streak = 1; // 首次登入
-                }
+                if(userStats.lastLogin === yest.toDateString()) userStats.streak++;
+                else userStats.streak = 1;
+                
                 userStats.lastLogin = today;
                 saveData();
             }
         }
 
+        // Journal & Quotes
         function generateQuote() {
-             const randomQuote = habitQuotes[Math.floor(Math.random() * habitQuotes.length)];
-             document.getElementById('daily-quote-text').innerText = `「${randomQuote.text}」`;
-             document.getElementById('daily-quote-source').innerText = `— ${randomQuote.source}`;
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        function resetData() {
-            if(confirm('確定要刪除所有紀錄重來嗎？')) {
-                localStorage.removeItem('bibleRpg_ChapterProgress');
-                localStorage.removeItem('bibleRpg_Stats');
-                localStorage.removeItem('bibleRpg_Reflections');
-                location.reload();
-            }
+             const q = habitQuotes[Math.floor(Math.random() * habitQuotes.length)];
+             document.getElementById('daily-quote-text').innerText = `「${q.text}」`;
+             document.getElementById('daily-quote-source').innerText = `— ${q.source}`;
         }
 
         function getTodayString() {
@@ -1087,44 +1389,139 @@
         function renderJournal() {
             const today = getTodayString();
             document.getElementById('journal-date').innerText = today;
-            if (reflections[today]) {
-                document.getElementById('journal-input').value = reflections[today];
+            if(reflections[today]) {
+                const el = document.getElementById('journal-input');
+                el.value = reflections[today];
+                updateCharCount(el);
             }
+        }
+
+        function updateCharCount(el) {
+            const len = el.value.length;
+            const counter = document.getElementById('char-count');
+            counter.innerText = len;
+            if(len > 500) counter.style.color = 'var(--danger-color)';
+            else if(len > 450) counter.style.color = 'var(--accent-gold)';
+            else counter.style.color = 'var(--text-tertiary)';
         }
 
         function saveReflection() {
             const today = getTodayString();
             const text = document.getElementById('journal-input').value;
-            if (text.trim() === "") return;
             
+            if(text.length > 500) {
+                alert("字數超過 500 字上限");
+                return;
+            }
+            if(text.trim() === "") {
+                delete reflections[today];
+                saveData();
+                showToast("🗑️ 日記已清除");
+                return;
+            }
             reflections[today] = text;
             saveData();
             showToast("📝 日記已儲存");
         }
 
-        // --- 視圖導航 ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'flex';
+            void t.offsetWidth; // force reflow
+            t.classList.add('show');
+            setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => t.style.display = 'none', 500);
+            }, 2000);
+        }
+
+        // --- 特效邏輯 ---
+        
+        // 1. Confetti (支援類型：colorful 或 gold)
+        function triggerConfetti(type = 'colorful') {
+            const colorfulColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            const goldColors = ['#fbbf24', '#f59e0b', '#d97706', '#fffbeb', '#ffffff'];
+            
+            const palette = type === 'gold' ? goldColors : colorfulColors;
+            
+            for (let i = 0; i < 150; i++) { // 增加數量
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = palette[Math.floor(Math.random() * palette.length)];
+                
+                // 隨機大小與速度
+                const duration = Math.random() * 2 + 2; 
+                confetti.style.animation = `fall ${duration}s linear forwards`;
+                
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), duration * 1000);
+            }
+        }
+
+        // 2. Rank Up Overlay (Gold)
+        function showRankUp(newRank) {
+            const overlay = document.getElementById('rank-up-overlay');
+            const nameEl = document.getElementById('rank-up-name');
+            nameEl.innerText = newRank;
+            
+            // Random encouragement/reminder
+            const reminders = [
+                "保持每日閱讀的習慣，讓生命更新。",
+                "每一個章節都是靈命的養分。",
+                "你的恆心將帶來豐盛的收穫。",
+                "不要輕看這微小的進步。",
+                "神的話語是你腳前的燈，路上的光。"
+            ];
+            const reminderEl = document.getElementById('rank-up-reminder');
+            if(reminderEl) reminderEl.innerText = reminders[Math.floor(Math.random() * reminders.length)];
+
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+        }
+
+        function closeRankUp() {
+            const overlay = document.getElementById('rank-up-overlay');
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.style.display = 'none', 600);
+        }
+
+        // 3. Book Complete Overlay (Green)
+        function showBookComplete(bookName) {
+            const overlay = document.getElementById('book-complete-overlay');
+            const nameEl = document.getElementById('book-complete-name');
+            nameEl.innerText = `《${bookName}》`;
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+        }
+
+        function closeBookComplete() {
+            const overlay = document.getElementById('book-complete-overlay');
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.style.display = 'none', 600);
+        }
+
+
+        // History Navigation
         function showMainView() {
             document.getElementById('history-view').classList.add('hidden');
             document.getElementById('main-view').classList.remove('hidden');
-            window.scrollTo(0, 0);
+            window.scrollTo(0,0);
         }
-
         function showHistoryView() {
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('history-view').classList.remove('hidden');
-            
             historyViewMode = 'list';
-            selectedYear = null;
-            selectedQuarter = null;
             renderHistoryLog();
-            window.scrollTo(0, 0);
+            window.scrollTo(0,0);
         }
-        
         function navigateBackHistory() {
-            if (historyViewMode === 'detail') {
+            if(historyViewMode === 'detail') {
                 historyViewMode = 'quarters';
                 renderHistoryLog();
-            } else if (historyViewMode === 'quarters') {
+            } else if(historyViewMode === 'quarters') {
                 historyViewMode = 'list';
                 renderHistoryLog();
             } else {
@@ -1132,204 +1529,124 @@
             }
         }
 
-        function getQuarter(month) {
-            if (month <= 3) return 1;
-            if (month <= 6) return 2;
-            if (month <= 9) return 3;
-            return 4;
+        function getQuarter(m) {
+            if(m<=3) return 1; if(m<=6) return 2; if(m<=9) return 3; return 4;
         }
 
         function renderHistoryLog() {
             const container = document.getElementById('history-content-area');
             const backText = document.getElementById('history-back-text');
             container.innerHTML = '';
-
+            
             const dates = Object.keys(reflections).sort().reverse();
-
-            if (dates.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary); margin-top:50px;">尚無紀錄，快去寫下第一篇靈修日記吧！</p>';
+            if(dates.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-secondary);margin-top:50px;">尚無紀錄</p>';
                 return;
             }
-            
+
             const yearsData = {};
-            dates.forEach(date => {
-                const y = date.split('-')[0];
-                if (!yearsData[y]) yearsData[y] = 0;
+            dates.forEach(d => {
+                const y = d.split('-')[0];
+                if(!yearsData[y]) yearsData[y] = 0;
                 yearsData[y]++;
             });
-            const sortedYears = Object.keys(yearsData).sort(); // 舊 -> 新
-            
-            // --- 年份列表 ---
-            if (historyViewMode === 'list') {
+            const sortedYears = Object.keys(yearsData).sort(); 
+
+            if(historyViewMode === 'list') {
                 backText.innerText = "返回主頁";
-                const listDiv = document.createElement('div');
-                listDiv.className = 'selection-grid';
-                
-                sortedYears.forEach(year => {
-                    const btn = document.createElement('div');
-                    btn.className = 'selection-card';
-                    btn.innerHTML = `
-                        <div class="card-title">${year}年</div>
-                        <div class="card-subtitle">共 ${yearsData[year]} 篇</div>
-                        <div class="card-arrow">➜</div>
-                    `;
-                    btn.onclick = () => {
-                        selectedYear = year;
-                        historyViewMode = 'quarters';
-                        renderHistoryLog();
-                    };
-                    listDiv.appendChild(btn);
+                const grid = document.createElement('div');
+                grid.className = 'year-grid';
+                sortedYears.forEach(y => {
+                    const card = document.createElement('div');
+                    card.className = 'year-card';
+                    card.innerHTML = `<span class="year-num">${y}</span><span class="year-desc">${yearsData[y]} 篇日記</span>`;
+                    card.onclick = () => { selectedYear = y; historyViewMode = 'quarters'; renderHistoryLog(); };
+                    grid.appendChild(card);
                 });
-                container.appendChild(listDiv);
-            } 
-            
-            // --- 季度列表 ---
-            else if (historyViewMode === 'quarters' && selectedYear) {
+                container.appendChild(grid);
+            }
+            else if(historyViewMode === 'quarters') {
                 backText.innerText = "返回年份";
-                
-                // 數據統計
-                const quartersData = {1: 0, 2: 0, 3: 0, 4: 0};
-                const yearDates = dates.filter(d => d.startsWith(selectedYear));
-                yearDates.forEach(date => {
-                    const month = parseInt(date.split('-')[1]);
-                    const q = getQuarter(month);
-                    quartersData[q]++;
+                const qData = {1:0, 2:0, 3:0, 4:0};
+                dates.filter(d => d.startsWith(selectedYear)).forEach(d => {
+                    qData[getQuarter(parseInt(d.split('-')[1]))]++;
                 });
-
-                const listDiv = document.createElement('div');
-                listDiv.className = 'selection-grid';
                 
-                [1, 2, 3, 4].forEach(q => {
-                    const count = quartersData[q];
-                    const label = `第 ${q} 季`;
-                    const range = ["1-3月", "4-6月", "7-9月", "10-12月"][q-1];
-                    
-                    const btn = document.createElement('div');
-                    btn.className = 'selection-card';
-                    if (count === 0) btn.style.opacity = '0.5';
-                    
-                    btn.innerHTML = `
-                        <div class="card-title">Q${q}</div>
-                        <div class="card-subtitle" style="color:var(--accent-gold); margin-bottom:5px;">${range}</div>
-                        <div class="card-subtitle">${count} 篇</div>
-                    `;
-                    
-                    if (count > 0) {
-                        btn.onclick = () => {
-                            selectedQuarter = q;
-                            historyViewMode = 'detail';
-                            renderHistoryLog();
-                        };
-                    }
-                    listDiv.appendChild(btn);
+                const grid = document.createElement('div');
+                grid.className = 'year-grid';
+                [1,2,3,4].forEach(q => {
+                    const count = qData[q];
+                    const card = document.createElement('div');
+                    card.className = 'year-card';
+                    if(count === 0) card.style.opacity = '0.5';
+                    card.innerHTML = `<span class="year-num">Q${q}</span><span class="year-desc">${count} 篇日記</span>`;
+                    if(count > 0) card.onclick = () => { selectedQuarter = q; historyViewMode = 'detail'; renderHistoryLog(); };
+                    grid.appendChild(card);
                 });
-                container.appendChild(listDiv);
+                container.appendChild(grid);
             }
-
-            // --- 明細 ---
-            else if (historyViewMode === 'detail' && selectedYear && selectedQuarter) {
+            else if(historyViewMode === 'detail') {
                 backText.innerText = "返回季度";
+                const targetDates = dates.filter(d => d.startsWith(selectedYear) && getQuarter(parseInt(d.split('-')[1])) === selectedQuarter);
                 
-                const groupedData = {};
-                const yearDates = dates.filter(d => d.startsWith(selectedYear));
-                
-                yearDates.forEach(date => {
-                    const [year, monthStr] = date.split('-');
-                    const month = parseInt(monthStr);
-                    if (getQuarter(month) === selectedQuarter) {
-                        const monthKey = `${month}月`;
-                        if (!groupedData[monthKey]) groupedData[monthKey] = [];
-                        groupedData[monthKey].push({ date, content: reflections[date] });
-                    }
+                targetDates.forEach(date => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item';
+                    item.innerHTML = `
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${date}</div>
+                        <div class="timeline-content">${reflections[date]}</div>
+                    `;
+                    container.appendChild(item);
                 });
-
-                for (const monthKey in groupedData) {
-                    const monthGroup = document.createElement('div');
-                    monthGroup.className = 'month-group';
-                    
-                    const title = document.createElement('div');
-                    title.className = 'month-title';
-                    title.innerText = monthKey;
-                    monthGroup.appendChild(title);
-                    
-                    const timeline = document.createElement('div');
-                    timeline.className = 'timeline';
-                    
-                    groupedData[monthKey].forEach(item => {
-                        const entry = document.createElement('div');
-                        entry.className = 'timeline-item';
-                        
-                        const dot = document.createElement('div');
-                        dot.className = 'timeline-dot';
-                        
-                        const dateDiv = document.createElement('div');
-                        dateDiv.className = 'timeline-date';
-                        dateDiv.innerText = item.date;
-                        
-                        const cardDiv = document.createElement('div');
-                        cardDiv.className = 'timeline-card';
-                        cardDiv.innerText = item.content;
-                        
-                        entry.appendChild(dot);
-                        entry.appendChild(dateDiv);
-                        entry.appendChild(cardDiv);
-                        timeline.appendChild(entry);
-                    });
-                    
-                    monthGroup.appendChild(timeline);
-                    container.appendChild(monthGroup);
-                }
             }
         }
 
-        // Scroll to Top Logic
-        const scrollTopBtn = document.getElementById('scroll-top-btn');
+        // FAB Scroll
+        const fab = document.getElementById('scroll-top-btn');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                scrollTopBtn.classList.add('visible');
-            } else {
-                scrollTopBtn.classList.remove('visible');
-            }
+            if(window.scrollY > 300) fab.classList.add('visible');
+            else fab.classList.remove('visible');
         });
+        function scrollToTop() { window.scrollTo({top:0, behavior:'smooth'}); }
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Export/Import Logic
+        // Import/Export
         function exportData() {
-            const dataToExport = {
-                progressData, userStats, settings, reflections,
-                exportDate: new Date().toISOString()
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "bible_rpg_backup_" + new Date().toISOString().slice(0,10) + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            const data = { progressData, userStats, settings, reflections, exportDate: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bible_rpg_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
         }
-
         function importData(input) {
             const file = input.files[0];
-            if (!file) return;
+            if(!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = e => {
                 try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (importedData.progressData) {
-                        if(confirm('確定要匯入備份嗎？')) {
-                            localStorage.setItem('bibleRpg_ChapterProgress', JSON.stringify(importedData.progressData));
-                            localStorage.setItem('bibleRpg_Stats', JSON.stringify(importedData.userStats));
-                            if(importedData.reflections) localStorage.setItem('bibleRpg_Reflections', JSON.stringify(importedData.reflections));
-                            location.reload();
-                        }
+                    const d = JSON.parse(e.target.result);
+                    if(d.progressData && confirm('確定要匯入備份嗎？進度將被覆蓋。')) {
+                        localStorage.setItem('bibleRpg_ChapterProgress', JSON.stringify(d.progressData));
+                        localStorage.setItem('bibleRpg_Stats', JSON.stringify(d.userStats));
+                        if(d.reflections) localStorage.setItem('bibleRpg_Reflections', JSON.stringify(d.reflections));
+                        location.reload();
                     }
-                } catch (err) { alert('匯入失敗'); }
+                } catch(err) { alert('匯入失敗'); }
                 input.value = '';
             };
             reader.readAsText(file);
+            input.value = '';
+        }
+
+        function resetData() {
+            if(confirm('確定要刪除所有紀錄重來嗎？')) {
+                localStorage.removeItem('bibleRpg_ChapterProgress');
+                localStorage.removeItem('bibleRpg_Stats');
+                localStorage.removeItem('bibleRpg_Reflections');
+                location.reload();
+            }
         }
 
         init();
