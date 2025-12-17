@@ -968,7 +968,11 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button id="scroll-top-btn" class="fab-top" onclick="scrollToTop()">▲</button>
+    <button id="scroll-top-btn" class="fab-top" onclick="scrollToTop()" aria-label="回到頂部">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
 
     <!-- Toast 提示 -->
     <div id="toast" class="toast">📝 日記已儲存</div>
