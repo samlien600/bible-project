@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#2c241b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="聖經讀經打卡">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <title>聖經讀經打卡 - 養成屬靈好習慣</title>
+    <style>
+        :root {
+            /* === 色彩系統 (深色模式預設 - 午夜流金) === */
+            --bg-body: #0f172a;          /* 深午夜藍背景 */
+            --bg-card: #1e293b;          /* 卡片背景 */
+            --bg-card-hover: #334155;    /* 卡片懸停 */
+            --text-primary: #f8fafc;     /* 主要文字 */
+            --text-secondary: #94a3b8;   /* 次要文字 */
+            --accent-gold: #fbbf24;      /* 流金 (強調色) */
+            --accent-glow: rgba(251, 191, 36, 0.3); /* 金色光暈 */
+            --primary-btn: linear-gradient(135deg, #6366f1, #4f46e5); /* 靛藍漸層按鈕 */
+            --success-color: #10b981;    /* 成功綠 */
+            --danger-color: #ef4444;     /* 警告紅 */
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(15, 23, 42, 0.85); /* 玻璃擬態背景 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 15px rgba(251, 191, 36, 0.15);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        /* === 淺色模式 (晨曦暖灰) === */
+        body.light-mode {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-gold: #d97706;      /* 深琥珀色 */
+            --accent-glow: rgba(217, 119, 6, 0.2);
+            --primary-btn: linear-gradient(135deg, #4f46e5, #4338ca);
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            padding-bottom: 100px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* === 頂部狀態列 (玻璃擬態) === */
+        .status-bar {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .level-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 6px;
+        }
+
+        .rank-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-feature-settings: "tnum";
+        }
+
+        .xp-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        body.light-mode .xp-track { background: rgba(0,0,0,0.1); }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), #f59e0b);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        .stats-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .stat-badge {
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        body.light-mode .stat-badge { background: rgba(0,0,0,0.03); }
+
+        .controls-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        /* === 主要容器 === */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 首頁標題 */
+        .app-header {
+            text-align: center;
+            margin: 30px 0 40px;
+        }
+        .app-header h1 {
+            font-size: 2rem;
+            margin: 0 0 10px;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .app-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* === 卡片通用樣式 (Glass/Elevated) === */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        /* 每日動力卡片 */
+        .quote-card {
+            border-left: 4px solid var(--accent-gold);
+            background: linear-gradient(to right, rgba(251, 191, 36, 0.05), transparent);
+        }
+        .quote-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .quote-source {
+            display: block;
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        /* 靈修日記卡片 */
+        .journal-card textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            font-size: 1rem;
+            margin-top: 15px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        body.light-mode .journal-card textarea { background: #f8fafc; }
+        
+        .journal-card textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background: transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary-btn);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            transition: transform 0.1s, box-shadow 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary:active { transform: scale(0.96); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+        body.light-mode .btn-outline:hover { background: rgba(0,0,0,0.05); }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        /* === 書卷網格 === */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .bible-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+        }
+
+        .book-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .book-btn:active { transform: scale(0.96); }
+        .book-btn:hover { border-color: var(--text-secondary); transform: translateY(-2px); }
+
+        .book-btn.completed {
+            border-color: var(--accent-gold);
+            background: linear-gradient(to bottom right, rgba(251, 191, 36, 0.1), transparent);
+            box-shadow: var(--shadow-glow);
+        }
+        .book-btn.completed::after {
+            content: "★";
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            color: var(--accent-gold);
+            font-size: 10px;
+        }
+
+        .book-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .mini-progress {
+            height: 4px;
+            background: rgba(128,128,128,0.2);
+            border-radius: 2px;
+            width: 80%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .mini-fill {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* === 歷史紀錄視圖 (優化版) === */
+        .history-container {
+            padding-top: 10px;
+        }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+            padding: 8px 0;
+        }
+        .nav-back:hover { color: var(--accent-gold); }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .selection-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        .selection-card:hover {
+            border-color: var(--accent-gold);
+            background: var(--bg-card-hover);
+        }
+        
+        .sel-title { font-size: 1.4rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 5px; }
+        .sel-sub { font-size: 0.85rem; color: var(--text-secondary); }
+
+        /* 時間軸樣式 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -35px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            border: 3px solid var(--bg-body);
+            box-shadow: 0 0 0 1px var(--accent-gold);
+        }
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .timeline-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* === 底部資料管理區 === */
+        .footer-tools {
+            margin-top: 60px;
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 6px;
+        }
+        .tool-btn:hover { background: rgba(128,128,128,0.1); color: var(--text-primary); }
+        .tool-btn.danger { color: var(--danger-color); }
+
+        /* === 彈出視窗 (Modal / Bottom Sheet) === */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center; /* Desktop Default */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; }
+
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        /* 手機版 Bottom Sheet 樣式 */
+        @media (max-width: 600px) {
+            .modal-overlay { align-items: flex-end; }
+            .modal-content {
+                border-radius: 24px 24px 0 0;
+                max-height: 80vh;
+                transform: translateY(100%);
+                transition: transform 0.3s ease-out;
+            }
+            .modal-overlay.active .modal-content { transform: translateY(0); }
+            
+            .app-header h1 { font-size: 1.6rem; }
+            .stats-badges { display: none; } /* 簡化手機頂部 */
+            .bible-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { margin: 0; font-size: 1.2rem; color: var(--text-primary); }
+        .btn-close { background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; padding: 5px; }
+        
+        .modal-body { padding: 20px; overflow-y: auto; }
+
+        /* 章節按鈕 */
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+        }
+        .ch-btn {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .ch-btn.active {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        /* 回到頂部按鈕 (Floating Action Button) */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px; 
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            color: var(--bg-body);
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 990;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8) translateY(20px);
+        }
+        
+        .scroll-top-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+        
+        .scroll-top-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- 頂部狀態列 -->
+    <div class="status-bar">
+        <div class="level-info">
+            <div class="level-header">
+                <span class="rank-title" id="rank-title">Lv.1 尋求者</span>
+                <span class="progress-text" id="total-progress-text">0 / 1189 章</span>
+            </div>
+            <div class="xp-container">
+                <div class="xp-track">
+                    <div class="xp-fill" id="main-xp-bar"></div>
+                </div>
+            </div>
+            <div class="stats-badges">
+                <span class="stat-badge">🔥 連續 <span id="streak-count" style="color:var(--accent-gold)">0</span> 天</span>
+                <span class="stat-badge">📖 完成度 <span id="percent-text">0%</span></span>
+            </div>
+        </div>
+        <div class="controls-area">
+            <button class="icon-btn" onclick="toggleTheme()" title="切換深淺模式">☀️</button>
+            <button class="icon-btn" onclick="openHelp()" title="使用說明">?</button>
+        </div>
+    </div>
+
+    <!-- 內容容器 -->
+    <div class="container">
+        
+        <!-- 主視圖 -->
+        <div id="main-view">
+            
+            <div class="app-header">
+                <h1>聖經讀經打卡：養成屬靈好習慣</h1>
+                <p>每天累積一點點，讓神的話語成為力量。透過打卡與進度追蹤，幫助您克服惰性，建立終身受用的屬靈習慣。</p>
+            </div>
+
+            <!-- 每日動力卡片 -->
+            <div class="card quote-card">
+                <h3 style="margin:0 0 10px; color:var(--text-secondary); font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">🔥 習慣養成動力</h3>
+                <div class="quote-text" id="daily-quote-text">載入中...</div>
+                <small class="quote-source" id="daily-quote-source"></small>
+                <div class="card-actions">
+                    <button class="btn-primary" onclick="generateQuote()">
+                        <span>💪</span> 獲得鼓勵
+                    </button>
+                </div>
+            </div>
+
+            <!-- 靈修日記卡片 -->
+            <div class="card journal-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.1rem;">📝 靈修日記</h3>
+                    <span id="journal-date" style="color:var(--text-secondary); font-size:0.9rem;"></span>
+                </div>
+                <textarea id="journal-input" placeholder="記錄今天神對你說的話，或是你的禱告..."></textarea>
+                <div class="card-actions">
+                    <button class="btn-outline" onclick="showHistoryView()">📜 歷史紀錄</button>
+                    <button class="btn-primary" onclick="saveReflection()">💾 儲存筆記</button>
+                </div>
+            </div>
+
+            <!-- 舊約區塊 -->
+            <div class="section-header">
+                <h2 class="section-title">舊約 Old Testament</h2>
+            </div>
+            <div class="bible-grid" id="ot-grid"></div>
+
+            <!-- 新約區塊 -->
+            <div class="section-header">
+                <h2 class="section-title">新約 New Testament</h2>
+            </div>
+            <div class="bible-grid" id="nt-grid"></div>
+
+            <!-- 底部工具 -->
+            <div class="footer-tools">
+                <p>資料皆儲存於本機，請定期備份。</p>
+                <button class="tool-btn" onclick="exportData()">📥 匯出備份</button>
+                <button class="tool-btn" onclick="document.getElementById('import-file').click()">📤 匯入紀錄</button>
+                <button class="tool-btn danger" onclick="resetData()">⚠️ 重置進度</button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(this)">
+            </div>
+        </div>
+
+        <!-- 歷史紀錄視圖 -->
+        <div id="history-view" class="hidden history-container">
+            <div class="nav-back" onclick="navigateBackHistory()">
+                <span>←</span> <span id="history-back-text">返回主頁</span>
+            </div>
+            <h2 style="margin:0 0 25px; font-size:1.8rem;">📜 靈修歷史紀錄</h2>
+            <div id="history-content-area"></div>
+        </div>
+
+    </div>
+
+    <!-- 回到頂部按鈕 -->
+    <button id="scroll-top-btn" class="scroll-top-btn" onclick="scrollToTop()" title="回到頂部">▲</button>
+
+    <!-- 章節選擇 Modal -->
+    <div class="modal-overlay" id="chapter-modal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-book-title">創世記</h3>
+                <button class="btn-close" onclick="closeModalDirect('chapter-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="chapter-grid" id="modal-chapter-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 幫助說明 Modal -->
+    <div class="modal-overlay" id="help-modal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📖 使用說明</h3>
+                <button class="btn-close" onclick="closeModalDirect('help-modal')">×</button>
+            </div>
+            <div class="modal-body" style="line-height:1.8; color:var(--text-secondary);">
+                <p><strong style="color:var(--text-primary)">🌟 願景：</strong> 本工具旨在透過「視覺化反饋」與「微小習慣堆疊」，幫助使用者克服惰性，建立穩定的靈修生活。</p>
+                <ul style="padding-left:20px; margin-top:10px;">
+                    <li><strong>點擊書卷：</strong> 展開章節選單進行打卡。</li>
+                    <li><strong>累積經驗：</strong> 讀經越多，等級越高，稱號也會隨之改變。</li>
+                    <li><strong>靈修日記：</strong> 每日記錄感動，並可在歷史紀錄中按年份/季度回顧。</li>
+                    <li><strong>資料安全：</strong> 資料僅存於您的瀏覽器中，請定期使用下方的「匯出備份」功能。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast" style="display:none;"></div>
+
+    <script>
+        // --- 1. 資料庫 ---
+        const bibleData = {
+            ot: [
+                { name: "創世記", ch: 50 }, { name: "出埃及記", ch: 40 }, { name: "利未記", ch: 27 }, 
+                { name: "民數記", ch: 36 }, { name: "申命記", ch: 34 }, { name: "約書亞記", ch: 24 }, 
+                { name: "士師記", ch: 21 }, { name: "路得記", ch: 4 }, { name: "撒母耳記上", ch: 31 }, 
+                { name: "撒母耳記下", ch: 24 }, { name: "列王紀上", ch: 22 }, { name: "列王紀下", ch: 25 }, 
+                { name: "歷代志上", ch: 29 }, { name: "歷代志下", ch: 36 }, { name: "以斯拉記", ch: 10 }, 
+                { name: "尼希米記", ch: 13 }, { name: "以斯帖記", ch: 10 }, { name: "約伯記", ch: 42 }, 
+                { name: "詩篇", ch: 150 }, { name: "箴言", ch: 31 }, { name: "傳道書", ch: 12 }, 
+                { name: "雅歌", ch: 8 }, { name: "以賽亞書", ch: 66 }, { name: "耶利米書", ch: 52 }, 
+                { name: "耶利米哀歌", ch: 5 }, { name: "以西結書", ch: 48 }, { name: "但以理書", ch: 12 }, 
+                { name: "何西阿書", ch: 14 }, { name: "約珥書", ch: 3 }, { name: "阿摩司書", ch: 9 }, 
+                { name: "俄巴底亞書", ch: 1 }, { name: "約拿書", ch: 4 }, { name: "彌迦書", ch: 7 }, 
+                { name: "那鴻書", ch: 3 }, { name: "哈巴谷書", ch: 3 }, { name: "西番雅書", ch: 3 }, 
+                { name: "哈該書", ch: 2 }, { name: "撒迦利亞書", ch: 14 }, { name: "瑪拉基書", ch: 4 }
+            ],
+            nt: [
+                { name: "馬太福音", ch: 28 }, { name: "馬可福音", ch: 16 }, { name: "路加福音", ch: 24 }, 
+                { name: "約翰福音", ch: 21 }, { name: "使徒行傳", ch: 28 }, { name: "羅馬書", ch: 16 }, 
+                { name: "哥林多前書", ch: 16 }, { name: "哥林多後書", ch: 13 }, { name: "加拉太書", ch: 6 }, 
+                { name: "以弗所書", ch: 6 }, { name: "腓立比書", ch: 4 }, { name: "歌羅西書", ch: 4 }, 
+                { name: "帖撒羅尼迦前書", ch: 5 }, { name: "帖撒羅尼迦後書", ch: 3 }, { name: "提摩太前書", ch: 6 }, 
+                { name: "提摩太後書", ch: 4 }, { name: "提多書", ch: 3 }, { name: "腓利門書", ch: 1 }, 
+                { name: "希伯來書", ch: 13 }, { name: "雅各書", ch: 5 }, { name: "彼得前書", ch: 5 }, 
+                { name: "彼得後書", ch: 3 }, { name: "約翰一書", ch: 5 }, { name: "約翰二書", ch: 1 }, 
+                { name: "約翰三書", ch: 1 }, { name: "猶大書", ch: 1 }, { name: "啟示錄", ch: 22 }
+            ]
+        };
+
+        const habitQuotes = [
+            // --- 聖經經文 (CUNP-神版) ---
+            { text: "誰藐視這日的事為小呢？這七眼乃是耶和華的眼睛，遍察全地，見所羅巴伯手拿線鉈就歡喜。", source: "撒迦利亞書 4:10" },
+            { text: "我們行善，不可喪志；若不灰心，到了時候就要收成。", source: "加拉太書 6:9" },
+            { text: "殷勤籌劃的，足致豐裕；行事急躁的，都必缺乏。", source: "箴言 21:5" },
+            { text: "凡事都要規規矩矩的按著次序行。", source: "哥林多前書 14:40" },
+            { text: "人在最小的事上忠心，在大事上也忠心；在最小的事上不義，在大事上也不義。", source: "路加福音 16:10" },
+            { text: "你要保守你心，勝過保守一切，因為一生的果效是由心發出。", source: "箴言 4:23" },
+            { text: "手懶的，要受貧窮；手勤的，卻要富足。", source: "箴言 10:4" },
+            { text: "懶惰人羨慕，卻無所得；殷勤人必得豐裕。", source: "箴言 13:4" },
+            { text: "凡你手所當做的事，要盡力去做；因為在你所必去的陰間沒有工作，沒有謀算，沒有知識，也沒有智慧。", source: "傳道書 9:10" },
+            { text: "因為你們立志行事都是神在你們心裡運行，為要成就他的美意。", source: "腓立比書 2:13" },
+            { text: "不但如此，就是在患難中也是歡歡喜喜的；因為知道患難生忍耐，忍耐生老練，老練生盼望；", source: "羅馬書 5:3-4" },
+            { text: "我們既有這許多的見證人，如同雲彩圍著我們，就當放下各樣的重擔，脫去容易纏累我們的罪，存心忍耐，奔那擺在我們前頭的路程，", source: "希伯來書 12:1" },
+            { text: "向著標竿直跑，要得神在基督耶穌裡從上面召我來得的獎賞。", source: "腓立比書 3:14" },
+            { text: "你的門閂（門閂或譯：鞋）是銅的，鐵的。你的日子如何，你的力量也必如何。", source: "申命記 33:25" },
+            { text: "總要警醒禱告，免得入了迷惑。你們心靈固然願意，肉體卻軟弱了。", source: "馬太福音 26:41" },
+            { text: "不輕易發怒的，勝過勇士；治服己心的，強如取城。", source: "箴言 16:32" },
+            { text: "因為神賜給我們，不是膽怯的心，乃是剛強、仁愛、謹守的心。", source: "提摩太後書 1:7" },
+            { text: "但義人的路好像黎明的光，越照越明，直到日午。", source: "箴言 4:18" },
+            { text: "教養孩童，使他走當行的道，就是到老他也不偏離。", source: "箴言 22:6" },
+            { text: "流淚撒種的，必歡呼收割！", source: "詩篇 126:5" },
+            { text: "你們必須忍耐，使你們行完了神的旨意，就可以得著所應許的。", source: "希伯來書 10:36" },
+            { text: "主耶和華─以色列的聖者曾如此說：你們得救在乎歸回安息；你們得力在乎平靜安穩；你們竟自不肯。", source: "以賽亞書 30:15" },
+            { text: "我深信那在你們心裡動了善工的，必成全這工，直到耶穌基督的日子。", source: "腓立比書 1:6" },
+            { text: "無論做什麼，都要從心裡做，像是給主做的，不是給人做的，", source: "歌羅西書 3:23" },
+            { text: "要愛惜光陰，因為現今的世代邪惡。", source: "以弗所書 5:16" },
+            { text: "懶惰人哪，你去察看螞蟻的動作就可得智慧。", source: "箴言 6:6" },
+            { text: "只是你們要行道，不要單單聽道，自己欺哄自己。", source: "雅各書 1:22" },
+            { text: "聖靈所結的果子，就是仁愛、喜樂、和平、忍耐、恩慈、良善、信實、溫柔、節制。這樣的事沒有律法禁止。", source: "加拉太書 5:22-23" },
+            { text: "所以，我奔跑不像無定向的；我鬥拳不像打空氣的。", source: "哥林多前書 9:26" },
+            { text: "我是攻克己身，叫身服我，恐怕我傳福音給別人，自己反被棄絕了。", source: "哥林多前書 9:27" },
+            { text: "你當竭力在神面前得蒙喜悅，作無愧的工人，按著正意分解真理的道。", source: "提摩太後書 2:15" },
+            { text: "惟喜愛耶和華的律法，晝夜思想，這人便為有福！", source: "詩篇 1:2" },
+            { text: "我將你的話藏在心裡，免得我得罪你。", source: "詩篇 119:11" },
+            { text: "這律法書不可離開你的口，總要晝夜思想，好使你謹守遵行這書上所寫的一切話。如此，你的道路就可以亨通，凡事順利。", source: "約書亞記 1:8" },
+            { text: "要常常喜樂，不住的禱告，凡事謝恩；因為這是神在基督耶穌裡向你們所定的旨意。", source: "帖撒羅尼迦前書 5:16-18" },
+            { text: "你們尋求我，若專心尋求我，就必尋見。", source: "耶利米書 29:13" },
+            
+            // --- 名人勵志 ---
+            { text: "我們重複做什麼，我們就是什麼樣的人。因此，卓越不是一種行為，而是一個習慣。", source: "亞里斯多德" },
+            { text: "成功是每天重複的小努力的總和。", source: "羅伯特·科利爾" },
+            { text: "每天進步 1%，一年後你會進步 37 倍。", source: "《原子習慣》" },
+            { text: "自律是連接「目標」與「成就」的橋樑。", source: "吉姆·羅恩" },
+            { text: "滴水穿石，不是靠力量，而是靠堅持。", source: "Ovid" },
+            { text: "簡單的事重複做，你就是專家；重複的事用心做，你就是贏家。", source: "習慣的力量" },
+            { text: "千里之行，始於足下。", source: "老子" },
+            { text: "習慣就是習慣，誰也不能將其扔出窗外，只能一步一步地引下樓。", source: "馬克·吐溫" },
+            { text: "首先我們養成習慣，然後習慣造就我們。", source: "約翰·德萊頓" },
+            { text: "成功不是將來才有的，而是從決定去做的那一刻起，持續累積而成的。", source: "無名氏" },
+            { text: "不要等待完美的時刻，抓住當下，讓它變得完美。", source: "無名氏" },
+            { text: "種下一個行動，收穫一種習慣；種下一種習慣，收穫一種性格；種下一種性格，收穫一種命運。", source: "威廉·詹姆斯" },
+            { text: "你不需要很厲害才能開始，但你需要開始才會很厲害。", source: "Zig Ziglar" },
+            { text: "羅馬不是一天造成的。", source: "諺語" },
+            { text: "重複是學習之母。", source: "拉丁諺語" },
+            { text: "專注於進步，而不是完美。", source: "比爾·菲利普斯" },
+            { text: "今天的你，是過去習慣的結果；未來的你，是現在習慣的延伸。", source: "《原子習慣》" },
+            { text: "微小的改變，會帶來巨大的不同。", source: "《原子習慣》" },
+            { text: "堅持下去，不是因為容易，而是因為值得。", source: "無名氏" },
+            { text: "自律就是選擇你現在想要的，和你最想要的。", source: "亞伯拉罕·林肯" },
+            { text: "如果你想改變世界，先從整理你的床舖開始。", source: "威廉·麥克雷文" },
+            { text: "行動是治癒恐懼的良藥。", source: "大衛·施瓦茨" },
+            { text: "每天多做一點點。", source: "無名氏" },
+            { text: "不要讓昨日佔據今日太多時間。", source: "威爾·羅傑斯" },
+            { text: "最有力量的戰士是時間和耐心。", source: "列夫·托爾斯泰" },
+            { text: "沒有偉大的意志力，就不可能有雄才大略。", source: "巴爾扎克" },
+            { text: "只有極度自律，才能獲得極度自由。", source: "Jocko Willink" },
+            { text: "耐心是苦澀的，但它的果實是甜美的。", source: "盧梭" },
+            { text: "生活不是在等待風暴過去，而是學會在雨中跳舞。", source: "Vivian Greene" },
+            { text: "最好的種樹時間是十年前，其次是現在。", source: "Dambisa Moyo" },
+            { text: "失之毫釐，差之千里。", source: "班傑明·富蘭克林" },
+            { text: "學而時習之，不亦說乎？", source: "孔子" },
+            { text: "認識你自己。", source: "蘇格拉底" },
+            { text: "在所有事情中，只有毅力是不可替代的。", source: "歌德" },
+            { text: "天才是一分靈感加上九十九分汗水。", source: "愛迪生" },
+            { text: "耐心、堅持和汗水是成功的無敵組合。", source: "拿破崙·希爾" },
+            { text: "我不怕練過一萬種踢法的人，我只怕將一種踢法練過一萬次的人。", source: "李小龍" },
+            { text: "鐵銹因不用而生，水因停滯而腐敗...人的才智也會因懶惰而枯萎。", source: "達文西" },
+            { text: "建立名聲需要二十年，毀掉它只需要五分鐘。", source: "巴菲特" },
+            { text: "我可以接受失敗，但我不能接受不去嘗試。", source: "喬丹" }
+        ];
+
+        const totalBibleChapters = 1189;
+        const ranks = [
+            "尋求者", "渴慕者", "學道者", "跟隨者", "扎根者", 
+            "踐行者", "見證人", "守望者", "好管家", "忠心僕人", "與神同行"
+        ];
+
+        // --- 2. 應用狀態 ---
+        let progressData = {}; 
+        let userStats = { streak: 0, lastLogin: null };
+        let settings = { theme: 'dark' }; 
+        let reflections = {}; 
+        let currentOpenBook = null;
+        
+        let historyViewMode = 'list'; // 'list' -> 'quarters' -> 'detail'
+        let selectedYear = null;
+        let selectedQuarter = null;
+
+        // --- 3. 初始化 ---
+        function init() {
+            loadData();
+            applyTheme();
+            checkStreak();
+            renderLibrary();
+            updateGlobalStats();
+            generateQuote();
+            renderJournal();
+        }
+
+        function loadData() {
+            const savedProgress = localStorage.getItem('bibleRpg_ChapterProgress');
+            const savedStats = localStorage.getItem('bibleRpg_Stats');
+            const savedSettings = localStorage.getItem('bibleRpg_Settings');
+            const savedReflections = localStorage.getItem('bibleRpg_Reflections');
+
+            if (savedProgress) progressData = JSON.parse(savedProgress);
+            if (savedStats) userStats = JSON.parse(savedStats);
+            if (savedSettings) settings = JSON.parse(savedSettings);
+            if (savedReflections) reflections = JSON.parse(savedReflections);
+        }
+
+        function saveData() {
+            localStorage.setItem('bibleRpg_ChapterProgress', JSON.stringify(progressData));
+            localStorage.setItem('bibleRpg_Stats', JSON.stringify(userStats));
+            localStorage.setItem('bibleRpg_Reflections', JSON.stringify(reflections));
+            updateGlobalStats();
+        }
+        
+        function toggleTheme() {
+            settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('bibleRpg_Settings', JSON.stringify(settings));
+            applyTheme();
+        }
+
+        function applyTheme() {
+            if (settings.theme === 'light') {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+        }
+
+        function renderLibrary() {
+            renderSection('ot', 'ot-grid');
+            renderSection('nt', 'nt-grid');
+        }
+
+        function renderSection(key, elementId) {
+            const grid = document.getElementById(elementId);
+            grid.innerHTML = '';
+
+            bibleData[key].forEach(book => {
+                const completedArr = progressData[book.name] || [];
+                const percent = Math.round((completedArr.length / book.ch) * 100);
+                const isFullyComplete = completedArr.length === book.ch;
+
+                const card = document.createElement('div');
+                card.className = `book-btn ${isFullyComplete ? 'completed' : ''}`;
+                card.onclick = () => openBookModal(book);
+                card.id = `card-${book.name}`; 
+
+                card.innerHTML = `
+                    <span class="book-title">${book.name}</span>
+                    <div class="mini-progress">
+                        <div class="mini-fill" style="width: ${percent}%"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openBookModal(book) {
+            currentOpenBook = book;
+            document.getElementById('modal-book-title').innerText = book.name;
+            const grid = document.getElementById('modal-chapter-grid');
+            grid.innerHTML = '';
+
+            const completedArr = progressData[book.name] || [];
+
+            for (let i = 1; i <= book.ch; i++) {
+                const btn = document.createElement('div');
+                btn.className = `ch-btn ${completedArr.includes(i) ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = () => toggleChapter(i, btn);
+                grid.appendChild(btn);
+            }
+
+            const modal = document.getElementById('chapter-modal');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('active'));
+        }
+        
+        function openHelp() {
+            const modal = document.getElementById('help-modal');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => modal.classList.add('active'));
+        }
+
+        function toggleChapter(chapterNum, btn) {
+            const bookName = currentOpenBook.name;
+            if (!progressData[bookName]) progressData[bookName] = [];
+
+            const index = progressData[bookName].indexOf(chapterNum);
+            
+            if (index === -1) {
+                progressData[bookName].push(chapterNum);
+                btn.classList.add('active');
+            } else {
+                progressData[bookName].splice(index, 1);
+                btn.classList.remove('active');
+            }
+
+            saveData();
+            updateBookCard(currentOpenBook);
+        }
+
+        function updateBookCard(book) {
+            const card = document.getElementById(`card-${book.name}`);
+            const completedArr = progressData[book.name] || [];
+            const percent = Math.round((completedArr.length / book.ch) * 100);
+            
+            card.querySelector('.mini-fill').style.width = `${percent}%`;
+            
+            if (completedArr.length === book.ch) {
+                card.classList.add('completed');
+            } else {
+                card.classList.remove('completed');
+            }
+        }
+
+        function closeModal(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active');
+                setTimeout(() => {
+                    e.target.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        function closeModalDirect(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function updateGlobalStats() {
+            let totalRead = 0;
+            
+            Object.values(progressData).forEach(chapters => {
+                totalRead += chapters.length;
+            });
+
+            const level = Math.floor(totalRead / 10) + 1;
+            const rankIndex = Math.min(Math.floor(level / 5), ranks.length - 1); 
+            const rankName = ranks[rankIndex];
+
+            document.getElementById('total-progress-text').innerText = `${totalRead} / ${totalBibleChapters} 章`;
+            document.getElementById('rank-title').innerText = `Lv.${level} ${rankName}`;
+            
+            const xpInCurrentLevel = totalRead % 10;
+            const xpPercent = (xpInCurrentLevel / 10) * 100;
+            document.getElementById('main-xp-bar').style.width = `${xpPercent}%`;
+
+            const totalPercent = ((totalRead / totalBibleChapters) * 100).toFixed(1);
+            document.getElementById('percent-text').innerText = `${totalPercent}%`;
+
+            document.getElementById('streak-count').innerText = userStats.streak;
+        }
+
+        function checkStreak() {
+            const today = new Date().toDateString();
+            if (userStats.lastLogin !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (userStats.lastLogin === yesterday.toDateString()) {
+                    userStats.streak++;
+                } else {
+                    // 如果不是第一天登入（斷更），重置為 1
+                    if (userStats.lastLogin) userStats.streak = 1;
+                    else userStats.streak = 1; // 首次登入
+                }
+                userStats.lastLogin = today;
+                saveData();
+            }
+        }
+
+        function generateQuote() {
+             const randomQuote = habitQuotes[Math.floor(Math.random() * habitQuotes.length)];
+             document.getElementById('daily-quote-text').innerText = `「${randomQuote.text}」`;
+             document.getElementById('daily-quote-source').innerText = `— ${randomQuote.source}`;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
+
+        function resetData() {
+            if(confirm('確定要刪除所有紀錄重來嗎？')) {
+                localStorage.removeItem('bibleRpg_ChapterProgress');
+                localStorage.removeItem('bibleRpg_Stats');
+                localStorage.removeItem('bibleRpg_Reflections');
+                location.reload();
+            }
+        }
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function renderJournal() {
+            const today = getTodayString();
+            document.getElementById('journal-date').innerText = today;
+            if (reflections[today]) {
+                document.getElementById('journal-input').value = reflections[today];
+            }
+        }
+
+        function saveReflection() {
+            const today = getTodayString();
+            const text = document.getElementById('journal-input').value;
+            if (text.trim() === "") return;
+            
+            reflections[today] = text;
+            saveData();
+            showToast("📝 日記已儲存");
+        }
+
+        // --- 視圖導航 ---
+        function showMainView() {
+            document.getElementById('history-view').classList.add('hidden');
+            document.getElementById('main-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function showHistoryView() {
+            document.getElementById('main-view').classList.add('hidden');
+            document.getElementById('history-view').classList.remove('hidden');
+            
+            historyViewMode = 'list';
+            selectedYear = null;
+            selectedQuarter = null;
+            renderHistoryLog();
+            window.scrollTo(0, 0);
+        }
+        
+        function navigateBackHistory() {
+            if (historyViewMode === 'detail') {
+                historyViewMode = 'quarters';
+                renderHistoryLog();
+            } else if (historyViewMode === 'quarters') {
+                historyViewMode = 'list';
+                renderHistoryLog();
+            } else {
+                showMainView();
+            }
+        }
+
+        function getQuarter(month) {
+            if (month <= 3) return 1;
+            if (month <= 6) return 2;
+            if (month <= 9) return 3;
+            return 4;
+        }
+
+        function renderHistoryLog() {
+            const container = document.getElementById('history-content-area');
+            const backText = document.getElementById('history-back-text');
+            container.innerHTML = '';
+
+            const dates = Object.keys(reflections).sort().reverse();
+
+            if (dates.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary); margin-top:50px;">尚無紀錄，快去寫下第一篇靈修日記吧！</p>';
+                return;
+            }
+            
+            const yearsData = {};
+            dates.forEach(date => {
+                const y = date.split('-')[0];
+                if (!yearsData[y]) yearsData[y] = 0;
+                yearsData[y]++;
+            });
+            const sortedYears = Object.keys(yearsData).sort(); // 舊 -> 新
+            
+            // --- 年份列表 ---
+            if (historyViewMode === 'list') {
+                backText.innerText = "返回主頁";
+                const listDiv = document.createElement('div');
+                listDiv.className = 'selection-grid';
+                
+                sortedYears.forEach(year => {
+                    const btn = document.createElement('div');
+                    btn.className = 'selection-card';
+                    btn.innerHTML = `
+                        <div class="card-title">${year}年</div>
+                        <div class="card-subtitle">共 ${yearsData[year]} 篇</div>
+                        <div class="card-arrow">➜</div>
+                    `;
+                    btn.onclick = () => {
+                        selectedYear = year;
+                        historyViewMode = 'quarters';
+                        renderHistoryLog();
+                    };
+                    listDiv.appendChild(btn);
+                });
+                container.appendChild(listDiv);
+            } 
+            
+            // --- 季度列表 ---
+            else if (historyViewMode === 'quarters' && selectedYear) {
+                backText.innerText = "返回年份";
+                
+                // 數據統計
+                const quartersData = {1: 0, 2: 0, 3: 0, 4: 0};
+                const yearDates = dates.filter(d => d.startsWith(selectedYear));
+                yearDates.forEach(date => {
+                    const month = parseInt(date.split('-')[1]);
+                    const q = getQuarter(month);
+                    quartersData[q]++;
+                });
+
+                const listDiv = document.createElement('div');
+                listDiv.className = 'selection-grid';
+                
+                [1, 2, 3, 4].forEach(q => {
+                    const count = quartersData[q];
+                    const label = `第 ${q} 季`;
+                    const range = ["1-3月", "4-6月", "7-9月", "10-12月"][q-1];
+                    
+                    const btn = document.createElement('div');
+                    btn.className = 'selection-card';
+                    if (count === 0) btn.style.opacity = '0.5';
+                    
+                    btn.innerHTML = `
+                        <div class="card-title">Q${q}</div>
+                        <div class="card-subtitle" style="color:var(--accent-gold); margin-bottom:5px;">${range}</div>
+                        <div class="card-subtitle">${count} 篇</div>
+                    `;
+                    
+                    if (count > 0) {
+                        btn.onclick = () => {
+                            selectedQuarter = q;
+                            historyViewMode = 'detail';
+                            renderHistoryLog();
+                        };
+                    }
+                    listDiv.appendChild(btn);
+                });
+                container.appendChild(listDiv);
+            }
+
+            // --- 明細 ---
+            else if (historyViewMode === 'detail' && selectedYear && selectedQuarter) {
+                backText.innerText = "返回季度";
+                
+                const groupedData = {};
+                const yearDates = dates.filter(d => d.startsWith(selectedYear));
+                
+                yearDates.forEach(date => {
+                    const [year, monthStr] = date.split('-');
+                    const month = parseInt(monthStr);
+                    if (getQuarter(month) === selectedQuarter) {
+                        const monthKey = `${month}月`;
+                        if (!groupedData[monthKey]) groupedData[monthKey] = [];
+                        groupedData[monthKey].push({ date, content: reflections[date] });
+                    }
+                });
+
+                for (const monthKey in groupedData) {
+                    const monthGroup = document.createElement('div');
+                    monthGroup.className = 'month-group';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'month-title';
+                    title.innerText = monthKey;
+                    monthGroup.appendChild(title);
+                    
+                    const timeline = document.createElement('div');
+                    timeline.className = 'timeline';
+                    
+                    groupedData[monthKey].forEach(item => {
+                        const entry = document.createElement('div');
+                        entry.className = 'timeline-item';
+                        
+                        const dot = document.createElement('div');
+                        dot.className = 'timeline-dot';
+                        
+                        const dateDiv = document.createElement('div');
+                        dateDiv.className = 'timeline-date';
+                        dateDiv.innerText = item.date;
+                        
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'timeline-card';
+                        cardDiv.innerText = item.content;
+                        
+                        entry.appendChild(dot);
+                        entry.appendChild(dateDiv);
+                        entry.appendChild(cardDiv);
+                        timeline.appendChild(entry);
+                    });
+                    
+                    monthGroup.appendChild(timeline);
+                    container.appendChild(monthGroup);
+                }
+            }
+        }
+
+        // Scroll to Top Logic
+        const scrollTopBtn = document.getElementById('scroll-top-btn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Export/Import Logic
+        function exportData() {
+            const dataToExport = {
+                progressData, userStats, settings, reflections,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "bible_rpg_backup_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.progressData) {
+                        if(confirm('確定要匯入備份嗎？')) {
+                            localStorage.setItem('bibleRpg_ChapterProgress', JSON.stringify(importedData.progressData));
+                            localStorage.setItem('bibleRpg_Stats', JSON.stringify(importedData.userStats));
+                            if(importedData.reflections) localStorage.setItem('bibleRpg_Reflections', JSON.stringify(importedData.reflections));
+                            location.reload();
+                        }
+                    }
+                } catch (err) { alert('匯入失敗'); }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        init();
+    </script>
+</body>
+</html>
