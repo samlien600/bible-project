@@ -149,7 +149,10 @@
             hasRendered: false,
             showSuccessToast: false,
             // 新增：深色模式狀態，預設讀取 localStorage 或系統偏好
-            darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+            // 新增狀態：用來追蹤彈窗是否已經打開過，避免重複播放動畫
+            wasAboutModalOpen: false,
+            wasActionModalOpen: false
         };
 
         // --- Firebase Logic ---
@@ -597,15 +600,18 @@
             
             // ... (Rest of the render function remains the same) ...
             
-            // 5. Action Modal (Unchanged)
+            // 5. Action Modal
             let actionModalHTML = '';
+            // 計算是否該播放動畫：只有當視窗是「開啟」且「之前是關閉」的狀態時才播放
+            const shouldAnimateAction = state.showActionModal && !state.wasActionModalOpen;
+            
             if (state.showActionModal) {
                 // ... (No changes here)
                 actionModalHTML = `
                     <div class="fixed inset-0 z-50 flex items-end lg:items-center justify-center sm:p-4">
                         <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity" onclick="window.closeActionModal()"></div>
                         
-                        <div class="relative w-full max-w-lg bg-white dark:bg-stone-800 rounded-t-[32px] lg:rounded-3xl shadow-2xl flex flex-col max-h-[90dvh] lg:max-h-[85vh] animate-slide-up lg:animate-fade-in overflow-hidden">
+                        <div class="relative w-full max-w-lg bg-white dark:bg-stone-800 rounded-t-[32px] lg:rounded-3xl shadow-2xl flex flex-col max-h-[90dvh] lg:max-h-[85vh] ${shouldAnimateAction ? 'animate-slide-up lg:animate-fade-in' : ''} overflow-hidden">
                             <!-- Modal Header -->
                             <div class="bg-${primaryColor}-600 dark:bg-${primaryColor}-700 p-6 text-white shrink-0 relative overflow-hidden">
                                 <div class="absolute -right-6 -top-6 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
@@ -633,7 +639,7 @@
                                         <input 
                                             name="userName"
                                             required
-                                            maxlength="30"
+                                            maxlength="20"
                                             placeholder="主內家人 / 您的暱稱"
                                             class="w-full p-4 rounded-xl border border-stone-200 dark:border-stone-700 focus:border-${primaryColor}-500 focus:ring-4 focus:ring-${primaryColor}-100 dark:focus:ring-${primaryColor}-900/30 outline-none bg-white dark:bg-stone-700 transition-all font-medium text-stone-800 dark:text-stone-100 placeholder-stone-300 dark:placeholder-stone-500 shadow-sm text-base"
                                         />
@@ -682,11 +688,14 @@
 
             // 6. About Modal
             let aboutModalHTML = '';
+            // 計算是否該播放動畫：只有當視窗是「開啟」且「之前是關閉」的狀態時才播放
+            const shouldAnimateAbout = state.showAboutModal && !state.wasAboutModalOpen;
+            
             if (state.showAboutModal) {
                 aboutModalHTML = `
                     <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
                         <div class="absolute inset-0 bg-stone-900/50 backdrop-blur-sm animate-fade-in" onclick="window.toggleAboutModal(false)"></div>
-                        <div class="relative w-full max-w-md bg-white dark:bg-stone-800 rounded-3xl shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[85vh]">
+                        <div class="relative w-full max-w-md bg-white dark:bg-stone-800 rounded-3xl shadow-2xl overflow-hidden ${shouldAnimateAbout ? 'animate-scale-in' : ''} flex flex-col max-h-[85vh]">
                             <div class="bg-stone-900 dark:bg-stone-950 p-6 text-white relative">
                                 <h3 class="text-2xl font-bold flex items-center gap-2">
                                     <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm">FA</div>
@@ -789,6 +798,9 @@
 
             // State update to flag that initial render has occurred
             state.hasRendered = true;
+            // 更新彈窗狀態記錄，以供下一次渲染判斷
+            state.wasAboutModalOpen = state.showAboutModal;
+            state.wasActionModalOpen = state.showActionModal;
 
             if (window.lucide) window.lucide.createIcons();
         }
