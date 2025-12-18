@@ -348,11 +348,21 @@
             const desktopSidebarHTML = `
                 <aside class="hidden lg:flex flex-col w-80 bg-white dark:bg-stone-800 border-r border-stone-100 dark:border-stone-700 h-full overflow-y-auto z-30 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
                     <div class="p-8">
-                        <div class="flex items-center gap-3 mb-10 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.switchTab('read')">
-                            <div class="w-10 h-10 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center font-bold text-xl shadow-md">FA</div>
-                            <div>
-                                <span class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 block">FaithAct</span>
-                                <span class="text-xs text-stone-400 dark:text-stone-500 font-medium tracking-wider uppercase">讓信心可看見</span>
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.switchTab('read')">
+                                <div class="w-10 h-10 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center font-bold text-xl shadow-md">FA</div>
+                                <div>
+                                    <span class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 block">FaithAct</span>
+                                    <span class="text-xs text-stone-400 dark:text-stone-500 font-medium tracking-wider uppercase">讓信心可看見</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="window.toggleTheme()" class="p-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-700" title="切換深淺模式">
+                                    <i data-lucide="${state.darkMode ? 'sun' : 'moon'}" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="window.toggleAboutModal(true)" class="p-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-700" title="使用說明">
+                                    <i data-lucide="circle-help" class="w-5 h-5"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -360,7 +370,7 @@
                             <h3 class="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-4 px-3">聖經故事旅程</h3>
                             ${Object.values(STORIES).map(story => `
                                 <button onclick="window.switchStory('${story.id}')" class="w-full text-left p-3.5 rounded-2xl transition-all duration-200 flex items-center gap-4 group ${state.currentStoryId === story.id ? `bg-${story.color}-50 dark:bg-${story.color}-900/30 shadow-sm border border-${story.color}-100 dark:border-${story.color}-900/50 translate-x-1` : 'hover:bg-stone-50 dark:hover:bg-stone-700 hover:translate-x-1 text-stone-500 dark:text-stone-400'}">
-                                    <div class="p-2.5 rounded-xl transition-colors ${state.currentStoryId === story.id ? `bg-${story.color}-100 text-${story.color}-600 dark:bg-${story.color}-900 dark:text-${story.color}-300` : 'bg-stone-100 text-stone-400 dark:bg-stone-700 dark:text-stone-500 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 group-hover:text-stone-600'}">
+                                    <div class="p-2.5 rounded-xl transition-colors ${state.currentStoryId === story.id ? `bg-${story.color}-100 text-${story.color}-600 dark:bg-${story.color}-900 dark:text-${story.color}-300` : 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 group-hover:text-stone-600'}">
                                         <i data-lucide="${story.icon}" class="w-5 h-5"></i>
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -373,7 +383,7 @@
                     </div>
                     
                     <div class="mt-auto p-6 border-t border-stone-100 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-800/50 backdrop-blur-sm">
-                        <nav class="flex gap-1.5 p-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-sm border border-stone-100 dark:border-stone-600 mb-3">
+                        <nav class="flex gap-1.5 p-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-sm border border-stone-100 dark:border-stone-600">
                             <button onclick="window.switchTab('read')" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${state.activeTab === 'read' ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-md' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-600'}">
                                 <i data-lucide="book-open" class="w-4 h-4"></i> 閱讀
                             </button>
@@ -381,17 +391,6 @@
                                 <i data-lucide="layout-grid" class="w-4 h-4"></i> 見證
                             </button>
                         </nav>
-                        
-                        <div class="flex gap-2">
-                            <button onclick="window.toggleTheme()" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 text-stone-600 dark:text-stone-300 font-bold hover:bg-stone-50 dark:hover:bg-stone-600 transition-colors shadow-sm">
-                                <i data-lucide="${state.darkMode ? 'sun' : 'moon'}" class="w-4 h-4"></i>
-                                ${state.darkMode ? '淺色' : '深色'}
-                            </button>
-                            <button onclick="window.toggleAboutModal(true)" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 text-stone-600 dark:text-stone-300 font-bold hover:bg-stone-50 dark:hover:bg-stone-600 transition-colors shadow-sm">
-                                <i data-lucide="circle-help" class="w-4 h-4"></i>
-                                說明
-                            </button>
-                        </div>
                     </div>
                 </aside>
             `;
@@ -461,7 +460,7 @@
                                 <span class="text-xs font-mono text-stone-400 dark:text-stone-500 bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded">CUNP</span>
                             </div>
                             
-                            <div class="space-y-6 lg:space-y-8 pb-10">
+                            <div class="space-y-3 lg:space-y-4 pb-10">
                                 ${currentStory.verses.map((item, index) => `
                                     <div class="flex gap-4 lg:gap-6 group">
                                         <span class="text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 mt-2 w-6 text-right font-mono select-none group-hover:text-${primaryColor}-400 transition-colors">${item.verse}</span>
@@ -494,10 +493,10 @@
                 }
 
                 mainContentHTML = `
-                    <div class="${animationClass} pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 py-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
+                    <div class="${animationClass} pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 pb-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
                         <div class="max-w-5xl mx-auto">
                             <!-- 頂部資訊與篩選列 -->
-                            <div class="sticky top-0 bg-[#FAFAF9]/95 dark:bg-[#1c1917]/95 backdrop-blur-sm z-20 pt-2 pb-4 space-y-4">
+                            <div class="sticky top-0 bg-[#FAFAF9]/95 dark:bg-[#1c1917]/95 backdrop-blur-sm z-20 pt-6 pb-4 space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h2 class="text-2xl lg:text-3xl font-bold text-stone-800 dark:text-stone-100 tracking-tight">見證雲彩</h2>
@@ -590,12 +589,6 @@
                                 ${state.activeTab === 'wall' ? `<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-${primaryColor}-600 dark:bg-${primaryColor}-400"></span>` : ''}
                             </div>
                             <span class="text-[10px] font-bold tracking-wide">見證牆</span>
-                        </button>
-                        <button onclick="window.toggleAboutModal(true)" class="flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform text-stone-400 dark:text-stone-500">
-                            <div class="relative">
-                                <i data-lucide="circle-help" class="w-6 h-6 stroke-[2px]"></i>
-                            </div>
-                            <span class="text-[10px] font-bold tracking-wide">說明</span>
                         </button>
                     </div>
                 </div>
@@ -717,28 +710,28 @@
                                     <h4 class="text-sm font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-4">使用說明</h4>
                                     <ul class="space-y-4">
                                         <li class="flex gap-4">
-                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">1</div>
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">1</div>
                                             <div>
                                                 <span class="font-bold text-stone-900 dark:text-stone-100 block">選擇故事</span>
                                                 <span class="text-sm text-stone-500 dark:text-stone-400">從左側（或選單）選擇一個觸動您的聖經人物故事。</span>
                                             </div>
                                         </li>
                                         <li class="flex gap-4">
-                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">2</div>
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">2</div>
                                             <div>
                                                 <span class="font-bold text-stone-900 dark:text-stone-100 block">沉浸閱讀</span>
                                                 <span class="text-sm text-stone-500 dark:text-stone-400">閱讀背景故事與完整經文，領受神的話語。</span>
                                             </div>
                                         </li>
                                         <li class="flex gap-4">
-                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">3</div>
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">3</div>
                                             <div>
                                                 <span class="font-bold text-stone-900 dark:text-stone-100 block">立約回應</span>
                                                 <span class="text-sm text-stone-500 dark:text-stone-400">點擊「我要回應」，寫下您具體的決定（例如：奉獻、饒恕、堅持...）。</span>
                                             </div>
                                         </li>
                                         <li class="flex gap-4">
-                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">4</div>
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0 font-bold text-stone-500 dark:text-stone-400">4</div>
                                             <div>
                                                 <span class="font-bold text-stone-900 dark:text-stone-100 block">見證雲彩</span>
                                                 <span class="text-sm text-stone-500 dark:text-stone-400">在「見證牆」看見眾人的立約，彼此激勵，如同雲彩圍繞。</span>
