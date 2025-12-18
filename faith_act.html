@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#2c241b">
+    <meta name="theme-color" content="#FAFAF9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FaithAct">
@@ -15,7 +15,7 @@
 
       gtag('config', 'G-3DFR7N5MT2');
     </script>
-    <title>FaithAct 信行行動網 - 讓信心可看見</title>
+    <title>FaithAct 信心行動網 - 讓信心可看見</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -71,6 +71,13 @@
         .animate-slide-up {
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-scale-in {
+            animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* 手機底部安全區域 */
         .pb-safe-nav {
@@ -108,41 +115,23 @@
             activeTab: 'read', // 'read' or 'wall'
             currentStoryId: 'jeremiah',
             showActionModal: false,
+            showAboutModal: true, 
             actions: [],
-            isSubmitting: false
+            isSubmitting: false,
+            // 新增：紀錄是否已經渲染過，避免動畫重複播放造成閃爍
+            hasRendered: false 
         };
 
         // --- Firebase Logic ---
-        
-        /**
-         * 部署到 GitHub Pages 的設定指南 (GitHub Pages Deployment Guide):
-         * * 1. 取得設定 (Get Config):
-         * - 到 Firebase Console > Project settings (專案設定) > General (一般)。
-         * - 在 "Your apps" (您的應用程式) 區塊，選擇 Web App (</>)。
-         * - 複製 `const firebaseConfig = { ... };` 內的物件內容。
-         * * 2. 填入下方 (Paste Below):
-         * - 將複製的內容填入下方的 `firebaseConfig` 物件中，取代目前的佔位符。
-         * * 3. 安全性設定 (Security - 重要!):
-         * - 由於這是公開的 HTML，API Key 會暴露，這是正常的。
-         * - 請務必到 Google Cloud Console > APIs & Services > Credentials。
-         * - 找到您的 API Key，設定 "Application restrictions" (應用程式限制)。
-         * - 選擇 "HTTP referrers (Web sites)"。
-         * - 加入您的 GitHub Pages 網址 (例如: https://yourusername.github.io/*)。
-         * - 這樣即便別人偷了 Key，也無法在其他網域使用。
-         */
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { 
-            // ▼▼▼ 請在此處填入您的 Firebase 真實設定 (從 Firebase Console 複製) ▼▼▼
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+        const firebaseConfig = {
+          apiKey: "AIzaSyA5PZrlN58ecxJ9vUE9_ICcSpASwaEyOJg",
+          authDomain: "faith-act.firebaseapp.com",
+          projectId: "faith-act",
+          storageBucket: "faith-act.firebasestorage.app",
+          messagingSenderId: "641363947520",
+          appId: "1:641363947520:web:e491b0d222f0f4f53f68e5",
+          measurementId: "G-K6WJKK2WFD"
         };
-
-        // 在 GitHub Pages 上，appId 通常是固定的字串，或者您也可以直接寫死在這裡
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'faith-act-app';
         
         let app, auth, db;
@@ -153,7 +142,6 @@
             db = getFirestore(app);
 
             const initAuth = async () => {
-                // 如果是在有提供 token 的環境 (如預覽器) 使用 token
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     try {
                         await signInWithCustomToken(auth, __initial_auth_token);
@@ -162,8 +150,6 @@
                         await signInAnonymously(auth);
                     }
                 } else {
-                    // 在 GitHub Pages 等公開環境，通常使用匿名登入
-                    // 記得在 Firebase Console > Authentication > Sign-in method 開啟「匿名 (Anonymous)」
                     await signInAnonymously(auth);
                 }
             };
@@ -172,7 +158,8 @@
             onAuthStateChanged(auth, (user) => {
                 state.user = user;
                 if (user) setupFirestoreListener(user);
-                render();
+                // Auth 狀態改變時不需重新渲染整個 UI，因為 UI 不依賴 user 物件顯示
+                // 僅需等待 Firestore 資料回來時觸發渲染即可
             });
 
         } catch (e) {
@@ -181,9 +168,6 @@
 
         function setupFirestoreListener(user) {
             try {
-                // 注意：在真實部署時，collection 路徑建議簡化，例如直接用 'faith_actions'
-                // 這裡為了相容預覽環境保留了 artifacts 路徑結構，您可以根據需求修改
-                // 若要修改，請確保 Firestore Security Rules 也對應開放權限
                 const q = query(
                     collection(db, 'artifacts', appId, 'public', 'data', 'faith_actions'),
                     orderBy('timestamp', 'desc')
@@ -202,33 +186,28 @@
         }
 
         async function submitAction(userName, actionText, verseIndex) {
-            // 1. 檢查資料庫連線
             if (!db) {
                 alert("系統初始化失敗。請確認程式碼中的 Firebase Config 是否已填入正確資訊 (apiKey, projectId 等)。");
                 return;
             }
 
-            // 2. 檢查並嘗試強制登入 (如果 state.user 尚未就緒)
             if (!state.user) {
                 try {
                     if (auth) {
-                        // 嘗試立即登入
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
                         } else {
                             await signInAnonymously(auth);
                         }
-                        // 強制更新狀態
                         state.user = auth.currentUser;
                     }
                 } catch (e) {
                     console.error("Auth failed:", e);
-                    alert("登入驗證失敗。請檢查：\n1. 網路連線\n2. Firebase Console Authentication 是否已啟用「匿名登入」");
+                    alert("登入驗證失敗，請檢查網路連線。");
                     return;
                 }
             }
             
-            // 3. 再次確認 (Double Check)
             if (!state.user) {
                 alert("無法確認使用者身分，請重新整理頁面後再試。");
                 return;
@@ -259,14 +238,7 @@
                 state.activeTab = 'wall';
             } catch (error) {
                 console.error("Error adding document: ", error);
-                let msg = "提交失敗，請稍後再試。";
-                // 針對常見的設定錯誤給予提示
-                if (error.code === 'permission-denied') {
-                    msg += "\n\n(權限不足：請檢查 Firestore Security Rules 是否允許寫入)";
-                } else if (error.code === 'unavailable' || error.code === 'project-not-found') {
-                    msg += "\n\n(連線錯誤：請檢查 Firebase Config 是否正確)";
-                }
-                alert(msg);
+                alert("提交失敗，請稍後再試。");
             } finally {
                 state.isSubmitting = false;
                 render();
@@ -278,7 +250,6 @@
 
         function formatTime(timestamp) {
             if (!timestamp) return "剛剛";
-            // Handle Firestore Timestamp or Date object
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             return date.toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
@@ -298,30 +269,38 @@
             }
 
             const currentStory = STORIES[state.currentStoryId] || Object.values(STORIES)[0];
-            const primaryColor = currentStory.color; // e.g., 'amber', 'blue'
+            const primaryColor = currentStory.color; 
             
-            // 1. Mobile Top Bar (Clean & Minimal)
+            // 邏輯修復：只有第一次渲染時才加入動畫 class，避免重繪時畫面閃爍
+            const animationClass = state.hasRendered ? '' : 'animate-fade-in';
+            
+            // 1. Mobile Top Bar
             const mobileHeaderHTML = `
                 <div class="lg:hidden bg-white/90 backdrop-blur-md border-b border-stone-100 sticky top-0 z-30 px-4 h-14 flex items-center justify-between shadow-sm transition-all duration-300">
                     <div class="font-serif font-bold text-stone-800 text-lg tracking-wide flex items-center gap-2">
                         <div class="w-7 h-7 rounded-lg bg-${primaryColor}-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">FA</div>
                         ${state.activeTab === 'read' ? currentStory.title : '見證雲彩'}
                     </div>
-                    ${state.activeTab === 'read' ? `
-                    <div class="flex gap-1.5">
-                         ${Object.values(STORIES).map(s => `
-                            <button onclick="window.switchStory('${s.id}')" class="h-1.5 rounded-full transition-all duration-300 ${state.currentStoryId === s.id ? `bg-${s.color}-500 w-4` : 'bg-stone-200 w-1.5'}"></button>
-                         `).join('')}
+                    <div class="flex items-center gap-3">
+                        ${state.activeTab === 'read' ? `
+                        <div class="flex gap-1.5 mr-2">
+                             ${Object.values(STORIES).map(s => `
+                                <button onclick="window.switchStory('${s.id}')" class="h-1.5 rounded-full transition-all duration-300 ${state.currentStoryId === s.id ? `bg-${s.color}-500 w-4` : 'bg-stone-200 w-1.5'}"></button>
+                             `).join('')}
+                        </div>
+                        ` : ''}
+                        <button onclick="window.toggleAboutModal(true)" class="text-stone-400 hover:text-stone-600">
+                            <i data-lucide="circle-help" class="w-6 h-6"></i>
+                        </button>
                     </div>
-                    ` : ''}
                 </div>
             `;
 
-            // 2. Desktop Sidebar (Elegant & Spacious)
+            // 2. Desktop Sidebar
             const desktopSidebarHTML = `
                 <aside class="hidden lg:flex flex-col w-80 bg-white border-r border-stone-100 h-full overflow-y-auto z-30 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
                     <div class="p-8">
-                        <div class="flex items-center gap-3 mb-10">
+                        <div class="flex items-center gap-3 mb-10 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.switchTab('read')">
                             <div class="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center font-bold text-xl shadow-md">FA</div>
                             <div>
                                 <span class="text-xl font-bold tracking-tight text-stone-900 block">FaithAct</span>
@@ -346,7 +325,7 @@
                     </div>
                     
                     <div class="mt-auto p-6 border-t border-stone-100 bg-stone-50/50 backdrop-blur-sm">
-                        <nav class="flex gap-1.5 p-1.5 bg-white rounded-xl shadow-sm border border-stone-100">
+                        <nav class="flex gap-1.5 p-1.5 bg-white rounded-xl shadow-sm border border-stone-100 mb-3">
                             <button onclick="window.switchTab('read')" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${state.activeTab === 'read' ? 'bg-stone-900 text-white shadow-md' : 'text-stone-500 hover:bg-stone-50'}">
                                 <i data-lucide="book-open" class="w-4 h-4"></i> 閱讀
                             </button>
@@ -354,6 +333,11 @@
                                 <i data-lucide="layout-grid" class="w-4 h-4"></i> 見證
                             </button>
                         </nav>
+                        
+                        <button onclick="window.toggleAboutModal(true)" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white border border-stone-200 text-stone-600 font-bold hover:bg-stone-50 hover:text-stone-800 hover:border-stone-300 transition-colors shadow-sm">
+                            <i data-lucide="circle-help" class="w-4 h-4 text-stone-400"></i>
+                            使用說明
+                        </button>
                     </div>
                 </aside>
             `;
@@ -363,7 +347,7 @@
             
             if (state.activeTab === 'read') {
                 mainContentHTML = `
-                    <div class="animate-fade-in pb-safe-nav lg:pb-20 max-w-4xl mx-auto w-full px-4 lg:px-12 py-6 lg:py-12">
+                    <div class="${animationClass} pb-safe-nav lg:pb-20 max-w-4xl mx-auto w-full px-4 lg:px-12 py-6 lg:py-12">
                         <!-- Hero Section -->
                         <div class="mb-8 lg:mb-12 text-center lg:text-left">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${primaryColor}-50 text-${primaryColor}-700 text-xs font-bold uppercase tracking-wider mb-4 border border-${primaryColor}-100">
@@ -374,7 +358,7 @@
                             <p class="text-stone-500 text-base lg:text-lg max-w-2xl leading-relaxed">${currentStory.description}</p>
                         </div>
 
-                        <!-- Context Cards (Improved Readability) -->
+                        <!-- Context Cards -->
                         <div class="grid lg:grid-cols-1 gap-6 mb-10">
                             <!-- Background & Challenge -->
                             <div class="bg-white rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-stone-100 p-6 lg:p-8 relative overflow-hidden group">
@@ -415,7 +399,7 @@
 
                         <!-- Scripture Reader -->
                         <div class="relative">
-                            <div class="sticky top-0 bg-stone-50/95 backdrop-blur-sm py-4 z-20 flex items-center justify-between border-b border-stone-200 mb-6">
+                            <div class="sticky top-0 bg-[#FAFAF9]/95 backdrop-blur-sm py-4 z-20 flex items-center justify-between border-b border-stone-200 mb-6">
                                 <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
                                     <i data-lucide="scroll-text" class="w-5 h-5 text-stone-400"></i>
                                     經文選讀
@@ -435,7 +419,7 @@
                             </div>
                         </div>
 
-                        <!-- Main CTA (Floating on Desktop, Inline on Mobile) -->
+                        <!-- Main CTA -->
                         <div class="mt-8 lg:mt-16 text-center">
                             <div class="w-20 h-1 mx-auto bg-stone-200 rounded-full mb-6"></div>
                             <p class="text-stone-500 mb-6 font-medium">聖經的信心不只是名詞，而是動詞</p>
@@ -450,7 +434,7 @@
                 `;
             } else if (state.activeTab === 'wall') {
                 mainContentHTML = `
-                    <div class="animate-fade-in pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 py-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
+                    <div class="${animationClass} pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 py-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
                         <div class="max-w-5xl mx-auto">
                             <div class="flex items-center justify-between mb-8 sticky top-0 bg-[#FAFAF9]/95 backdrop-blur-sm py-4 z-20">
                                 <div>
@@ -515,7 +499,7 @@
                 `;
             }
 
-            // 4. Mobile Bottom Nav (Optimized for Touch)
+            // 4. Mobile Bottom Nav
             const mobileNavHTML = `
                 <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-stone-200 bottom-nav-padding z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
                     <div class="flex justify-around items-center h-16">
@@ -533,14 +517,20 @@
                             </div>
                             <span class="text-[10px] font-bold tracking-wide">見證牆</span>
                         </button>
+                        <button onclick="window.toggleAboutModal(true)" class="flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform text-stone-400">
+                            <div class="relative">
+                                <i data-lucide="circle-help" class="w-6 h-6 stroke-[2px]"></i>
+                            </div>
+                            <span class="text-[10px] font-bold tracking-wide">說明</span>
+                        </button>
                     </div>
                 </div>
             `;
 
-            // 5. Modal (Better Mobile Experience)
-            let modalHTML = '';
+            // 5. Action Modal
+            let actionModalHTML = '';
             if (state.showActionModal) {
-                modalHTML = `
+                actionModalHTML = `
                     <div class="fixed inset-0 z-50 flex items-end lg:items-center justify-center sm:p-4">
                         <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity" onclick="window.closeActionModal()"></div>
                         
@@ -629,6 +619,82 @@
                 `;
             }
 
+            // 6. About Modal
+            let aboutModalHTML = '';
+            if (state.showAboutModal) {
+                aboutModalHTML = `
+                    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-stone-900/50 backdrop-blur-sm animate-fade-in" onclick="window.toggleAboutModal(false)"></div>
+                        <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[85vh]">
+                            <div class="bg-stone-900 p-6 text-white relative">
+                                <h3 class="text-2xl font-bold flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm">FA</div>
+                                    關於 FaithAct
+                                </h3>
+                                <p class="text-stone-300 text-sm mt-1">讓信心成為可見的行動</p>
+                                <button onclick="window.toggleAboutModal(false)" class="absolute top-6 right-6 p-1 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="p-6 overflow-y-auto space-y-8">
+                                <!-- Section 1: Vision -->
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-3">核心異象</h4>
+                                    <p class="text-stone-700 leading-relaxed text-justify-cn">
+                                        我們相信，聖經不只是一本用來閱讀的書，更是一本用來<span class="font-bold text-stone-900">「遵行」</span>的書。
+                                        <br><br>
+                                        FaithAct 旨在解決「聽道而不行道」的斷層。透過精選的聖經信心故事，我們邀請您不只是被感動，更要將感動化為具體的<span class="font-bold text-stone-900">「立約行動」</span>。
+                                        就像耶利米在被圍困的城中買地一樣，讓我們在生活中為神畫押，留下信心的憑據。
+                                    </p>
+                                </div>
+
+                                <!-- Section 2: How to use -->
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-400 uppercase tracking-widest mb-4">使用說明</h4>
+                                    <ul class="space-y-4">
+                                        <li class="flex gap-4">
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0 font-bold text-stone-500">1</div>
+                                            <div>
+                                                <span class="font-bold text-stone-900 block">選擇故事</span>
+                                                <span class="text-sm text-stone-500">從左側（或選單）選擇一個觸動您的聖經人物故事。</span>
+                                            </div>
+                                        </li>
+                                        <li class="flex gap-4">
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0 font-bold text-stone-500">2</div>
+                                            <div>
+                                                <span class="font-bold text-stone-900 block">沉浸閱讀</span>
+                                                <span class="text-sm text-stone-500">閱讀背景故事與完整經文，領受神的話語。</span>
+                                            </div>
+                                        </li>
+                                        <li class="flex gap-4">
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0 font-bold text-stone-500">3</div>
+                                            <div>
+                                                <span class="font-bold text-stone-900 block">立約回應</span>
+                                                <span class="text-sm text-stone-500">點擊「我要回應」，寫下您具體的決定（例如：奉獻、饒恕、堅持...）。</span>
+                                            </div>
+                                        </li>
+                                        <li class="flex gap-4">
+                                            <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center shrink-0 font-bold text-stone-500">4</div>
+                                            <div>
+                                                <span class="font-bold text-stone-900 block">見證雲彩</span>
+                                                <span class="text-sm text-stone-500">在「見證牆」看見眾人的立約，彼此激勵，如同雲彩圍繞。</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="p-4 border-t border-stone-100 bg-stone-50">
+                                <button onclick="window.toggleAboutModal(false)" class="w-full py-3 rounded-xl bg-stone-200 text-stone-700 font-bold hover:bg-stone-300 transition-colors">
+                                    我明白了
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             // Assembly
             appContainer.innerHTML = `
                 <div class="flex h-full w-full bg-[#FAFAF9]">
@@ -644,8 +710,12 @@
                         ${mobileNavHTML}
                     </main>
                 </div>
-                ${modalHTML}
+                ${actionModalHTML}
+                ${aboutModalHTML}
             `;
+
+            // State update to flag that initial render has occurred
+            state.hasRendered = true;
 
             if (window.lucide) window.lucide.createIcons();
         }
@@ -669,6 +739,11 @@
 
         window.closeActionModal = () => {
             state.showActionModal = false;
+            render();
+        };
+
+        window.toggleAboutModal = (show) => {
+            state.showAboutModal = show;
             render();
         };
 
