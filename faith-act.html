@@ -46,6 +46,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
 
         :root {
+            /* 新增頂部安全區域變數 */
+            --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
@@ -110,6 +112,16 @@
         }
         .bottom-nav-padding {
             padding-bottom: var(--safe-bottom);
+        }
+        
+        /* 新增：頂部安全區域 Padding Class */
+        .pt-safe-top {
+            padding-top: var(--safe-top);
+        }
+        
+        /* 新增：計算過後的遮罩 Top 位置 (3.5rem 是 h-14 的高度) */
+        .top-header-offset {
+            top: calc(3.5rem + var(--safe-top));
         }
         
         /* 文字對齊優化 */
@@ -322,39 +334,41 @@
             const animationClass = state.hasRendered ? '' : 'animate-fade-in';
             
             // 1. Mobile Top Bar
-            // 更新：設計更有質感的下拉選單觸發器與面板
+            // 更新：加入 pt-safe-top 來避開狀態列，並調整結構
             const mobileHeaderHTML = `
-                <div class="lg:hidden bg-white/90 dark:bg-stone-800/90 backdrop-blur-md border-b border-stone-100 dark:border-stone-700 sticky top-0 z-30 px-4 h-14 flex items-center justify-between shadow-sm transition-all duration-300 relative">
-                    <div class="flex items-center gap-2 overflow-hidden">
-                        <div class="w-7 h-7 rounded-lg bg-${primaryColor}-600 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0">FA</div>
-                        
-                        ${state.activeTab === 'read' ? `
-                            <!-- Story Selector Trigger -->
-                            <button onclick="window.toggleStoryMenu()" class="flex items-center gap-2 group px-2 py-1 -ml-2 rounded-lg active:bg-stone-100 dark:active:bg-stone-700 transition-colors">
-                                <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide truncate max-w-[180px]">${currentStory.title}</span>
-                                <div class="bg-stone-100 dark:bg-stone-700 rounded-full p-0.5 transition-transform duration-300 ${state.isStoryMenuOpen ? 'rotate-180 bg-stone-200 dark:bg-stone-600' : ''}">
-                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-500 dark:text-stone-400"></i>
-                                </div>
+                <div class="lg:hidden bg-white/90 dark:bg-stone-800/90 backdrop-blur-md border-b border-stone-100 dark:border-stone-700 sticky top-0 z-30 pt-safe-top shadow-sm transition-all duration-300 relative">
+                    <div class="h-14 px-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <div class="w-7 h-7 rounded-lg bg-${primaryColor}-600 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0">FA</div>
+                            
+                            ${state.activeTab === 'read' ? `
+                                <!-- Story Selector Trigger -->
+                                <button onclick="window.toggleStoryMenu()" class="flex items-center gap-2 group px-2 py-1 -ml-2 rounded-lg active:bg-stone-100 dark:active:bg-stone-700 transition-colors">
+                                    <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide truncate max-w-[180px]">${currentStory.title}</span>
+                                    <div class="bg-stone-100 dark:bg-stone-700 rounded-full p-0.5 transition-transform duration-300 ${state.isStoryMenuOpen ? 'rotate-180 bg-stone-200 dark:bg-stone-600' : ''}">
+                                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-500 dark:text-stone-400"></i>
+                                    </div>
+                                </button>
+                            ` : `
+                                <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide">見證雲彩</span>
+                            `}
+                        </div>
+
+                        <div class="flex items-center gap-3 shrink-0">
+                            <!-- Theme Toggle (Mobile) -->
+                            <button onclick="window.toggleTheme()" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                                <i data-lucide="${state.darkMode ? 'sun' : 'moon'}" class="w-6 h-6"></i>
                             </button>
-                        ` : `
-                            <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide">見證雲彩</span>
-                        `}
-                    </div>
 
-                    <div class="flex items-center gap-3 shrink-0">
-                        <!-- Theme Toggle (Mobile) -->
-                        <button onclick="window.toggleTheme()" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
-                            <i data-lucide="${state.darkMode ? 'sun' : 'moon'}" class="w-6 h-6"></i>
-                        </button>
-
-                        <button onclick="window.toggleAboutModal(true)" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
-                            <i data-lucide="circle-help" class="w-6 h-6"></i>
-                        </button>
+                            <button onclick="window.toggleAboutModal(true)" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                                <i data-lucide="circle-help" class="w-6 h-6"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Custom Dropdown Menu (Positioned Absolute) -->
-                    <!-- 背景遮罩 -->
-                    <div onclick="window.toggleStoryMenu(false)" class="fixed inset-0 top-14 z-20 bg-stone-900/20 dark:bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${state.isStoryMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}"></div>
+                    <!-- 背景遮罩：調整 top 位置為 top-header-offset (動態計算) -->
+                    <div onclick="window.toggleStoryMenu(false)" class="fixed inset-0 top-header-offset z-20 bg-stone-900/20 dark:bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${state.isStoryMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}"></div>
                     
                     <!-- 選單本體 -->
                     <div class="absolute top-full left-0 right-0 z-30 bg-white/95 dark:bg-[#1c1917]/95 backdrop-blur-xl border-b border-stone-200 dark:border-stone-700 shadow-xl transition-all duration-300 origin-top transform ${state.isStoryMenuOpen ? 'scale-y-100 opacity-100 translate-y-0' : 'scale-y-95 opacity-0 -translate-y-2 pointer-events-none'}">
@@ -499,9 +513,11 @@
                             
                             <div class="space-y-3 lg:space-y-4 pb-2">
                                 ${currentStory.verses.map((item, index) => `
-                                    <div class="group">
-                                        <p class="text-[17px] lg:text-[19px] ${index % 2 === 0 ? 'text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400'} leading-loose lg:leading-[2.2] text-justify-cn font-serif tracking-wide">
-                                            <span class="inline-block w-6 text-right text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 font-mono select-none whitespace-nowrap group-hover:text-${primaryColor}-400 transition-colors mr-2">${item.verse}</span>${item.text}
+                                    <div class="flex gap-4 lg:gap-6 group">
+                                        <!-- 更新：寬度加大到 w-20 (80px) -->
+                                        <span class="text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 mt-2 w-20 shrink-0 text-right font-mono select-none whitespace-nowrap group-hover:text-${primaryColor}-400 transition-colors">${item.verse}</span>
+                                        <p class="flex-1 text-[17px] lg:text-[19px] ${index % 2 === 0 ? 'text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400'} leading-loose lg:leading-[2.2] text-justify-cn font-serif tracking-wide">
+                                            ${item.text}
                                         </p>
                                     </div>
                                 `).join('')}
@@ -517,8 +533,8 @@
                                 <i data-lucide="pen-tool" class="w-5 h-5"></i>
                                 我要回應這個信心行動
                             </button>
-                            <!-- 更新：底部留白從 pb-5 改為 pb-2.5 -->
-                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-2.5">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
+                            <!-- 更新：底部留白從 pb-8 改為 pb-5 -->
+                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-5">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
                         </div>
                     </div>
                 `;
