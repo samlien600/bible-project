@@ -476,19 +476,16 @@
                                                 
                                                 <div class="relative mb-4">
                                                     <i data-lucide="quote" class="absolute -top-1 -left-1 w-4 h-4 text-stone-100 fill-stone-100"></i>
-                                                    <p class="text-stone-700 text-[15px] leading-relaxed pl-2 relative z-10 font-serif">
+                                                    <p class="text-stone-700 text-[15px] leading-relaxed pl-2 relative z-10 font-serif whitespace-pre-line">
                                                         ${item.action}
                                                     </p>
                                                 </div>
 
                                                 <div class="flex items-center justify-between pt-2">
-                                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-50 rounded-lg border border-stone-100 max-w-[75%]">
+                                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-50 rounded-lg border border-stone-100 max-w-[100%]">
                                                         <div class="w-1.5 h-1.5 rounded-full bg-${story.color}-400 shrink-0"></div>
                                                         <span class="text-[11px] font-medium text-stone-500 truncate">${item.storyTitle}</span>
                                                     </div>
-                                                    <button class="text-stone-300 hover:text-red-500 transition-colors flex items-center gap-1 text-xs group-hover:text-stone-400">
-                                                        <i data-lucide="heart" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                                                    </button>
                                                 </div>
                                             </div>
                                         `;
@@ -749,8 +746,8 @@
         };
 
         window.submitForm = (form) => {
-            const userName = form.userName.value;
-            const actionText = form.actionText.value;
+            const userName = form.userName.value.trim();
+            const actionText = form.actionText.value.trim();
             const verseIndex = form.verseIndex.value;
             submitAction(userName, actionText, verseIndex);
         };
