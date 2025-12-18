@@ -104,7 +104,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         // --- Data & Config ---
         const STORIES = window.STORIES || {};
@@ -114,11 +114,11 @@
             user: null,
             activeTab: 'read', // 'read' or 'wall'
             currentStoryId: 'jeremiah',
+            wallFilter: 'all', // 新增：見證牆的篩選狀態 ('all' 或 storyId)
             showActionModal: false,
             showAboutModal: true, 
             actions: [],
             isSubmitting: false,
-            // 新增：紀錄是否已經渲染過，避免動畫重複播放造成閃爍
             hasRendered: false 
         };
 
@@ -159,8 +159,6 @@
             onAuthStateChanged(auth, (user) => {
                 state.user = user;
                 if (user) setupFirestoreListener(user);
-                // Auth 狀態改變時不需重新渲染整個 UI，因為 UI 不依賴 user 物件顯示
-                // 僅需等待 Firestore 資料回來時觸發渲染即可
             });
 
         } catch (e) {
@@ -169,9 +167,11 @@
 
         function setupFirestoreListener(user) {
             try {
+                // 優化：加入 limit(50) 限制讀取數量，避免資料過多影響效能
                 const q = query(
                     collection(db, 'artifacts', appId, 'public', 'data', 'faith_actions'),
-                    orderBy('timestamp', 'desc')
+                    orderBy('timestamp', 'desc'),
+                    limit(50)
                 );
 
                 onSnapshot(q, (snapshot) => {
@@ -186,7 +186,7 @@
             }
         }
 
-        async function submitAction(userName, actionText, verseIndex) {
+        async function submitAction(userName, actionText) {
             if (!db) {
                 alert("系統初始化失敗。請確認程式碼中的 Firebase Config 是否已填入正確資訊 (apiKey, projectId 等)。");
                 return;
@@ -218,9 +218,7 @@
             render();
 
             const currentStory = STORIES[state.currentStoryId];
-            const verseText = verseIndex !== "" && verseIndex !== null 
-                ? `${currentStory.scripture} ${currentStory.verses[verseIndex].verse}節`
-                : `${currentStory.scripture}`;
+            const verseText = `${currentStory.scripture}`;
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'faith_actions'), {
@@ -237,6 +235,7 @@
                 
                 state.showActionModal = false;
                 state.activeTab = 'wall';
+                state.wallFilter = 'all'; // 提交後重置篩選，讓使用者能看到剛發佈的內容
             } catch (error) {
                 console.error("Error adding document: ", error);
                 alert("提交失敗，請稍後再試。");
@@ -272,7 +271,6 @@
             const currentStory = STORIES[state.currentStoryId] || Object.values(STORIES)[0];
             const primaryColor = currentStory.color; 
             
-            // 邏輯修復：只有第一次渲染時才加入動畫 class，避免重繪時畫面閃爍
             const animationClass = state.hasRendered ? '' : 'animate-fade-in';
             
             // 1. Mobile Top Bar
@@ -434,30 +432,53 @@
                     </div>
                 `;
             } else if (state.activeTab === 'wall') {
+                // 1. 過濾資料
+                let filteredActions = state.actions;
+                if (state.wallFilter !== 'all') {
+                    filteredActions = state.actions.filter(item => item.storyId === state.wallFilter);
+                }
+
                 mainContentHTML = `
                     <div class="${animationClass} pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 py-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
                         <div class="max-w-5xl mx-auto">
-                            <div class="flex items-center justify-between mb-8 sticky top-0 bg-[#FAFAF9]/95 backdrop-blur-sm py-4 z-20">
-                                <div>
-                                    <h2 class="text-2xl lg:text-3xl font-bold text-stone-800 tracking-tight">見證雲彩</h2>
-                                    <p class="text-sm text-stone-500 font-medium mt-1">如同雲彩圍繞著我們</p>
+                            <!-- 頂部資訊與篩選列 -->
+                            <div class="sticky top-0 bg-[#FAFAF9]/95 backdrop-blur-sm z-20 pt-2 pb-4 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h2 class="text-2xl lg:text-3xl font-bold text-stone-800 tracking-tight">見證雲彩</h2>
+                                        <p class="text-sm text-stone-500 font-medium mt-1">如同雲彩圍繞著我們</p>
+                                    </div>
+                                    <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200 text-sm font-bold text-stone-600 flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        最新 50 則
+                                    </div>
                                 </div>
-                                <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-stone-200 text-sm font-bold text-stone-600 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                    ${state.actions.length} 則
+
+                                <!-- 故事分類篩選器 (Horizontal Scroll) -->
+                                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                    <button onclick="window.setWallFilter('all')" class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${state.wallFilter === 'all' ? 'bg-stone-800 text-white shadow-md' : 'bg-white text-stone-500 border border-stone-200 hover:bg-stone-50'}">
+                                        全部
+                                    </button>
+                                    ${Object.values(STORIES).map(s => `
+                                        <button onclick="window.setWallFilter('${s.id}')" class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${state.wallFilter === s.id ? `bg-${s.color}-600 text-white shadow-md` : 'bg-white text-stone-500 border border-stone-200 hover:bg-stone-50'}">
+                                            ${state.wallFilter !== s.id ? `<div class="w-2 h-2 rounded-full bg-${s.color}-400"></div>` : ''}
+                                            ${s.title}
+                                        </button>
+                                    `).join('')}
                                 </div>
                             </div>
 
-                            ${state.actions.length === 0 ? `
+                            <!-- 內容呈現 -->
+                            ${filteredActions.length === 0 ? `
                                 <div class="flex flex-col items-center justify-center py-32 text-center opacity-60">
                                     <div class="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mb-6">
                                         <i data-lucide="wind" class="w-10 h-10 text-stone-300"></i>
                                     </div>
-                                    <p class="text-stone-500 text-lg font-medium">目前還沒有見證<br>成為第一位回應者吧！</p>
+                                    <p class="text-stone-500 text-lg font-medium">目前此分類還沒有見證<br>成為第一位回應者吧！</p>
                                 </div>
                             ` : `
                                 <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                                    ${state.actions.map(item => {
+                                    ${filteredActions.map(item => {
                                         const story = STORIES[item.storyId] || STORIES['jeremiah'];
                                         return `
                                             <div class="break-inside-avoid bg-white p-5 lg:p-6 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-stone-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
@@ -563,22 +584,6 @@
                                             placeholder="主內家人 / 您的暱稱"
                                             class="w-full p-4 rounded-xl border border-stone-200 focus:border-${primaryColor}-500 focus:ring-4 focus:ring-${primaryColor}-100 outline-none bg-white transition-all font-medium text-stone-800 placeholder-stone-300 shadow-sm text-base"
                                         />
-                                    </div>
-
-                                    <!-- Verse Selector -->
-                                    <div>
-                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-2 ml-1">
-                                            特別觸動您的經文 (選填)
-                                        </label>
-                                        <div class="relative">
-                                            <select name="verseIndex" class="w-full p-4 pr-10 rounded-xl border border-stone-200 focus:border-${primaryColor}-500 focus:ring-4 focus:ring-${primaryColor}-100 outline-none bg-white appearance-none text-stone-700 text-sm truncate shadow-sm font-medium">
-                                                <option value="" class="text-stone-400">-- 整個故事 --</option>
-                                                ${currentStory.verses.map((v, i) => `
-                                                    <option value="${i}">${v.verse}節 - ${v.text.substring(0, 20)}...</option>
-                                                `).join('')}
-                                            </select>
-                                            <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none"></i>
-                                        </div>
                                     </div>
 
                                     <!-- Action Text -->
@@ -724,6 +729,11 @@
             render();
         };
 
+        window.setWallFilter = (filter) => {
+            state.wallFilter = filter;
+            render();
+        };
+
         window.switchStory = (storyId) => {
             state.currentStoryId = storyId;
             state.activeTab = 'read';
@@ -748,8 +758,8 @@
         window.submitForm = (form) => {
             const userName = form.userName.value.trim();
             const actionText = form.actionText.value.trim();
-            const verseIndex = form.verseIndex.value;
-            submitAction(userName, actionText, verseIndex);
+            // Removed verseIndex
+            submitAction(userName, actionText);
         };
 
         // Initial Render
