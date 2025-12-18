@@ -104,9 +104,9 @@
             animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* 手機底部安全區域 */
+        /* 手機底部安全區域 - 使用 !important 確保不被 tailwind 覆蓋，並預留足夠高度 */
         .pb-safe-nav {
-            padding-bottom: calc(64px + var(--safe-bottom));
+            padding-bottom: calc(100px + var(--safe-bottom)) !important;
         }
         .bottom-nav-padding {
             padding-bottom: var(--safe-bottom);
@@ -153,14 +153,13 @@
         };
 
         // --- Firebase Logic ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyA5PZrlN58ecxJ9vUE9_ICcSpASwaEyOJg",
-          authDomain: "faith-act.firebaseapp.com",
-          projectId: "faith-act",
-          storageBucket: "faith-act.firebasestorage.app",
-          messagingSenderId: "641363947520",
-          appId: "1:641363947520:web:e491b0d222f0f4f53f68e5",
-          measurementId: "G-K6WJKK2WFD"
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { 
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'faith-act-app';
@@ -347,8 +346,8 @@
             // 2. Desktop Sidebar
             const desktopSidebarHTML = `
                 <aside class="hidden lg:flex flex-col w-80 bg-white dark:bg-stone-800 border-r border-stone-100 dark:border-stone-700 h-full overflow-y-auto z-30 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-                    <div class="p-8">
-                        <div class="flex items-center justify-between mb-8">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.switchTab('read')">
                                 <div class="w-10 h-10 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center font-bold text-xl shadow-md">FA</div>
                                 <div>
@@ -382,8 +381,9 @@
                         </div>
                     </div>
                     
-                    <div class="mt-auto p-6 border-t border-stone-100 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-800/50 backdrop-blur-sm">
-                        <nav class="flex gap-1.5 p-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-sm border border-stone-100 dark:border-stone-600 mb-3">
+                    <div class="p-5 pt-0 border-t border-stone-100 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-800/50 backdrop-blur-sm">
+                        <div class="pt-3"></div>
+                        <nav class="flex gap-1.5 p-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-sm border border-stone-100 dark:border-stone-600 mb-0">
                             <button onclick="window.switchTab('read')" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${state.activeTab === 'read' ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-md' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-600'}">
                                 <i data-lucide="book-open" class="w-4 h-4"></i> 閱讀
                             </button>
@@ -400,7 +400,7 @@
             
             if (state.activeTab === 'read') {
                 mainContentHTML = `
-                    <div class="${animationClass} pb-safe-nav lg:pb-20 max-w-4xl mx-auto w-full px-4 lg:px-12 py-6 lg:py-12">
+                    <div class="${animationClass} pb-safe-nav lg:pb-20 max-w-4xl mx-auto w-full px-4 lg:px-12 pt-4 lg:py-12">
                         <!-- Hero Section -->
                         <div class="mb-8 lg:mb-12 text-center lg:text-left">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-${primaryColor}-50 dark:bg-${primaryColor}-900/30 text-${primaryColor}-700 dark:text-${primaryColor}-300 text-xs font-bold uppercase tracking-wider mb-4 border border-${primaryColor}-100 dark:border-${primaryColor}-800">
@@ -452,7 +452,7 @@
 
                         <!-- Scripture Reader -->
                         <div class="relative">
-                            <div class="sticky top-0 bg-[#FAFAF9]/95 dark:bg-[#1c1917]/95 backdrop-blur-sm py-4 z-20 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 mb-6">
+                            <div class="sticky top-0 bg-[#FAFAF9] dark:bg-[#1c1917] z-30 pt-6 pb-4 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 mb-6">
                                 <h3 class="text-lg font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
                                     <i data-lucide="scroll-text" class="w-5 h-5 text-stone-400"></i>
                                     經文選讀
@@ -460,10 +460,11 @@
                                 <span class="text-xs font-mono text-stone-400 dark:text-stone-500 bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded">CUNP</span>
                             </div>
                             
-                            <div class="space-y-3 lg:space-y-4 pb-10">
+                            <div class="space-y-3 lg:space-y-4 pb-2">
                                 ${currentStory.verses.map((item, index) => `
                                     <div class="flex gap-4 lg:gap-6 group">
-                                        <span class="text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 mt-2 w-12 shrink-0 text-right font-mono select-none group-hover:text-${primaryColor}-400 transition-colors">${item.verse}</span>
+                                        <!-- 更新：寬度加大到 w-20 (80px) -->
+                                        <span class="text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 mt-2 w-20 shrink-0 text-right font-mono select-none whitespace-nowrap group-hover:text-${primaryColor}-400 transition-colors">${item.verse}</span>
                                         <p class="flex-1 text-[17px] lg:text-[19px] ${index % 2 === 0 ? 'text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400'} leading-loose lg:leading-[2.2] text-justify-cn font-serif tracking-wide">
                                             ${item.text}
                                         </p>
@@ -473,15 +474,15 @@
                         </div>
 
                         <!-- Main CTA -->
-                        <div class="mt-8 lg:mt-16 text-center">
-                            <div class="w-20 h-1 mx-auto bg-stone-200 dark:bg-stone-600 rounded-full mb-6"></div>
-                            <p class="text-stone-500 dark:text-stone-400 mb-6 font-medium">聖經的信心不只是名詞，而是動詞</p>
+                        <div class="mt-4 lg:mt-6 text-center">
+                            <div class="w-20 h-1 mx-auto bg-stone-200 dark:bg-stone-700 rounded-full mb-4"></div>
+                            <p class="text-stone-500 dark:text-stone-400 mb-4 font-medium">聖經的信心不只是名詞，而是動詞</p>
                             
                             <button onclick="window.openActionModal()" class="w-full lg:w-auto px-10 py-4 bg-stone-900 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-900 text-lg font-bold rounded-2xl shadow-xl shadow-stone-200 dark:shadow-stone-900/50 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 mx-auto ring-4 ring-stone-100 dark:ring-stone-700">
                                 <i data-lucide="pen-tool" class="w-5 h-5"></i>
                                 我要回應這個信心行動
                             </button>
-                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
+                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-2">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
                         </div>
                     </div>
                 `;
@@ -496,7 +497,7 @@
                     <div class="${animationClass} pb-safe-nav lg:pb-20 w-full px-4 lg:px-8 pb-6 h-full overflow-y-auto no-scrollbar scroll-smooth">
                         <div class="max-w-5xl mx-auto">
                             <!-- 頂部資訊與篩選列 -->
-                            <div class="sticky top-0 bg-[#FAFAF9]/95 dark:bg-[#1c1917]/95 backdrop-blur-sm z-20 pt-6 pb-4 space-y-4">
+                            <div class="sticky top-0 bg-[#FAFAF9] dark:bg-[#1c1917] z-30 pt-6 pb-4 space-y-4 border-b border-transparent transition-colors">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h2 class="text-2xl lg:text-3xl font-bold text-stone-800 dark:text-stone-100 tracking-tight">見證雲彩</h2>
