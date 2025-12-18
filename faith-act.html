@@ -465,7 +465,7 @@
                                 ${currentStory.verses.map((item, index) => `
                                     <div class="group">
                                         <p class="text-[17px] lg:text-[19px] ${index % 2 === 0 ? 'text-stone-800 dark:text-stone-200' : 'text-stone-600 dark:text-stone-400'} leading-loose lg:leading-[2.2] text-justify-cn font-serif tracking-wide">
-                                            <span class="text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 font-mono select-none whitespace-nowrap group-hover:text-${primaryColor}-400 transition-colors mr-2">${item.verse}</span>${item.text}
+                                            <span class="inline-block w-6 text-right text-xs lg:text-sm font-bold text-stone-300 dark:text-stone-600 font-mono select-none whitespace-nowrap group-hover:text-${primaryColor}-400 transition-colors mr-2">${item.verse}</span>${item.text}
                                         </p>
                                     </div>
                                 `).join('')}
@@ -481,7 +481,8 @@
                                 <i data-lucide="pen-tool" class="w-5 h-5"></i>
                                 我要回應這個信心行動
                             </button>
-                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
+                            <!-- 更新：底部留白從 pb-5 改為 pb-2.5 -->
+                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-2.5">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
                         </div>
                     </div>
                 `;
@@ -632,6 +633,7 @@
                                         <input 
                                             name="userName"
                                             required
+                                            maxlength="30"
                                             placeholder="主內家人 / 您的暱稱"
                                             class="w-full p-4 rounded-xl border border-stone-200 dark:border-stone-700 focus:border-${primaryColor}-500 focus:ring-4 focus:ring-${primaryColor}-100 dark:focus:ring-${primaryColor}-900/30 outline-none bg-white dark:bg-stone-700 transition-all font-medium text-stone-800 dark:text-stone-100 placeholder-stone-300 dark:placeholder-stone-500 shadow-sm text-base"
                                         />
