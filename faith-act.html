@@ -153,13 +153,14 @@
         };
 
         // --- Firebase Logic ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { 
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+        const firebaseConfig = {
+          apiKey: "AIzaSyA5PZrlN58ecxJ9vUE9_ICcSpASwaEyOJg",
+          authDomain: "faith-act.firebaseapp.com",
+          projectId: "faith-act",
+          storageBucket: "faith-act.firebasestorage.app",
+          messagingSenderId: "641363947520",
+          appId: "1:641363947520:web:e491b0d222f0f4f53f68e5",
+          measurementId: "G-K6WJKK2WFD"
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'faith-act-app';
@@ -482,7 +483,8 @@
                                 <i data-lucide="pen-tool" class="w-5 h-5"></i>
                                 我要回應這個信心行動
                             </button>
-                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-2">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
+                            <!-- 更新：底部留白從 pb-8 改為 pb-5 -->
+                            <p class="text-xs text-stone-400 dark:text-stone-600 mt-4 pb-5">已有 <span class="font-bold text-stone-600 dark:text-stone-400">${state.actions.filter(a => a.storyId === state.currentStoryId).length}</span> 人參與立約</p>
                         </div>
                     </div>
                 `;
@@ -594,10 +596,13 @@
                     </div>
                 </div>
             `;
-
-            // 5. Action Modal
+            
+            // ... (Rest of the render function remains the same) ...
+            
+            // 5. Action Modal (Unchanged)
             let actionModalHTML = '';
             if (state.showActionModal) {
+                // ... (No changes here)
                 actionModalHTML = `
                     <div class="fixed inset-0 z-50 flex items-end lg:items-center justify-center sm:p-4">
                         <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity" onclick="window.closeActionModal()"></div>
