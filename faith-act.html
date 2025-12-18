@@ -152,7 +152,9 @@
             darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
             // 新增狀態：用來追蹤彈窗是否已經打開過，避免重複播放動畫
             wasAboutModalOpen: false,
-            wasActionModalOpen: false
+            wasActionModalOpen: false,
+            // 新增：故事選單開關狀態
+            isStoryMenuOpen: false
         };
 
         // --- Firebase Logic ---
@@ -320,21 +322,26 @@
             const animationClass = state.hasRendered ? '' : 'animate-fade-in';
             
             // 1. Mobile Top Bar
+            // 更新：設計更有質感的下拉選單觸發器與面板
             const mobileHeaderHTML = `
-                <div class="lg:hidden bg-white/90 dark:bg-stone-800/90 backdrop-blur-md border-b border-stone-100 dark:border-stone-700 sticky top-0 z-30 px-4 h-14 flex items-center justify-between shadow-sm transition-all duration-300">
-                    <div class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-lg bg-${primaryColor}-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">FA</div>
-                        ${state.activeTab === 'read' ? currentStory.title : '見證雲彩'}
-                    </div>
-                    <div class="flex items-center gap-3">
-                        ${state.activeTab === 'read' ? `
-                        <div class="flex gap-1.5 mr-2">
-                             ${Object.values(STORIES).map(s => `
-                                <button onclick="window.switchStory('${s.id}')" class="h-1.5 rounded-full transition-all duration-300 ${state.currentStoryId === s.id ? `bg-${s.color}-500 w-4` : 'bg-stone-200 dark:bg-stone-600 w-1.5'}"></button>
-                             `).join('')}
-                        </div>
-                        ` : ''}
+                <div class="lg:hidden bg-white/90 dark:bg-stone-800/90 backdrop-blur-md border-b border-stone-100 dark:border-stone-700 sticky top-0 z-30 px-4 h-14 flex items-center justify-between shadow-sm transition-all duration-300 relative">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <div class="w-7 h-7 rounded-lg bg-${primaryColor}-600 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0">FA</div>
                         
+                        ${state.activeTab === 'read' ? `
+                            <!-- Story Selector Trigger -->
+                            <button onclick="window.toggleStoryMenu()" class="flex items-center gap-2 group px-2 py-1 -ml-2 rounded-lg active:bg-stone-100 dark:active:bg-stone-700 transition-colors">
+                                <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide truncate max-w-[180px]">${currentStory.title}</span>
+                                <div class="bg-stone-100 dark:bg-stone-700 rounded-full p-0.5 transition-transform duration-300 ${state.isStoryMenuOpen ? 'rotate-180 bg-stone-200 dark:bg-stone-600' : ''}">
+                                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-500 dark:text-stone-400"></i>
+                                </div>
+                            </button>
+                        ` : `
+                            <span class="font-serif font-bold text-stone-800 dark:text-stone-100 text-lg tracking-wide">見證雲彩</span>
+                        `}
+                    </div>
+
+                    <div class="flex items-center gap-3 shrink-0">
                         <!-- Theme Toggle (Mobile) -->
                         <button onclick="window.toggleTheme()" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
                             <i data-lucide="${state.darkMode ? 'sun' : 'moon'}" class="w-6 h-6"></i>
@@ -343,6 +350,32 @@
                         <button onclick="window.toggleAboutModal(true)" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
                             <i data-lucide="circle-help" class="w-6 h-6"></i>
                         </button>
+                    </div>
+
+                    <!-- Custom Dropdown Menu (Positioned Absolute) -->
+                    <!-- 背景遮罩 -->
+                    <div onclick="window.toggleStoryMenu(false)" class="fixed inset-0 top-14 z-20 bg-stone-900/20 dark:bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${state.isStoryMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}"></div>
+                    
+                    <!-- 選單本體 -->
+                    <div class="absolute top-full left-0 right-0 z-30 bg-white/95 dark:bg-[#1c1917]/95 backdrop-blur-xl border-b border-stone-200 dark:border-stone-700 shadow-xl transition-all duration-300 origin-top transform ${state.isStoryMenuOpen ? 'scale-y-100 opacity-100 translate-y-0' : 'scale-y-95 opacity-0 -translate-y-2 pointer-events-none'}">
+                        <div class="max-h-[60vh] overflow-y-auto p-2 space-y-1 overscroll-contain">
+                            <div class="px-4 py-2 text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">選擇故事旅程</div>
+                            ${Object.values(STORIES).map(s => `
+                                <button onclick="window.switchStory('${s.id}')" class="w-full flex items-center gap-4 p-3 rounded-xl transition-all duration-200 ${state.currentStoryId === s.id ? `bg-${s.color}-50 dark:bg-${s.color}-900/30 ring-1 ring-${s.color}-200 dark:ring-${s.color}-800` : 'active:bg-stone-50 dark:active:bg-stone-800'}">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${state.currentStoryId === s.id ? `bg-${s.color}-100 text-${s.color}-600 dark:bg-${s.color}-800 dark:text-${s.color}-200` : 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500'}">
+                                        <i data-lucide="${s.icon}" class="w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1 text-left">
+                                        <div class="font-bold text-[15px] ${state.currentStoryId === s.id ? `text-${s.color}-900 dark:text-${s.color}-100` : 'text-stone-700 dark:text-stone-300'}">${s.title}</div>
+                                        <div class="text-xs font-medium ${state.currentStoryId === s.id ? `text-${s.color}-600 dark:text-${s.color}-400` : 'text-stone-400 dark:text-stone-500'}">${s.scripture}</div>
+                                    </div>
+                                    ${state.currentStoryId === s.id ? `
+                                        <i data-lucide="check" class="w-5 h-5 text-${s.color}-600 dark:text-${s.color}-400"></i>
+                                    ` : ''}
+                                </button>
+                            `).join('')}
+                            <div class="h-2"></div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -819,6 +852,17 @@
         window.switchStory = (storyId) => {
             state.currentStoryId = storyId;
             state.activeTab = 'read';
+            state.isStoryMenuOpen = false; // 切換故事後自動關閉選單
+            render();
+        };
+        
+        // 新增：切換選單開關
+        window.toggleStoryMenu = (force) => {
+            if (force !== undefined) {
+                state.isStoryMenuOpen = force;
+            } else {
+                state.isStoryMenuOpen = !state.isStoryMenuOpen;
+            }
             render();
         };
 
