@@ -207,7 +207,8 @@
         <!-- Right: Narrative Area (Mobile: 50% height, Desktop: Full height but 50% width) -->
         <div class="w-full h-1/2 md:h-auto md:w-1/2 p-6 overflow-y-auto relative bg-texture">
             
-            <div id="event-content" class="fade-in max-w-3xl mx-auto pb-20">
+            <!-- Increased bottom padding (pb-48) to prevent buttons from blocking content -->
+            <div id="event-content" class="fade-in max-w-3xl mx-auto pb-48 md:pb-32">
                 <!-- Content injected via JS -->
             </div>
 
@@ -302,7 +303,7 @@
 
     <script>
         // --- 1. Base Data: Avatars Only ---
-        const baseBiographies = {
+         const baseBiographies = {
             "馬利亞(母親)": { avatar: "🤱" },
             "天使加百列": { avatar: "👼" },
             "以利沙伯": { avatar: "🤰" },
