@@ -921,13 +921,26 @@
         };
 
         window.submitForm = (form) => {
+            const rawUserName = form.userName.value.trim();
+            const rawActionText = form.actionText.value.trim();
+
+            // --- XSS 攻擊檢測 (新增) ---
+            // 定義危險特徵：HTML 標籤、javascript 偽協議、事件處理器等
+            const xssRiskPattern = /<[^>]+>|javascript:|vbscript:|data:|on\w+\s*=/i;
+
+            if (xssRiskPattern.test(rawUserName) || xssRiskPattern.test(rawActionText)) {
+                alert("【安全警告】\n系統檢測到您的輸入內容包含潛在的程式碼或 HTML 標籤。\n為維護平台安全，請求已被攔截。\n\n請移除特殊符號 (如 < >) 後再試。");
+                return; // 終止執行，不進行 submitAction
+            }
+
             // --- XSS 防護優化 (輸入端) ---
-            // 這裡進行基本的 Input Sanitization，移除 HTML 標籤
-            // 使用 Regex 簡單過濾，防止明顯的惡意程式碼存入資料庫
+            // 雖然已經阻擋，但為了雙重保險，通過檢測的內容再做一次標籤淨化
+
+
             const stripTags = (str) => str ? str.replace(/<[^>]*>?/gm, '') : '';
             
-            const userName = stripTags(form.userName.value.trim());
-            const actionText = stripTags(form.actionText.value.trim());
+            const userName = stripTags(rawUserName);
+            const actionText = stripTags(rawActionText);
             
             submitAction(userName, actionText);
         };
