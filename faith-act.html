@@ -298,6 +298,18 @@
             }
         }
 
+        // --- XSS Helper Function (新增) ---
+        // 這是防禦 XSS 最關鍵的工具，將特殊字元轉義為 HTML Entity
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return text;
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         // --- Rendering Logic ---
         const appContainer = document.getElementById('app');
 
@@ -585,14 +597,20 @@
                                 <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                                     ${filteredActions.map(item => {
                                         const story = STORIES[item.storyId] || STORIES['jeremiah'];
+                                        
+                                        // --- XSS 防護優化 (顯示端) ---
+                                        // 在插入 HTML 之前，務必對使用者產生的內容 (UGC) 進行轉義
+                                        const safeUserName = escapeHtml(item.userName);
+                                        const safeAction = escapeHtml(item.action);
+                                        
                                         return `
                                             <div class="break-inside-avoid bg-white dark:bg-stone-800 p-5 lg:p-6 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-stone-100 dark:border-stone-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                                                 <div class="flex items-center gap-3 mb-4 pb-3 border-b border-stone-50 dark:border-stone-700">
                                                     <div class="w-9 h-9 rounded-full bg-${story.color}-50 dark:bg-${story.color}-900/30 text-${story.color}-600 dark:text-${story.color}-300 flex items-center justify-center text-sm font-bold border border-${story.color}-100 dark:border-${story.color}-700">
-                                                        ${item.userName ? item.userName.charAt(0) : '名'}
+                                                        ${safeUserName ? safeUserName.charAt(0) : '名'}
                                                     </div>
                                                     <div class="flex-1 min-w-0">
-                                                        <div class="font-bold text-[15px] text-stone-800 dark:text-stone-100 truncate">${item.userName}</div>
+                                                        <div class="font-bold text-[15px] text-stone-800 dark:text-stone-100 truncate">${safeUserName}</div>
                                                         <div class="text-xs text-stone-400 dark:text-stone-500 truncate flex items-center gap-1">
                                                             <i data-lucide="clock" class="w-3 h-3"></i>
                                                             ${formatTime(item.timestamp)}
@@ -603,7 +621,7 @@
                                                 <div class="relative mb-4">
                                                     <i data-lucide="quote" class="absolute -top-1 -left-1 w-4 h-4 text-stone-100 dark:text-stone-700 fill-stone-100 dark:fill-stone-700"></i>
                                                     <p class="text-stone-700 dark:text-stone-300 text-[15px] leading-relaxed pl-2 relative z-10 font-serif whitespace-pre-line">
-                                                        ${item.action}
+                                                        ${safeAction}
                                                     </p>
                                                 </div>
 
@@ -903,8 +921,14 @@
         };
 
         window.submitForm = (form) => {
-            const userName = form.userName.value.trim();
-            const actionText = form.actionText.value.trim();
+            // --- XSS 防護優化 (輸入端) ---
+            // 這裡進行基本的 Input Sanitization，移除 HTML 標籤
+            // 使用 Regex 簡單過濾，防止明顯的惡意程式碼存入資料庫
+            const stripTags = (str) => str ? str.replace(/<[^>]*>?/gm, '') : '';
+            
+            const userName = stripTags(form.userName.value.trim());
+            const actionText = stripTags(form.actionText.value.trim());
+            
             submitAction(userName, actionText);
         };
 
