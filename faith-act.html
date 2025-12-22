@@ -148,6 +148,16 @@
         // --- Data & Config ---
         const STORIES = window.STORIES || {};
 
+        // 放在 initializeAppCheck 之前（同一個 module 作用域）
+        if (!window.__APP_CHECK_INITIALIZED__) {
+          window.__APP_CHECK_INITIALIZED__ = true;
+
+          initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider('6LfmIjMsAAAAADGFuOD19tTmSEXPOrrZvXR9laHT'),
+            isTokenAutoRefreshEnabled: true
+          });
+        }
+
         // --- State Management ---
         const state = {
             user: null,
