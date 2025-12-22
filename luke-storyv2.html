@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路加福音：人子腳蹤</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #f3e9d2;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dcb889' fill-opacity='0.1'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .map-wrapper-outer {
+            position: relative;
+            background-color: #e6dcc3;
+            border: 4px double #8b5a2b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .scroll-paper {
+            background: #fffbf0;
+            border: 1px solid #d4c5a9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+        
+        .scroll-paper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #8b5a2b, #d35400, #8b5a2b);
+            opacity: 0.8;
+        }
+
+        .character-avatar {
+            transition: transform 0.2s;
+        }
+        .character-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1e9d2; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8b5a2b; 
+            border-radius: 4px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Acts Button Glow Animation */
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 0 20px 0 rgba(59, 130, 246, 0.4); transform: scale(1.02); }
+        }
+        .acts-btn-glow {
+            animation: pulse-blue 2s infinite;
+        }
+
+        /* Leaflet Customization */
+        .custom-div-icon {
+            background: transparent;
+            border: none;
+        }
+        .marker-pin {
+            width: 34px; /* Increased size for number */
+            height: 34px;
+            border-radius: 50% 50% 50% 0;
+            background: #8b5a2b;
+            position: absolute;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin: -17px 0 0 -17px;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            transition: all 0.3s;
+        }
+        .marker-pin::after {
+            content: '';
+            width: 22px; /* White circle background for number */
+            height: 22px;
+            background: #fff;
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        .marker-number {
+            position: absolute;
+            z-index: 10;
+            transform: rotate(45deg); /* Counter-rotate text */
+            font-weight: bold;
+            font-size: 14px;
+            color: #8b5a2b;
+            font-family: sans-serif;
+        }
+
+        .marker-active .marker-pin {
+            background: #c0392b;
+            transform: rotate(-45deg) scale(1.15);
+            z-index: 100;
+            border-color: #f1c40f;
+        }
+        
+        .marker-active .marker-number {
+            color: #c0392b;
+        }
+        
+        .marker-label {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #8b5a2b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 13px;
+            font-weight: bold;
+            color: #5d4037;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 50;
+        }
+        
+        /* Ensure active label is on top */
+        .marker-active-parent .marker-label {
+            z-index: 101;
+            background: #fffbf0;
+            border-color: #c0392b;
+            color: #c0392b;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-yellow-900 to-yellow-800 text-amber-100 p-4 shadow-lg z-10 flex justify-between items-center shrink-0">
+        <div>
+            <h1 class="text-2xl font-bold tracking-widest">路加福音：人子腳蹤</h1>
+            <p class="text-xs text-amber-300 opacity-80 italic">"人子來，為要尋找、拯救失喪的人。" - 路 19:10</p>
+        </div>
+        <div class="text-sm border border-amber-600 px-3 py-1 rounded bg-yellow-900 bg-opacity-50">
+            事件進度: <span id="progress-display">1 / 43</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+        
+        <!-- Left: Map Area (Mobile: 50% height, Desktop: Full height but 50% width) -->
+        <div class="w-full h-1/2 md:h-auto md:w-1/2 p-2 md:p-4 flex flex-col bg-[#eaddcf] relative z-0">
+            <h2 class="text-lg font-bold text-center mb-2 text-yellow-900 uppercase tracking-widest border-b-2 border-yellow-800 pb-1 w-max mx-auto">以色列地理行旅</h2>
+            <div class="map-wrapper-outer">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Right: Narrative Area (Mobile: 50% height, Desktop: Full height but 50% width) -->
+        <div class="w-full h-1/2 md:h-auto md:w-1/2 p-6 overflow-y-auto relative bg-texture">
+            
+            <!-- Increased bottom padding (pb-48) to prevent buttons from blocking content -->
+            <div id="event-content" class="fade-in max-w-3xl mx-auto pb-48 md:pb-32">
+                <!-- Content injected via JS -->
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="fixed bottom-0 right-0 left-0 md:left-auto md:w-1/2 p-4 bg-gradient-to-t from-[#f3e9d2] to-transparent pointer-events-none flex justify-between items-end z-20">
+                <button onclick="prevEvent()" id="btn-prev" class="pointer-events-auto px-6 py-2 bg-stone-600 text-stone-100 rounded-lg shadow hover:bg-stone-700 disabled:opacity-0 transition flex items-center gap-2">
+                    <span>&#8592;</span> 上個事件
+                </button>
+                <!-- Next Button Container -->
+                <div id="btn-next-container">
+                    <button onclick="nextEvent()" id="btn-next" class="pointer-events-auto px-6 py-3 bg-red-800 text-amber-100 rounded-lg shadow-lg hover:bg-red-900 disabled:opacity-50 transition flex items-center gap-2 font-bold text-lg border-2 border-red-900">
+                        下個事件 <span>&#8594;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intro Modal (Welcome) -->
+    <div id="intro-modal" onclick="if(event.target === this) startJourney()" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-500 cursor-pointer">
+        <!-- Inner box with max-height and flex-col for scrollable content on mobile -->
+        <div class="bg-[#fffbf0] w-full max-w-2xl max-h-[90vh] flex flex-col rounded-lg shadow-2xl border-4 double border-yellow-800 relative overflow-hidden transform transition-transform duration-500 scale-100 cursor-default" onclick="event.stopPropagation()">
+            
+            <!-- Close Button (Top Right) -->
+            <button onclick="startJourney()" class="absolute top-3 right-3 md:top-4 md:right-4 text-stone-400 hover:text-red-800 text-4xl font-bold z-20 leading-none">&times;</button>
+
+            <!-- Decorative Header -->
+            <div class="bg-gradient-to-r from-yellow-900 via-red-900 to-yellow-900 h-3 w-full shrink-0"></div>
+            
+            <!-- Scrollable Content -->
+            <div class="p-6 md:p-10 text-center overflow-y-auto">
+                <div class="mb-6">
+                    <h2 class="text-3xl md:text-4xl font-bold text-yellow-900 tracking-widest mb-2 font-serif">人子腳蹤</h2>
+                    <p class="text-lg md:text-xl text-stone-600 italic border-b border-stone-300 pb-4 inline-block px-8">路加福音沈浸式體驗</p>
+                </div>
+
+                <div class="text-stone-800 space-y-6 text-base md:text-lg leading-relaxed mb-8">
+                    <p>歡迎來到這趟穿越兩千年的旅程。這不僅僅是一張地圖，更是一封來自加利利的情書。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left text-sm md:text-base mt-8">
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">🗺️</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">地理行旅</h3>
+                            <p class="text-stone-700 text-justify">跟隨真實的地理座標，從北部的加利利一步步走向南方的耶路撒冷，親歷受難與復活的腳蹤。</p>
+                        </div>
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">👣</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">第一人稱</h3>
+                            <p class="text-stone-700 text-justify">打破傳統敘事，以耶穌的「第一人稱視角」重述 42 個關鍵事件，聽見祂內心的慈憐與掙扎。</p>
+                        </div>
+                        <div class="bg-[#f0e6d2] p-4 rounded border border-[#dcc098]">
+                            <div class="text-3xl mb-2 text-center">👥</div>
+                            <h3 class="font-bold text-yellow-900 text-center mb-2">人物深度</h3>
+                            <p class="text-stone-700 text-justify">點擊事件下方的角色按鈕，閱讀他們不為人知的心路歷程，看見小人物眼中的救主。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startJourney()" class="group relative px-8 py-4 bg-red-900 text-amber-100 font-bold text-xl rounded shadow-lg hover:bg-red-800 transition-all hover:scale-105 active:scale-95">
+                    <span class="relative z-10 flex items-center gap-2">
+                        開始旅程 <span class="group-hover:translate-x-1 transition-transform">⟶</span>
+                    </span>
+                    <div class="absolute inset-0 border-2 border-yellow-500/30 rounded scale-95 group-hover:scale-100 transition-transform"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Bio Modal -->
+    <div id="bio-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#fffbf0] w-full max-w-md rounded-lg shadow-2xl border-2 border-yellow-800 relative overflow-hidden transform transition-all scale-95 opacity-0" id="bio-content-wrapper">
+            <div class="h-2 bg-red-800 w-full"></div>
+            <button onclick="closeBio()" class="absolute top-4 right-4 text-gray-500 hover:text-red-800 text-2xl font-bold">&times;</button>
+            
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="bio-avatar" class="w-20 h-20 rounded-full bg-stone-300 flex items-center justify-center text-3xl shadow-inner border-2 border-yellow-700"></div>
+                    <div>
+                        <h3 id="bio-name" class="text-2xl font-bold text-yellow-900"></h3>
+                        <p id="bio-role" class="text-sm text-stone-600 italic"></p>
+                    </div>
+                </div>
+                <div class="prose prose-stone text-stone-800 leading-relaxed">
+                    <p id="bio-desc" class="text-justify"></p>
+                </div>
+            </div>
+            <div class="bg-[#f0e6d2] p-3 text-center text-xs text-stone-500 border-t border-stone-300">
+                路加福音人物誌
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Base Data: Avatars Only ---
+         const baseBiographies = {
+            "馬利亞(母親)": { avatar: "🤱" },
+            "天使加百列": { avatar: "👼" },
+            "以利沙伯": { avatar: "🤰" },
+            "施洗約翰(胎兒)": { avatar: "👶" },
+            "施洗約翰": { avatar: "🌊" },
+            "約瑟": { avatar: "🔨" },
+            "牧羊人": { avatar: "🐑" },
+            "天使": { avatar: "✨" },
+            "西面": { avatar: "👴" },
+            "亞拿": { avatar: "👵" },
+            "聖殿教師": { avatar: "📖" },
+            "上帝(天父)": { avatar: "☁️" },
+            "聖靈": { avatar: "🕊️" },
+            "魔鬼": { avatar: "🐍" },
+            "拿撒勒鄉親": { avatar: "👥" },
+            "以賽亞(書卷)": { avatar: "📜" },
+            "西門彼得": { avatar: "🗝️" },
+            "彼得岳母": { avatar: "🛌" },
+            "污鬼": { avatar: "👻" },
+            "雅各": { avatar: "⚡" },
+            "約翰": { avatar: "❤️" },
+            "癱子": { avatar: "🛏️" },
+            "抬癱子的人": { avatar: "👬" },
+            "法利賽人": { avatar: "⚖️" },
+            "利未(馬太)": { avatar: "💰" },
+            "十二使徒": { avatar: "👣" },
+            "門徒群眾": { avatar: "👥" },
+            "拿因寡婦": { avatar: "🕯️" },
+            "少年人": { avatar: "🛌" },
+            "有罪的女人": { avatar: "🏺" },
+            "法利賽人西門": { avatar: "🤔" },
+            "格拉森被鬼附者": { avatar: "⛓️" },
+            "群鬼": { avatar: "👻" },
+            "睚魯": { avatar: "👨‍👧" },
+            "睚魯的女兒": { avatar: "👧" },
+            "血漏婦人": { avatar: "🩸" },
+            "五千群眾": { avatar: "🍞" },
+            "摩西": { avatar: "⛰️" },
+            "以利亞": { avatar: "🔥" },
+            "三門徒": { avatar: "💤" },
+            "撒瑪利亞人": { avatar: "👤" },
+            "七十門徒": { avatar: "🎒" },
+            "律法師": { avatar: "❓" },
+            "好撒瑪利亞人": { avatar: "🤝" },
+            "馬大": { avatar: "🍽️" },
+            "馬利亞(伯大尼)": { avatar: "👂" },
+            "慈父": { avatar: "🤗" },
+            "浪子": { avatar: "🐖" },
+            "大兒子": { avatar: "😤" },
+            "財主": { avatar: "🍷" },
+            "拉撒路": { avatar: "🐕" },
+            "亞伯拉罕": { avatar: "🌟" },
+            "十個痲瘋病人": { avatar: "🤕" },
+            "感恩的撒瑪利亞人": { avatar: "🙏" },
+            "耶利哥瞎子": { avatar: "👁️" },
+            "撒該": { avatar: "🌳" },
+            "群眾": { avatar: "🗣️" },
+            "聖殿商人": { avatar: "🐮" },
+            "祭司長": { avatar: "🕍" },
+            "窮寡婦": { avatar: "👛" },
+            "猶大": { avatar: "💋" },
+            "天父": { avatar: "🌌" },
+            "大祭司僕人": { avatar: "🤕" },
+            "彼拉多": { avatar: "🏛️" },
+            "希律安提帕": { avatar: "👑" },
+            "巴拉巴": { avatar: "⛓️" },
+            "悔改的強盜": { avatar: "✝️" },
+            "百夫長": { avatar: "🛡️" },
+            "古利奈人西門": { avatar: "✝️" },
+            "抹大拉的馬利亞": { avatar: "🌅" },
+            "約亞拿": { avatar: "🏺" },
+            "婦女們": { avatar: "🏃‍♀️" },
+            "革流巴": { avatar: "🥖" },
+            "另一個門徒": { avatar: "🚶" },
+            "十一使徒": { avatar: "🙌" },
+            "你": { avatar: "❤️" }
+        };
+
+        // --- 2. Event Data with embedded Character States ---
+        const events = [
+            {
+                id: 1, title: "天使報信", location: "拿撒勒", coords: [32.7019, 35.2971], chapter: "路加福音 1:26-38",
+                narrative: "在亙古的榮耀中，我注視著加利利那座名不見經傳的小城——拿撒勒。這裡遠離權力的中心，塵土飛揚，卻是我道成肉身、進入人類歷史的入口。父差遣天使加百列，去到一位名叫馬利亞的童女那裡。這不是偶然的選擇，而是永恆計畫的落實。\n\n我看見馬利亞臉上的驚惶，那是凡人面對屬天榮光時本能的畏懼。但隨即，那份驚惶化為了謙卑的聆聽。當加百列宣告她將因聖靈感孕，生下至高者的兒子時，她雖然困惑問道『我沒有出嫁，怎麼有這事呢？』，但在聽見『因為出於神的話，沒有一句不帶能力的』之後，她沒有再遲疑。她毅然說出：『我是主的使女，情願照你的話成就在我身上。』這句『情願』，如同破曉的第一道光，劃破了人類歷史沈寂的長夜。我的肉身生命，便在這位卑微女子的順服與信心中孕育了。",
+                characters: [
+                    { name: "馬利亞(母親)", role: "蒙恩女子", desc: "我正在屋裡沈思，忽然光芒四射。一位天使顯現，說我蒙了大恩！我只是一個卑微的拿撒勒女子，怎配得這樣的問候？他告訴我將要懷孕生子，是至高者的兒子。我雖然不明白童女如何能懷孕，但我相信神的話沒有一句不帶能力的。我是主的使女，我不求榮耀，只求主的旨意成就。哪怕這意味著未婚懷孕的羞辱，我也願意順服。" },
+                    { name: "天使加百列", role: "傳信者", desc: "我侍立在神面前，今日奉差遣來到這塵土飛揚的小城。我看見這位女子馬利亞，她的心靈如同純淨的水晶。當我傳達這驚天動地的信息時，天庭都屏住了呼吸。她的順服，『情願照你的話成就』，是人類歷史上最美妙的聲音。救贖的計畫，就此展開。" }
+                ]
+            },
+            {
+                id: 2, title: "馬利亞訪以利沙伯", location: "猶大山地", coords: [31.765, 35.165], chapter: "路加福音 1:39-56",
+                narrative: "那時，雖然我在母腹中尚未成形，但我能感受到母親馬利亞的急切與喜樂。她急忙起身，往猶大的山地去，那是一段艱辛的旅程，但她心中懷著神聖的奧祕，腳步卻是輕盈的。當她進了撒迦利亞的家，問以利沙伯安時，奇妙的靈裡共鳴發生了。\n\n在以利沙伯腹中，那將要作我先鋒的約翰，因著聖靈的充滿而歡喜跳動。這不是普通的胎動，這是靈裡的歡呼，是僕人認出了君王。以利沙伯大聲宣告馬利亞是有福的。而我的母親馬利亞，她的靈被聖靈提升，唱出了那首傳頌千古的讚歌（Magnificat）：『我心尊主為大，我靈以神我的救主為樂。』這首歌，宣告了神要顛覆世上的權勢，叫有權柄的失位，叫卑微的升高，叫飢餓的得飽美食。這正是我將要帶來的國度，一個翻轉價值、憐憫貧窮的國度。",
+                characters: [
+                    { name: "馬利亞(母親)", role: "歌頌者", desc: "我心尊主為大，我靈以神我的救主為樂！祂竟然顧念我這卑微的使女。從今以後，萬代要稱我有福。這不是因為我有什麼長處，全是因為那全能者為我成就了大事。祂的憐憫世世代代歸與敬畏祂的人。這首歌從我靈魂深處湧出，是讚美，也是宣告——神要施行大能，叫卑微的升高，叫飢餓的得飽！" },
+                    { name: "以利沙伯", role: "被聖靈充滿者", desc: "當馬利亞的問安聲傳入耳中，聖靈猛烈地充滿了我！這不是普通的訪客，我腹裡的胎兒竟然歡喜跳動！我看出了這奧祕——我主的母竟然到我這裡來！這真是何等的榮幸。馬利亞啊，你在婦女中是有福的，因為你相信了主的話！" },
+                    { name: "施洗約翰(胎兒)", role: "預備者", desc: "光！雖然我還在黑暗溫暖的母腹中，但我感受到了那道光！那是我的主，我的君王！我的靈魂在震動，在歡呼，在跳舞！我來到這世界，就是為了要在祂面前預備道路。主啊，我在這裡，為祢歡喜！" }
+                ]
+            },
+            {
+                id: 3, title: "降生伯利恆", location: "伯利恆", coords: [31.7054, 35.2024], chapter: "路加福音 2:1-20",
+                narrative: "因著凱撒亞古士督的一道報名上冊的詔令，約瑟帶著身孕重重的馬利亞，長途跋涉回到了大衛的城伯利恆。這看似是帝王的意志，實則是應驗先知彌迦的預言。客店裡人聲鼎沸，沒有我們容身之處。這個世界似乎沒有為它的造物主預備地方。\n\n於是在一個卑微的馬廄裡，伴隨著牲畜的氣息與乾草的粗糙，我降生了。母親用布將我包起來，放在馬槽裡。這就是我來到世間的第一個寶座——一個餵食牲畜的槽。然而，地上的冷清掩蓋不住天上的榮耀。在野地裡，天使向驚恐的牧羊人報佳音：『不要懼怕！我報給你們大喜的信息，是關乎萬民的。』榮耀歸於至高神，平安歸於地上喜悅的人。我的降生，選擇了最卑微的方式，是為了擁抱最卑微的人，不是為了受人的服事，而是為了服事人。",
+                characters: [
+                    { name: "馬利亞(母親)", role: "沈思者", desc: "看著懷中這個柔弱的嬰孩，我的心融化了。他那麼小，卻是至高者的兒子。牧羊人跑來說天使向他們顯現，歌頌這孩子。這一切太奇妙，太神聖。我把這些話都存在心裡，反覆思想。這雙小手，將來要做什麼樣的大事呢？" },
+                    { name: "約瑟", role: "守護者", desc: "伯利恆的夜晚很冷，客店也沒有地方。我只能找到這個馬廄。看著馬利亞疲憊的臉和剛出生的嬰孩，我感到一種沈重的責任。雖然這孩子不是出於我，但神將護衛他的任務交給了我。我會用我的生命，保護他們母子平安。" },
+                    { name: "牧羊人", role: "見證人", desc: "我們只是在野地裡看守羊群的粗人，又冷又累。突然，天亮得像白晝！天使的榮光嚇壞了我們。但他說不要怕，救主降生了！我們跑進城，真的看見了嬰孩包著布，臥在馬槽裡。就像天使說的一模一樣！這大喜的信息，我們怎能不傳開呢？" },
+                    { name: "天使", role: "讚美者", desc: "榮耀！榮耀歸於至高神！我們在永恆中敬拜祂，如今看見君王降卑成為一個嬰孩，這愛的奧祕令我們震撼。我們在伯利恆的野地高唱：『在至高之處榮耀歸與神！在地上平安歸與他所喜悅的人！』" }
+                ]
+            },
+            {
+                id: 4, title: "聖殿獻嬰", location: "耶路撒冷聖殿", coords: [31.7781, 35.2360], chapter: "路加福音 2:22-38",
+                narrative: "按摩西的律法，滿了潔淨的日子，父母帶我上耶路撒冷去獻給主。我們獻上的祭物是窮人的祭物——一對斑鳩。在宏偉的聖殿中，人來人往，並沒有多少人注意到這個貧窮家庭的嬰孩。\n\n但有兩位守望的長者例外。公義虔誠的西面，受了聖靈的感動，接過我，稱頌神說：『主啊，如今可以照你的話，釋放僕人安然去世，因為我的眼睛已經看見你的救恩。』他是舊時代盼望的終點。但他轉向我的母親，預言了一個沉重的未來：『這孩子被立，是要叫以色列中許多人跌倒，許多人興起...你自己的心也要被刀刺透。』救恩的道路，註定是一條伴隨著犧牲與苦痛的道路。年老的亞拿也前來稱謝神，將這事講給一切盼望耶路撒冷得救贖的人聽。我是那被立的記號，將顯露許多人心裡的意念。",
+                characters: [
+                    { name: "西面", role: "守望者", desc: "我的眼睛昏花了，但我的靈眼卻無比明亮。聖靈曾應許我，不死以前必看見基督。當我看見那對貧窮夫婦抱著嬰孩進來，我知道，就是他！我接過他，感覺抱住了整個以色列的盼望。主啊，我現在可以安然離去了。這孩子是光，也是審判。馬利亞啊，你要預備好，你的心將會碎裂，但救恩將從中流出。" },
+                    { name: "亞拿", role: "祈禱者", desc: "我寡居了八十四年，以聖殿為家，禁食祈求。這漫長的歲月，就是為了等待這一刻。我看見西面抱著那孩子，我也認出來了！這就是我們盼望的救贖！我要告訴所有人，神沒有忘記我們，祂的應許實現了！" },
+                    { name: "馬利亞(母親)", role: "受驚者", desc: "西面的祝福充滿了奧祕，但也充滿了陰影。『被刀刺透』...這句話像一陣寒風吹過我的心。我看著懷中熟睡的耶穌，他的未來將面臨什麼樣的敵對和痛苦？我緊緊抱著他，心中默默禱告，願主加給我力量，面對那未知的將來。" }
+                ]
+            },
+            {
+                id: 5, title: "父家之事", location: "耶路撒冷聖殿", coords: [31.7781, 35.2360], chapter: "路加福音 2:41-52",
+                narrative: "十二歲那年，我們按著規矩上耶路撒冷守逾越節。那是我成年前的重要時刻。節期滿了，父母啟程回家，我卻留在了耶路撒冷。這不是頑皮，而是一種深沉的歸屬感在召喚我，我必須在父的家裡。\n\n三天後，他們在殿裡遇見我。我坐在教師中間，一面聽，一面問。凡聽見的人都希奇我的聰明和應對。當焦急的母親問我為何這樣做時，我回答：『為什麼找我呢？豈不知我應當以我父的事為念嗎？』這是第一次，我公開表明了我與天父的獨特關係，表明了我對神聖使命的意識。但我深知時候未到，於是我同他們下去，回到拿撒勒，並且順從他們。人子的成長，也需要在平凡的家庭生活中，盡諸般的義，在智慧和身量上增長。",
+                characters: [
+                    { name: "聖殿教師", role: "驚奇者", desc: "這個十二歲的少年是從哪裡來的？拿撒勒？不可能！他對律法的理解深刻得驚人。他提出的問題，直指信仰的核心，連我們這些鑽研律法一輩子的拉比都感到汗顏。他有一種特殊的智慧，彷彿這殿就是他的家。" },
+                    { name: "馬利亞(母親)", role: "不解者", desc: "三天了！我們以為他走丟了，心急如焚，幾乎要崩潰。結果他在殿裡，像個小大人一樣和教師討論？當我責備他時，他說『豈不知我應當以我父的事為念嗎？』這句話讓我怔住了。我有時覺得，這個孩子離我好遠，他屬於一個我無法完全理解的神聖世界。但我只能把這一切存在心裡。" },
+                    { name: "約瑟", role: "沈默者", desc: "看到他平安無事，我鬆了一口氣。但他的回答提醒了我，我只是他肉身的養父，他真正的父親在天上。我看著他逐漸長大，智慧和身量都在增長，我知道，把他交還給神的時刻終將來到。" }
+                ]
+            },
+            {
+                id: 6, title: "受洗", location: "約旦河", coords: [31.8373, 35.5463], chapter: "路加福音 3:21-22",
+                narrative: "三十歲，那沈默預備的日子結束了。我來到約旦河邊。那裡，我的表兄約翰正在宣講悔改的洗禮，眾人如潮水般湧來承認他們的罪。約翰看見我，想要攔阻，但我堅持要盡這諸般的義。\n\n我雖無罪，卻走入水中，與眾罪人同列。這不是為了洗去我的罪，而是為了認同人類的軟弱與需要，為了承擔他們的重擔。當我正禱告的時候，天開了，聖靈降臨在我身上，形狀彷彿鴿子；又有聲音從天上來，說：『你是我的愛子，我喜悅你。』這來自父的印證，如同堅固的磐石，成為我展開公開事奉、面對即將到來的試探與苦難的力量泉源。我是父的愛子，我將以順服來回應這份愛。",
+                characters: [
+                    { name: "施洗約翰", role: "謙卑者", desc: "當他走向水面時，我的靈魂在顫抖。他是那一位！我連給他解鞋帶都不配，他竟然要受我的洗？這顛覆了所有的道理。但我看見了聖靈彷彿鴿子降在他身上，聽見了天上的聲音。我的任務完成了，新郎的朋友只要聽見新郎的聲音就喜樂。他必興旺，我必衰微。" },
+                    { name: "上帝(天父)", role: "慈父", desc: "這是我的愛子，我心所深悅的。看著他順服地走入渾濁的約旦河水，與罪人站在一起，我的心充滿了愛與驕傲。他選擇了謙卑的道路。去吧，我的兒子，帶著聖靈的能力，去完成那偉大的救贖計畫。" },
+                    { name: "聖靈", role: "膏抹者", desc: "我帶著能力與溫柔，有形有體地降臨在他身上。這不是一時的感動，而是永遠的內住。從今以後，我將與他完全同在，伴隨他行過每一個神蹟，度過每一個孤獨的夜晚，直到十字架的盡頭。" }
+                ]
+            },
+            {
+                id: 7, title: "曠野試探", location: "猶大曠野", coords: [31.725, 35.35], chapter: "路加福音 4:1-13",
+                narrative: "聖靈將我引到曠野。四十天，沒有食物，只有風沙、烈日與飢餓的燒灼感。在那裡，魔鬼來試探我，攻擊人性的弱點，試圖在我的事奉開始前就扭曲它。\n\n他利用我的飢餓，叫我變石頭為餅。我回答：『人活著不是單靠食物，乃是靠神口裡所出的一切話。』他帶我上高山，展示萬國的榮華，只要我一拜。這是捷徑的誘惑，但我拒絕：『當拜主你的神，單要事奉他。』他叫我從殿頂跳下以證明神的保護。我斥責：『不可試探主你的神。』我得勝，不是靠神蹟的炫耀，而是靠對父話語的絕對順服。這是一場關於身分與使命的戰爭，我選擇了十字架的道路，而非榮耀的捷徑。魔鬼暫時離開我，等待下一個時機。",
+                characters: [
+                    { name: "魔鬼", role: "詭詐者", desc: "他很餓，身體虛弱到了極點。這是最好的機會。只要一點點妥協，一點點對物質和權力的渴望，我就能毀掉神的計畫。為什麼要受苦呢？變個餅吃吧！跳下去展示神蹟吧！統治萬國不好嗎？該死，他用經文回擊我，他的意志比曠野的石頭還硬。沒關係，我會暫時離開，等待下一個時刻。" },
+                    { name: "聖靈", role: "引導者", desc: "我引導他進入這試煉之地，並非要害他，而是要煉淨他。他在這裡勝過了亞當當初失敗的地方。在極度的軟弱中，他緊緊抓住父的話語。我是他力量的源泉，在每一個拒絕試探的瞬間，我都與他同在。" }
+                ]
+            },
+            {
+                id: 8, title: "拿撒勒的拒絕", location: "拿撒勒", coords: [32.7019, 35.2971], chapter: "路加福音 4:16-30",
+                narrative: "帶著聖靈的能力，我回到長大的地方拿撒勒。安息日，我照常進了會堂。有人把先知以賽亞的書交給我。我展開書卷，讀出那關於彌賽亞的應許：『主的靈在我身上，因為他用膏膏我，叫我傳福音給貧窮的人；差遣我報告被擄的得釋放，瞎眼的得看見，叫那受壓制的得自由...』\n\n讀畢，我捲起書卷，對他們說：『這經你們聽見，今天應驗了。』起初他們稱讚我，但當我指出他們不信的心，並引用以利亞和以利沙時代神眷顧外邦人的例子時，他們的驕傲受傷了，轉瞬間變成了暴怒。他們攆我出城，要把我推下山崖。但我從他們中間直行過去了，因為我的時候還沒有到。先知在本地是沒有人尊敬的，這句話應驗在我身上，也預示了我將被本國百姓棄絕的命運。",
+                characters: [
+                    { name: "拿撒勒鄉親", role: "暴怒者", desc: "我們看著他長大，修補我們的桌椅。他不就是木匠約瑟的兒子嗎？憑什麼教訓我們？他竟然說神會眷顧外邦的寡婦和痲瘋病人，勝過我們以色列人？這是對我們選民身分的侮辱！太冒犯了！把他推下去！讓他知道誰才是這裡的主人！" },
+                    { name: "以賽亞(書卷)", role: "應驗者", desc: "千百年來，我等待著這一刻。先知在羊皮卷上寫下了關於受苦僕人和禧年的預言。當他的手指觸摸我的文字，當他的聲音讀出這些話語，字句彷彿燃燒起來。我不再是古老的文字，我是活生生的見證，指向眼前這位彌賽亞。" }
+                ]
+            },
+            {
+                id: 9, title: "迦百農的權柄", location: "迦百農", coords: [32.881, 35.575], chapter: "路加福音 4:31-41",
+                narrative: "我下到迦百農，這城成了我傳道的主要據點。在會堂裡教訓人時，一個被污鬼附著的人喊叫起來：『拿撒勒人耶穌，我們與你有什麼相干？你來滅我們嗎？我知道你是誰，乃是神的聖者！』這邪靈試圖用道出我身分來控制局面。\n\n我責備牠說：『不要作聲，從這人身上出來吧！』鬼雖掙扎，卻不得不服從。眾人都驚訝我的話帶有權柄。出了會堂，我進了西門的家。他的岳母害熱病甚重。我斥責那熱病，病就退了，她立刻起來服事我們。日落的時候，全城的人帶著各種病患來到門前，我一一按手醫治他們。我要讓世人知道，神的國在於大能，也在於對受苦之人的憐憫。我來，是要摧毀魔鬼的作為。",
+                characters: [
+                    { name: "西門彼得", role: "旁觀者", desc: "這人...到底是誰？在會堂裡連污鬼都聽他的命令。回到家，他只斥責了一聲，我岳母的高燒就退了，還能起來做飯？這不只是醫術，這是權柄。我家今天接待了一位不得了的客人，我感到一種深深的敬畏。" },
+                    { name: "彼得岳母", role: "服事者", desc: "我以為我要燒死了，渾身無力，意識模糊。但他一斥責，熱就退了，像一陣涼風吹過火爐。我立刻感到力量回到了身體！我不能躺著，我要起來！我要給他們做飯，這是我唯一能做的報答。" },
+                    { name: "污鬼", role: "戰兢者", desc: "他的光太強烈了！我們受不了！我們想用喊出他的名字來控制他，揭穿他的身分，但他的權柄讓我們無法抗拒。那個命令像鐵鎚一樣擊碎了我們的抓手。我們只能逃跑，離開這個人。" }
+                ]
+            },
+            {
+                id: 10, title: "呼召首徒", location: "加利利海", coords: [32.8256, 35.535], chapter: "路加福音 5:1-11", 
+                narrative: "清晨的革尼撒勒湖邊，眾人擁擠著要聽神的道。我看見兩隻船灣在湖邊，漁夫正在洗網。我上了西門的那隻船，請他撐開離岸稍微遠一點，就坐下教訓眾人。\n\n講完了，我對西門說：『把船開到水深之處，下網打魚。』西門雖然整夜勞力一無所獲，充滿了疲憊與無奈，但他還是順服了：『但依從你的話，我就下網。』結果，那一網魚裝滿了兩隻船，甚至船都要沉下去。西門彼得看見，就俯伏在我膝前說：『主啊，離開我，我是個罪人！』他在神蹟中看見了我的聖潔，也看見了自己的污穢。我看著這個將要成為教會柱石的漁夫，對他說：『不要怕，從今以後，你要得人了。』他和雅各、約翰，就撇下一切，跟從了我。", 
+                characters: [
+                    { name: "西門彼得", role: "被折服者", desc: "我打了一輩子魚，從沒見過這種事！整夜什麼都沒有，他一句話，魚多到網都要破了。在這樣的神蹟面前，我只看見自己的卑微和污穢。我不配跟這位聖者在一起。'主啊，離開我！' 但他...他竟然要我？得人？我這個粗魯的漁夫？" },
+                    { name: "雅各", role: "跟隨者", desc: "這魚多到我們得去幫忙拉網，船都要沉了！這個拿撒勒人絕對不是普通拉比。他說『跟從我』，我心裡有一種衝動，這條船、這些魚，甚至父親的事業，都不重要了。我要跟著他，看看這『得人』是怎麼回事。" },
+                    { name: "約翰", role: "沈思者", desc: "他的眼神裡有一種火焰，比湖面上的陽光更耀眼。這不僅僅是魚的問題，這是關於生命方向的問題。我願意放下補網的針線，去編織新的故事，跟隨這位能掌管深海的主。" }
+                ]
+            },
+            {
+                id: 11, title: "醫治癱子", location: "迦百農", coords: [32.881, 35.575], chapter: "路加福音 5:17-26", 
+                narrative: "有一天我在屋裡教導人，有法利賽人和教法師在座。因為人多，有人拆了房頂，將一個癱子連褥子縋下來，放在我面前。這突如其來的舉動打斷了講道，但我看見的不是混亂，而是他們信心的光芒。\n\n就對癱子說：『你的罪赦了。』這句話激怒了在場的宗教領袖，他們心裡議論這是僭妄，因為只有神能赦罪。我早已知道他們的意念，便問：『或說罪赦了，或說你起來行走，哪一樣容易呢？但要叫你們知道，人子在地上有赦罪的權柄。』於是我吩咐癱子起來，拿褥子回家去。那人立刻起來，歸榮耀與神。這一刻，我向世人顯明，身體的醫治固然重要，但靈魂的赦免才是天國的核心恩典。", 
+                characters: [
+                    { name: "癱子", role: "蒙恩者", desc: "我以為我求的是腿好起來。但他先說『你的罪赦了』。那一刻，心裡的重擔先卸下了，比腿好起來更讓我想哭。但我真的站起來了！我感覺到了力量！我拿著褥子，像拿著勝利的旗幟！榮耀歸給神！" },
+                    { name: "抬癱子的人", role: "好朋友", desc: "人太多了，擠不進去。不管了，上房頂！拆瓦片！只要能把他送到耶穌面前，這點代價算什麼？看！耶穌在笑，他看見我們的信心了。我就知道他會救我們的朋友！" },
+                    { name: "法利賽人", role: "質疑者", desc: "僭妄！這簡直是褻瀆！除了神，誰能赦罪？這人以為他是誰？竟敢說這種話。雖然他治好了癱子，但這赦罪的宣告太危險了。我們會盯著他的。" }
+                ]
+            },
+            {
+                id: 12, title: "呼召利未", location: "迦百農稅關", coords: [32.881, 35.575], chapter: "路加福音 5:27-32", 
+                narrative: "經過稅關時，我看見一個名叫利未的稅吏坐在那裡。在眾人眼中，他是羅馬人的走狗，是罪人，是不可接觸的。但在我眼中，他是一個迷失的羊，一個渴望被接納的靈魂。\n\n我只對他說了一句：『你跟從我來。』這句話如同閃電擊中他的靈魂。他就撇下一切，起來跟從了我，甚至在他家裡為我大擺筵席。法利賽人向我的門徒發怨言，問為什麼我和稅吏並罪人一同吃喝。我告訴他們：『無病的人用不著醫生，有病的人才用得著；我來本不是召義人悔改，乃是召罪人悔改。』這就是我使命的宣言，我是罪人的朋友，是靈魂的醫生。", 
+                characters: [
+                    { name: "利未(馬太)", role: "重生者", desc: "坐在這裡，每天面對的是人們眼中的鄙視和仇恨。我有錢，但我沒有靈魂。直到他經過，看著我，不像看一條狗，而像看一個失散的朋友。那句『跟從我』，像一道光照進我心裡的黑暗角落。錢？稅關？都見鬼去吧。我找到更有價值的主人了。我要開個大派對慶祝我的新生！" },
+                    { name: "法利賽人", role: "衛道士", desc: "和稅吏吃飯？這人完全不懂潔淨的規矩嗎？稅吏是賣國賊，是罪人！物以類聚，看來這耶穌也不過是個罪人的頭目，不配稱為拉比。" }
+                ]
+            },
+            {
+                id: 13, title: "平地寶訓", location: "八福山附近", coords: [32.8805, 35.5492], chapter: "路加福音 6:17-49", 
+                narrative: "經過整夜的禱告，我選立了十二個使徒。隨後，我下山站在一塊平地上，許多門徒和百姓聚集。我看著這些貧窮的、飢餓的、哭泣的、被恨惡的人，心中充滿了憐憫與愛。\n\n我開口教導他們天國的價值觀，那與世界截然不同的標準：『你們貧窮的人有福了！因為神的國是你們的。』但我也有禍哉的警告給那些富足飽足的人。我頒布了最具挑戰性的命令：『愛你們的仇敵，善待恨你們的人。』這不是軟弱，這是像天父一樣仁慈。我教導他們不要論斷，要結好果子，要把根基立在磐石上。凡聽我話去行的，風吹雨打總不倒塌。這是天國子民的生活憲章。", 
+                characters: [
+                    { name: "十二使徒", role: "領受者", desc: "愛仇敵？有人打臉還要轉過來？這教導太難了！這跟我們想的推翻羅馬、建立榮耀國度完全不同。但他身上有一種力量，讓我們覺得...或許這才是真正的力量，像神一樣的完全。" },
+                    { name: "門徒群眾", role: "渴慕者", desc: "我們是貧窮的、受苦的。他說我們有福了？從來沒有人這樣對我們說過。他的話像膏油，滋潤了我們乾渴的心。我們願意把生命建在這磐石上。" }
+                ]
+            },
+            {
+                id: 14, title: "拿因城復活", location: "拿因城", coords: [32.6366, 35.337], chapter: "路加福音 7:11-17", 
+                narrative: "將近拿因城門的時候，一場悲劇正在上演。一個死人被抬出來，他是獨生子，母親又是寡婦。她失去丈夫，如今又失去唯一的兒子，這是何等大的絕望，意味著她將失去所有的依靠和社會地位。\n\n看見她，我的心被憐憫緊緊抓住。我對她說：『不要哭。』這不是空洞的安慰，而是權能的預告。我進前按住槓，抬的人就站住了。我發出命令：『少年人，我吩咐你起來！』死人就坐起，並且說話。我把他交給他的母親。死亡必須在生命之主面前退後。眾人都驚奇，歸榮耀與神，說神眷顧了他的百姓。這神蹟不僅是為了那個家庭，更是為了顯明神對孤苦人的眷顧。", 
+                characters: [
+                    { name: "拿因寡婦", role: "悲喜交集者", desc: "我的天塌了。丈夫沒了，兒子也沒了，我活著還有什麼指望？直到那隻手按在棺材上。他說『不要哭』。然後，我聽見兒子坐起來說話的聲音。天哪，我是不是在做夢？不，他是活的！神眷顧了我這苦命人！" },
+                    { name: "少年人", role: "甦醒者", desc: "我記得那種冰冷和黑暗，像深淵一樣。然後是一個溫暖、充滿力量的聲音叫我『起來』。我睜開眼，看見媽媽的淚臉，還有那個眼神充滿慈愛的人。我...我回來了？" }
+                ]
+            },
+            {
+                id: 15, title: "罪女膏抹", location: "加利利", coords: [32.85, 35.3], chapter: "路加福音 7:36-50", 
+                narrative: "一個法利賽人西門請我去吃飯。席間，一個城裡有罪的女人進來，拿著玉瓶。她站在我背後，挨著我的腳哭，眼淚溼了我的腳，就用自己的頭髮擦乾，又用嘴連連親我的腳，把香膏抹上。\n\n西門心中論斷：『這人若是先知，必知道摸他的是誰。』我知道他的意念，也知道這女人的心。我講了一個兩個債戶的比喻，問他哪一個更愛債主。西門回答是那多得恩免的。我告訴他：你看見這女人嗎？你沒有給我水洗腳，她卻用眼淚溼了我的腳。所以我告訴你，她許多的罪都赦免了，因為她的愛多。我轉向那女人說：『你的信救了你，平平安安地回去吧。』愛，是赦免的確據。", 
+                characters: [
+                    { name: "有罪的女人", role: "感恩者", desc: "城裡人都知道我是做什麼的，他們繞道而行。但我聽說他在這裡，我顧不得羞恥。我帶著香膏，但我能獻上的只有眼淚。我知道西門嫌棄我，但耶穌...他不縮回他的腳。他赦免了我。因為愛多，所以赦免多。那一刻，我重生了。" },
+                    { name: "法利賽人西門", role: "傲慢者", desc: "真是掃興。我請他吃飯是給他面子，這女人闖進來哭哭啼啼，成何體統？如果是先知，怎會讓這種不潔的人摸他？看來這耶穌也沒什麼了不起。但他竟然知道我在想什麼...那個比喻，像鞭子一樣抽打我的驕傲。" }
+                ]
+            },
+            {
+                id: 16, title: "平靜風浪", location: "加利利海", coords: [32.82, 35.54], chapter: "路加福音 8:22-25", 
+                narrative: "有一天，我和門徒上了船，對他們說：『我們可以渡到湖那邊去。』行船的時候，我因疲憊睡著了。忽然湖上起了暴風，船將滿了水，甚是危險。門徒的信心在風浪中動搖了。\n\n他們驚慌地叫醒我：『夫子！夫子！我們喪命啦！』我醒了，站起來斥責那狂風大浪，風浪就止住，大大地平靜了。我轉身問他們：『你們的信心在哪裡呢？』他們既懼怕又希奇。他們需要明白，那位創造滄海的主，此刻就躺在他們的小船上。有我在，風浪能將我們如何呢？這經歷是為了訓練他們，因為將來他們要面對比這更大的屬靈風暴。", 
+                characters: [
+                    { name: "門徒群眾", role: "驚懼者", desc: "浪比船還高！這風暴來得太突然了，我們是老漁夫了都沒見過這種陣勢！死定了！但他...他只是說了一句話，斥責風和水，海就平了？這到底是誰？連自然界都聽他的命令？" }
+                ]
+            },
+            {
+                id: 17, title: "格拉森趕鬼", location: "格拉森", coords: [32.78, 35.65], chapter: "路加福音 8:26-39", 
+                narrative: "船到了格拉森人的地方。剛上岸，一個被鬼附著的人從墳塋裡出來迎著我。他不穿衣服，不住房子，沒有人能捆住他，日夜喊叫，用石頭砍自己。見到我，他喊叫俯伏：『至高神的兒子耶穌，我與你有什麼相干？求你不要叫我受苦！』\n\n我問他叫什麼名字，他說：『群』，因為進去的鬼很多。鬼求我准牠們進入豬群。我准了牠們。那群豬闖下山崖，投在湖裡淹死了。放豬的逃跑了，城裡的人出來，看見那人坐在我腳前，穿著衣服，心裡明白，就害怕。他們求我離開。我上船時，那人懇求同在，但我差他回去：『你回家去，傳說神為你做了何等大的事。』一個人靈魂的價值，勝過兩千頭豬。", 
+                characters: [
+                    { name: "格拉森被鬼附者", role: "獲釋者", desc: "那種撕裂般的噪音終於停了。我的腦袋好安靜。不再有瘋狂的聲音叫我傷害自己。看著他，我感覺像回到了家，久違的平安。我想跟他走，但他要我回家作見證。是的，我要告訴全城的人，他為我做了何等大的事，他救了我！" },
+                    { name: "群鬼", role: "潰敗者", desc: "不要！不要叫我們下無底坑！我們受不了他的聖潔！給我們豬也好，讓我們離開這個人！快逃！" }
+                ]
+            },
+            {
+                id: 18, title: "醫治血漏與睚魯女", location: "迦百農", coords: [32.881, 35.575], chapter: "路加福音 8:40-56", 
+                narrative: "回來時，管會堂的睚魯俯伏在我腳前，求我去救他快死的獨生女兒。去的時候，眾人擁擠。有一個女人，患了十二年血漏，耗盡了一切，無人能醫。她從後頭摸我的衣裳繸子，血漏立刻止住了。\n\n我感到有能力出去，便問：『摸我的是誰？』她戰戰兢兢地出來俯伏。我對她說：『女兒，你的信救了你，平平安安地去吧！』這時有人來報信說睚魯的女兒死了。我對睚魯說：『不要怕，只要信！』到了他家，眾人都在哭泣。我拉著女孩的手呼叫說：『女兒，起來！』她的靈魂便回來，立刻起來了。我吩咐給她東西吃。信的人，必看見神的榮耀超越死亡。這兩個神蹟交織，顯明了信心是開啟恩典的鑰匙。", 
+                characters: [
+                    { name: "睚魯", role: "絕望中的父親", desc: "為什麼要停下來？那個女人只是摸了一下，我女兒可是快死了啊！...遲了，報信的說她死了。我的世界崩塌了。但他轉過頭，那眼神堅定如山：『不要怕，只要信。』在這絕望的深淵，我選擇抓住這句話。" },
+                    { name: "睚魯的女兒", role: "甦醒者", desc: "我記得好像睡著了，很深很深的夢。然後有人拉我的手，叫我起來。我餓了，爸爸媽媽在哭又在笑。那個拉我的叔叔，他的手好溫暖。" },
+                    { name: "血漏婦人", role: "觸摸者", desc: "十二年了，我是不潔的，不能碰人。但我告訴自己，只要摸他的衣裳繸子...啊！感覺到了！那股熱流！血止住了！但他發現了...我以為會被責備，但他叫我『女兒』？十二年了，第一次有人這樣叫我，給我平安。" }
+                ]
+            },
+            {
+                id: 19, title: "五餅二魚", location: "伯賽大", coords: [32.893, 35.613], chapter: "路加福音 9:10-17", 
+                narrative: "使徒回來後，我們來到伯賽大的野地。群眾跟隨而來。我接待他們，講論神國的道，醫治有病的人。日頭快平西了，十二使徒請我叫眾人散開找吃的。但我挑戰他們：『你們給他們吃吧！』\n\n他們說只有五個餅、兩條魚。我叫眾人一排一排坐下。我拿著這點微薄的食物，望著天祝福，擘開，遞給門徒，門徒又遞給眾人。在傳遞的過程中，恩典倍增了。眾人都吃飽了，剩下的零碎還裝滿了十二籃。這是天國豐盛的筵席，在曠野中供應所需。這神蹟不僅是為了餵飽肚子，更是為了啟示我是生命的糧。", 
+                characters: [
+                    { name: "五千群眾", role: "飽足者", desc: "我們只是不想離開他，聽得入神。沒想到還有飯吃。這餅真香，而且怎麼傳都傳不完？這是摩西在曠野降嗎哪的神蹟重現嗎？我們吃飽了，還剩這麼多！" },
+                    { name: "十二使徒", role: "分餅者", desc: "這不可能！我手裡的餅越擘越多！我的手在發抖。這就是他說的供應嗎？『你們給他們吃吧』...原來他是要透過我們，顯出他的大能。" }
+                ]
+            },
+            {
+                id: 20, title: "彼得認信", location: "該撒利亞腓立比", coords: [33.245, 35.69], chapter: "路加福音 9:18-22", 
+                narrative: "我獨自禱告的時候，門徒也與我同在。我問他們：『眾人說我是誰？』回答各異。我又問：『你們說我是誰？』這個問題是信仰的核心。\n\n彼得回答說：『是神的基督。』這是聖靈的啟示。我切切囑咐他們不可將這事告訴人，並第一次明確預言：『人子必須受許多苦，被長老、祭司長和文士棄絕，並且被殺，第三日復活。』榮耀的基督，必須先行過受苦的道路。若有人要跟從我，就當捨己，天天背起他的十字架來跟從我。這條路不是舒適的，卻是通往生命的。", 
+                characters: [
+                    { name: "西門彼得", role: "認信者", desc: "我知道！這不是我聰明，是心裡有個聲音告訴我：你是基督，是神的受膏者！但...受苦？被殺？這我不明白，也不接受！基督怎麼能死？這跟我們的期待太不一樣了。" },
+                    { name: "十二使徒", role: "困惑者", desc: "彼得說對了，他是基督！但為什麼他接著說要受死？十字架？那不是羅馬人的刑具嗎？這條路...似乎比我們想像的要艱難得多。" }
+                ]
+            },
+            {
+                id: 21, title: "登山變像", location: "黑門山", coords: [33.3128, 35.7869], chapter: "路加福音 9:28-36", 
+                narrative: "帶著彼得、雅各、約翰上山禱告。正禱告時，我的面貌改變了，衣服潔白放光。摩西和以利亞顯現，在榮光中同我談論我去世的事，就是我在耶路撒冷將要成的事（Exodus）。這表明律法和先知都指向我。\n\n門徒雖然打盹，卻看見了這榮光。彼得想要搭棚留住這時刻。這時有雲彩來遮蓋，有聲音從雲彩裡出來說：『這是我的兒子，我所揀選的，你們要聽他！』榮耀不是終點，而是為了堅固他們。下山後，我們必須面對這世界的黑暗與苦難，直到那榮耀完全顯現的日子。", 
+                characters: [
+                    { name: "三門徒", role: "目擊者", desc: "太耀眼了！那是摩西？那是以利亞？我們是在天堂嗎？彼得說要搭棚，我們也想留下來，永遠不要回到山下的混亂中。但雲彩裡的聲音說要聽他...這經歷，我一輩子忘不了。" },
+                    { name: "摩西", role: "見證人", desc: "我在西奈山領受律法，如今我在黑門山見證恩典。我曾帶領百姓出埃及，如今我與他談論他即將在耶路撒冷完成的『出埃及』——將百姓從罪惡的奴役中領出來。" },
+                    { name: "以利亞", role: "見證人", desc: "我曾乘旋風升天，今日站在榮光中。他是我們所有先知預言的焦點。看著他，我知道我的任務完成了，他才是那要來的真先知。" }
+                ]
+            },
+            {
+                id: 22, title: "撒瑪利亞拒絕", location: "撒瑪利亞", coords: [32.22, 35.25], chapter: "路加福音 9:51-56", 
+                narrative: "被接上升的日子將到，我定意向耶路撒冷去，這是我在地使命的終點。我打發人先去預備。到了撒瑪利亞的一個村莊，那裡的人因我面向耶路撒冷去，就不接待我。\n\n雅各、約翰看見了，心生憤怒，就說：『主啊，你要我們吩咐火從天上降下來燒滅他們，像以利亞所做的嗎？』我轉身責備兩個門徒說：『你們的心如何，你們並不知道。人子來不是要滅人的性命，是要救人的性命。』我們就往別的村莊去了。這趟旅程的第一課，就是寬恕與包容。恨不能化解恨，唯有愛能。", 
+                characters: [
+                    { name: "雅各", role: "雷子", desc: "這些雜種竟敢不接待主？太可惡了！主啊，給我們權柄，像以利亞一樣燒死他們！讓他們知道厲害！" },
+                    { name: "約翰", role: "雷子", desc: "對！燒死他們！...什麼？我們的心不對？救人而不是滅命？我...我好像懂了什麼。原來主的道路不是報復。" },
+                    { name: "撒瑪利亞人", role: "排斥者", desc: "去耶路撒冷？哼，猶太人的傲慢。我們這裡不歡迎猶太人，走開！別想在我們這裡住宿。" }
+                ]
+            },
+            {
+                id: 23, title: "差遣七十人", location: "往南方旅途", coords: [32, 35.3], chapter: "路加福音 10:1-20", 
+                narrative: "莊稼多，工人少。我又設立七十個人，差遣他們兩個兩個在我前面，往我所要到的各城各地方去。我賜給他們權柄，但也告訴他們如羊進入狼群，要他們依賴神的供應，傳講『神的國臨近了』。\n\n那七十個人歡歡喜喜地回來，說：『主啊，因你的名，就是鬼也服了我們。』我對他們說：『我曾看見撒但從天上墜落，像閃電一樣...然而，不要因鬼服了你們就歡喜，要因你們的名記錄在天上歡喜。』最大的神蹟不是能力的彰顯，而是救恩的確據。我為他們的信心在聖靈裡歡樂，感謝父將這些事向嬰孩顯出來。", 
+                characters: [
+                    { name: "七十門徒", role: "勝利者", desc: "太神奇了！奉他的名，那些惡鬼真的逃跑了！我們感覺無所不能！這就是天國的力量嗎？主說得對，名字記在天上比趕鬼更讓人高興！" }
+                ]
+            },
+            {
+                id: 24, title: "好撒瑪利亞人", location: "耶利哥路", coords: [31.8415, 35.4057], chapter: "路加福音 10:25-37", 
+                narrative: "一個律法師起來試探我：『我該做什麼才可以承受永生？』並問：『誰是我的鄰舍？』他想劃定愛的界線。我便講了一個故事：一個人落在強盜手中，半死不活。\n\n祭司看見他，從那邊過去了；利未人看見他，也照樣過去了。唯有一個被猶太人輕視的撒瑪利亞人，動了慈心，上前包裹傷處，扶他上牲口，帶到店裡照應，並付了銀子。我問律法師：『這三個人哪一個是落在強盜手中的鄰舍呢？』他說是憐憫他的。我說：『你去照樣行吧。』鄰舍不是由血緣或地緣定義的，而是由『憐憫』定義的。愛，就是付代價去行動。", 
+                characters: [
+                    { name: "律法師", role: "思辯者", desc: "我想難倒他，但他這個故事...讓我無話可說。要我承認那個撒瑪利亞人比祭司更義？這太顛覆了。但我不得不承認他是對的。憐憫人的人，才是真正的鄰舍。" },
+                    { name: "好撒瑪利亞人", role: "行動者", desc: "(比喻中) 我看見的不是猶太人，是一條命。我不怕麻煩，我只怕我的良心過不去。我的油、酒、牲口、銀子，這時候不用，更待何時？" }
+                ]
+            },
+            {
+                id: 25, title: "馬大馬利亞", location: "伯大尼", coords: [31.772, 35.257], chapter: "路加福音 10:38-42", 
+                narrative: "進了一個村莊，馬大接我到她家。她有一個妹子名叫馬利亞，在我的腳前坐著聽道。馬大伺候的事多，心裡忙亂，就進前來說：『主啊，我的妹子留下我一個人伺候，你不在意嗎？請吩咐她來幫助我。』\n\n我看著焦慮的馬大，溫柔地說：『馬大！馬大！你為許多的事思慮煩擾，但是不可少的只有一件。馬利亞已經選擇那上好的福分，是不能奪去的。』忙碌的事奉雖好，但安靜的親近與聆聽，更是生命的核心。我渴望的不是僕人的勞碌，而是朋友的陪伴。", 
+                characters: [
+                    { name: "馬大", role: "焦慮者", desc: "家裡來了這麼重要的客人，我忙得團團轉！馬利亞竟然只會坐著聽？太不懂事了！我氣不過，抱怨了。主卻叫我的名字...他說我思慮煩擾？是的，我忙於事奉主，卻忘了享受主。" },
+                    { name: "馬利亞(伯大尼)", role: "聆聽者", desc: "我知道姊姊在生氣，但我真的捨不得離開。他的每一句話都像甘露，滋潤我的心。世界可以等，廚房可以等，我現在只想在這裡，這福分我不能錯過。" }
+                ]
+            },
+            {
+                id: 26, title: "浪子回頭", location: "比利亞", coords: [31.9, 35.55], chapter: "路加福音 15", 
+                narrative: "眾稅吏和罪人都挨近我要聽道。法利賽人和文士私下議論說：『這個人接待罪人，又同他們吃飯。』於是我講了三個比喻：失羊、失錢、浪子，來表明天父對罪人的愛。\n\n最動人的是那個浪子。當他耗盡一切，醒悟過來，決定回家為奴時，相離還遠，他父親看見，就動了慈心，跑去抱著他的頸項，連連與他親嘴。父親給他穿上袍子，戴上戒指，宰了肥牛犢。我告訴他們，這就是天父的心腸：『我們理當歡喜快樂，因為你這個兄弟是死而復活，失而又得的。』我來，就是要尋找這些迷失的兒子，帶他們回家。", 
+                characters: [
+                    { name: "慈父", role: "等待者", desc: "(比喻中) 每天，我都在村口張望。那個逆子拿走了家產，傷透了我的心。但我不在乎錢，我只在乎他。那天我看見他衣衫襤褸地回來，我顧不得尊嚴，跑過去抱住他。他想做僕人？不，他是我的兒子！死而復活，失而又得，怎能不快樂？" },
+                    { name: "浪子", role: "悔改者", desc: "(比喻中) 在豬圈裡搶豆莢吃的時候，我醒了。我得罪了天，也得罪了父。我以為回家只能做奴僕，沒想到迎接我的是擁抱、袍子和戒指。這份愛，我一輩子也還不清，也不用還，只需領受。" },
+                    { name: "大兒子", role: "憤怒者", desc: "(比喻中) 我做牛做馬這麼多年，沒違背過命令。這敗家子一回來就殺牛犢？父親偏心！我不服！我不想進去！" },
+                    { name: "法利賽人", role: "被影射者", desc: "他在說我們是那個大兒子？這人太會諷刺了。但...神真的會像那個父親一樣接納那些罪人嗎？這不合規矩啊。" }
+                ]
+            },
+            {
+                id: 27, title: "財主與拉撒路", location: "比利亞", coords: [31.9, 35.55], chapter: "路加福音 16:19-31", 
+                narrative: "我講了一個財主和討飯的拉撒路的故事。財主生前穿著紫色袍和細麻布衣服，天天奢華宴樂；拉撒路渾身生瘡，被人放在財主門口，要得財主桌子上掉下來的零碎充飢。\n\n死後，情況逆轉。拉撒路在亞伯拉罕的懷裡得安慰，財主在陰間受痛苦。財主請求打發拉撒路去警告他的五個兄弟。亞伯拉罕說：『若不聽從摩西和先知的話，就是有一個從死裡復活的，他們也是不聽。』這不僅是關於貧富，更是關於心是否向神的話語敞開。神蹟不能改變剛硬的心，唯有聽從神的話語才能得救。", 
+                characters: [
+                    { name: "財主", role: "受苦者", desc: "(比喻中) 好熱！好渴！早知道會這樣...我在世上享盡榮華，卻忘了神，也忘了門口的窮人。亞伯拉罕祖宗啊，求你打發拉撒路去警告我的兄弟！我後悔了，但太遲了。" },
+                    { name: "拉撒路", role: "安息者", desc: "(比喻中) 生前只有狗舔我的瘡，但我心裡仰望神。現在，我在祖宗懷裡得安慰。痛苦過去了，永恆的福樂開始了。神的公義，終必顯明。" },
+                    { name: "亞伯拉罕", role: "宣告者", desc: "(比喻中) 孩子，鴻溝已定。不聽神的話，就算死人復活去警告，他們也會找理由不信。信心來自聽道，不是看神蹟。" }
+                ]
+            },
+            {
+                id: 28, title: "十個痲瘋", location: "撒瑪利亞邊境", coords: [32.4, 35.45], chapter: "路加福音 17:11-19", 
+                narrative: "往耶路撒冷去，經過撒瑪利亞和加利利的交界。進入一個村子，有十個長大痲瘋的，遠遠站著高聲喊：『耶穌，夫子，可憐我們吧！』\n\n我看見他們，就對他們說：『你們去把身體給祭司察看。』他們去的時候就潔淨了。內中有一個見自己已經好了，就回來大聲歸榮耀與神，又俯伏在我腳前感謝我；這人是撒瑪利亞人。我感嘆道：『潔淨了的不是十個人嗎？那九個在哪裡呢？』只有這個外族人回來歸榮耀與神。我對他說：『起來，走吧！你的信救了你。』感恩的心，使他的靈魂也得了拯救。肉體的潔淨是恩典，心靈的感恩是信心。", 
+                characters: [
+                    { name: "九個痲瘋病人", role: "康復者", desc: "看！皮膚好了！快回家！祭司證明了我們就能見家人了！那個拿撒勒人真神！...回去道謝？哎呀，先回家再說吧，反正已經好了。" },
+                    { name: "感恩的撒瑪利亞人", role: "敬拜者", desc: "我好了！神啊感謝你！我不能就這樣走，我要回去跪在他腳前。雖然我是外族人，但我知道誰是我的恩主。這份恩典，值得我用一生來感謝。" }
+                ]
+            },
+            {
+                id: 29, title: "耶利哥瞎子", location: "耶利哥近郊", coords: [31.86, 35.46], chapter: "路加福音 18:35-43", 
+                narrative: "將近耶利哥的時候，一個瞎子坐在路旁討飯。聽見許多人經過，他就問是什麼事。人告訴他，是拿撒勒人耶穌經過。他就呼叫說：『大衛的子孫耶穌，可憐我吧！』這呼喊是對彌賽亞身分的承認。\n\n在前頭走的人責備他，不許他作聲；他卻越發喊叫。我站住，吩咐把他領過來。我問他：『你要我為你做什麼？』他說：『主啊，我要能看見。』我看見他單純的信心，就說：『你可以看見！你的信救了你。』瞎子立刻看見了，就跟隨我，一路歸榮耀與神。眾人看見這事，也讚美神。這光，不僅照亮了他的眼，也照亮了他的路。", 
+                characters: [
+                    { name: "耶利哥瞎子", role: "呼求者", desc: "這是我的機會！大衛的子孫！別攔我，我要喊到他聽見為止！...光！我看見了！那是他的臉！榮耀歸給神！我再也不要討飯了，我要跟隨他！" }
+                ]
+            },
+            {
+                id: 30, title: "撒該", location: "耶利哥城", coords: [31.856, 35.46], chapter: "路加福音 19:1-10", 
+                narrative: "進了耶利哥，有一個人名叫撒該，作稅吏長，是個財主。他要看看我，因為人多，身量又矮，就跑到前頭，爬上桑樹。我看見了他那顆渴望的心，儘管被世俗包裹，卻依然跳動。\n\n我到了那裡，抬頭一看，對他說：『撒該，快下來！今天我必住在你家裡。』這句話震驚了眾人，也融化了撒該的心。他歡歡喜喜地接待我。面對眾人的議論，撒該站著對我說：『主啊，我把所有的一半給窮人；我若訛詐了誰，就還他四倍。』我宣告：『今天救恩到了這家...人子來，為要尋找、拯救失喪的人。』救恩，就是生命的翻轉。", 
+                characters: [
+                    { name: "撒該", role: "被尋回者", desc: "他...叫我的名字？他要住我家？沒人願意理我的，我是個罪人。但他接納我！那一刻，錢不重要了。我願意賠償，願意施捨。因為我找到了真正的寶藏。我這輩子從沒這麼開心過！" },
+                    { name: "群眾", role: "議論者", desc: "這人竟然去罪人家裡住宿？嘖嘖嘖，看來他也沒那麼聖潔。撒該這種吸血鬼，憑什麼得到這種待遇？" }
+                ]
+            },
+            {
+                id: 31, title: "榮耀進城", location: "橄欖山", coords: [31.778, 35.245], chapter: "路加福音 19:28-40", 
+                narrative: "我騎著驢駒，從橄欖山下來。眾門徒因所見過的一切異能，都歡樂起來，大聲讚美神說：『奉主名來的王是應當稱頌的！在天上有和平，在至高之處有榮耀！』\n\n眾人把衣服鋪在路上。幾個法利賽人對我說：『夫子，責備你的門徒吧！』我告訴他們：『若是他們閉口不說，這些石頭必要呼叫起來。』這是神定的日子，君王柔和地進了祂的城。但我看見這城，就為它哭泣，因為它不知道眷顧它的時候。榮耀的背後，是即將來臨的審判與毀滅，我的心為耶路撒冷破碎。", 
+                characters: [
+                    { name: "門徒群眾", role: "歡呼者", desc: "和散那！我們的王來了！羅馬人的末日到了！看這榮耀的場面！我們的主終於要作王了！" },
+                    { name: "法利賽人", role: "憤怒者", desc: "管管你的門徒！這些話太僭妄了！這會惹出大麻煩的。羅馬人看見了怎麼辦？" }
+                ]
+            },
+            {
+                id: 32, title: "潔淨聖殿", location: "耶路撒冷聖殿", coords: [31.7781, 35.236], chapter: "路加福音 19:45-46", 
+                narrative: "進入聖殿，我看見這裡充滿了牛羊鴿子的叫聲和兌換銀錢的喧鬧。父的家本應是萬國禱告的殿，如今卻被貪婪充滿，成了強盜的巢穴。\n\n我心焦急，如同火燒。我趕出裡頭做買賣的人，推翻他們的桌子，教訓他們說：『經上寫著：「我的殿必作禱告的殿」，你們倒使它成為賊窩了！』祭司長和文士想要殺我，但百姓都側耳聽我。我要潔淨這殿，因為審判要從神的家起首。這不僅是對制度的挑戰，更是對敬拜本質的回歸。", 
+                characters: [
+                    { name: "聖殿商人", role: "驚慌者", desc: "瘋了！這人瘋了！我的錢！我的鴿子！誰給他這權力？但他眼裡的火光太嚇人了，我們不敢反抗。" },
+                    { name: "祭司長", role: "陰謀者", desc: "他動了我們的利益，挑戰了我們的權柄。這人留不得，必須想辦法除掉他，不然我們的位置不保。" }
+                ]
+            },
+            {
+                id: 33, title: "寡婦奉獻", location: "耶路撒冷聖殿", coords: [31.7781, 35.236], chapter: "路加福音 21:1-4", 
+                narrative: "我在聖殿裡抬頭觀看，見財主把捐項投在庫裡，洋洋得意。又見一個窮寡婦投了兩個小錢，那是極微小的數目，甚至發不出響聲。\n\n但我指著她告訴門徒：『我實在告訴你們，這窮寡婦所投的比眾人還多；因為眾人都是自己有餘，拿出來投在捐項裡；但這寡婦是自己不足，把她一切養生的都投上了。』神看重的不是數量的多寡，而是那顆完全依靠、全然奉獻的心。她在物質上貧窮，在信心上卻是富足的。", 
+                characters: [
+                    { name: "窮寡婦", role: "奉獻者", desc: "神啊，這是我僅有的。我知道很少，但我愛祢，我願把我的命都交托在祢手中。沒人注意我，這很好。這是我和神之間的祕密。" }
+                ]
+            },
+            {
+                id: 34, title: "最後晚餐", location: "耶路撒冷", coords: [31.775, 35.23], chapter: "路加福音 22:7-23", 
+                narrative: "時候到了，我和十二使徒坐席。我對他們說：『我很願意在受害以先和你們吃這逾越節的筵席。』這是我與他們最後的晚餐，也是新約的開始。\n\n我拿起餅來，祝謝了，擘開，遞給他們，說：『這是我的身體，為你們捨的，你們也應當如此行，為的是記念我。』飯後也照樣拿起杯來，說：『這杯是用我血所立的新約，是為你們流出來的。』然而，那賣我之人的手與我一同在桌子上。雖然心中憂愁，但我必須走這條路，為了愛他們到底，立下這永恆的約。", 
+                characters: [
+                    { name: "十二使徒", role: "困惑者", desc: "身體？血？這是什麼意思？不過這餅和酒感覺很神聖。可是...他說我們中間有人要賣他？是誰？難道是我嗎？" },
+                    { name: "猶大", role: "心虛者", desc: "他知道了？他看我的眼神...不，我已經拿了錢，回不了頭了。這一切都要結束。我是為了逼他出手...對，我是為了大家好。" }
+                ]
+            },
+            {
+                id: 35, title: "客西馬尼", location: "橄欖山", coords: [31.779, 35.24], chapter: "路加福音 22:39-46", 
+                narrative: "出來到了橄欖山。我離開門徒約有扔一塊石頭那麼遠，跪下禱告。面對即將到來的審判與與父的隔絕，我極其傷痛，汗珠如大血點滴在地上。這是一場靈魂的熬煉。\n\n我呼求：『父啊！你若願意，就把這杯撤去；然而，不要成就我的意思，只要成就你的意思。』有一位天使從天上顯現，加添我的力量。回到門徒那裡，見他們因憂愁都睡著了。這是一場孤獨的戰役，但我已準備好順服到底。黑暗掌權了，賣我的人近了。", 
+                characters: [
+                    { name: "天父", role: "沈默者", desc: "我的愛子，這杯苦澀，但我必須讓你喝。為了那將要得救的億萬靈魂，我掩面不看你的痛苦。這是三一神最深的痛，也是最深的愛。" },
+                    { name: "天使", role: "加力者", desc: "主啊，我們來服事你。雖然我們不能替你喝這杯，但我們會托住你的肉身，讓你走完這路。" },
+                    { name: "三門徒", role: "昏睡者", desc: "眼皮好重...主看起來很痛苦，但我真的...撐不住了...對不起..." }
+                ]
+            },
+            {
+                id: 36, title: "彼得不認主", location: "大祭司宅院", coords: [31.773, 35.232], chapter: "路加福音 22:54-62", 
+                narrative: "他們拿住我，帶到大祭司的宅裡。彼得遠遠地跟著。在院子中間的炭火旁，有人認出他，但他三次極力否認：『我不認得他！』恐懼戰勝了他的承諾。\n\n正說話的時候，雞就叫了。我轉過身看彼得。那一眼，沒有定罪，只有深深的愛與提醒。他想起了我對他說的話，就出去痛哭。撒但想要篩他像篩麥子，但我已為他祈求，叫他不至於失了信心。這眼淚，將成為他回頭後堅固弟兄的起點。我的受難，包含了被最親密戰友否認的痛苦。", 
+                characters: [
+                    { name: "西門彼得", role: "崩潰者", desc: "我不認識他！...雞叫了？天啊，我做了什麼？他看著我...那眼神沒有憤怒，只有悲傷。我背叛了我最愛的主！我曾發誓死也不離開他！我該死！我出去痛哭，這悔恨要撕裂我了。" },
+                    { name: "大祭司僕人", role: "指認者", desc: "這口音明明就是加利利人，還敢狡辯？這群人都是一夥的懦夫，主子被抓了，連認都不敢認。" }
+                ]
+            },
+            {
+                id: 37, title: "受審與定罪", location: "彼拉多衙門", coords: [31.78, 35.234], chapter: "路加福音 23:1-25", 
+                narrative: "天一亮，公會便審問我。接著將我解到彼拉多那裡。彼拉多查不出我有什麼罪，便將我送到希律那裡。希律早已想見我，指望看神蹟，我卻一言不答。那種沈默，是審判前的威嚴。\n\n又回到彼拉多面前。他三次宣告我無罪，想要釋放我。但祭司長和百姓喊著：『釘他十字架！』他們寧願釋放作亂殺人的巴拉巴。彼拉多為了討好群眾，屈服了。無罪的被判有罪，義者代替了不義者，這正是救贖的奧祕。我默默承受，因為這是父的旨意。", 
+                characters: [
+                    { name: "彼拉多", role: "妥協者", desc: "真理是什麼？這人沒罪，但我不能讓暴動發生。猶太人太難搞了。洗手吧，這血與我無關，是他自己同胞要殺他的。" },
+                    { name: "希律安提帕", role: "戲弄者", desc: "原來這就是耶穌？也不變個戲法看看。一句話也不說？無趣，給他穿件華麗衣服送回去羞辱一番。" },
+                    { name: "巴拉巴", role: "倖存者", desc: "我竟然活了？那個耶穌替我死？這算什麼運氣？一個無辜的人替換了一個殺人犯...哼，活著真好。" }
+                ]
+            },
+            {
+                id: 38, title: "受難", location: "各各他", coords: [31.779, 35.23], chapter: "路加福音 23:26-49", 
+                narrative: "到了骷髏地，他們在那裡釘我十字架。在劇痛中，我卻禱告：『父啊！赦免他們，因為他們所做的，他們不曉得。』這是我對世界最後的溫柔。\n\n同釘的強盜一個譏誚我，另一個卻求我紀念。我應許他：『我實在告訴你，今日你要同我在樂園裡了。』那時約有午正，遍地都黑暗了，日頭變黑，殿裡的幔子從當中裂為兩半。我大聲喊著：『父啊！我將我的靈魂交在你手裡！』氣就斷了。百夫長看見，歸榮耀與神說：『這真是個義人！』成了，救贖的大功成了。", 
+                characters: [
+                    { name: "悔改的強盜", role: "蒙恩者", desc: "這人是王。他在死前還在為仇敵禱告。主啊，紀念我！...他說我今天就要在樂園？在這種劇痛中，我得到了最大的安慰。我一生作惡，最後一刻卻被接納。" },
+                    { name: "百夫長", role: "震撼者", desc: "天黑了，地在震動。這人死的方式...沒有咒詛，只有寬恕。這真是個義人，甚至是神的兒子！" },
+                    { name: "古利奈人西門", role: "背十架者", desc: "這血跡斑斑的十字架好重。但他剛才背得更重。我只是路過，卻走上了一條永生路。這段路，我一輩子忘不了。" }
+                ]
+            },
+            {
+                id: 39, title: "復活", location: "空墳墓", coords: [31.784, 35.23], chapter: "路加福音 24:1-12", 
+                narrative: "七日的頭一日，黎明的時候，婦女們帶著香膏來到墳墓，發現石頭已經滾開了，進去卻不見我的身體。死亡不能拘禁生命的主。\n\n正在猜疑之間，有兩個人身穿畢挺衣服站在旁邊，對驚怕的婦女說：『為什麼在死人中找活人呢？他不在這裡，已經復活了！』她們回去把這一切事告訴十一使徒。彼得跑去墳墓，低頭往裡看，只見細麻布獨在一處，就回去了，心裡希奇所成的事。新的時代開始了，光明已戰勝黑暗。", 
+                characters: [
+                    { name: "抹大拉的馬利亞", role: "報信者", desc: "空的！空的！天使說他活了！我的心快跳出來了，我要去告訴彼得！主真的戰勝了死亡！悲傷變成了狂喜！" },
+                    { name: "天使", role: "宣告者", desc: "為什麼在死人中找活人呢？記住他的話！他已經復活了！這是神的大能！" }
+                ]
+            },
+            {
+                id: 40, title: "以馬忤斯", location: "以馬忤斯路", coords: [31.839, 34.979], chapter: "路加福音 24:13-35", 
+                narrative: "同一天，兩個門徒往以馬忤斯去，臉上帶著愁容，談論最近發生的事。我親近他們，與他們同行，只是他們的眼睛迷糊了，不認識我。我問他們在談論什麼，他們訴說了對『先知耶穌』的失望。\n\n我責備他們信得太遲鈍，於是從摩西和眾先知起，凡經上所指著自己的話，都給他們講解明白了。說明基督必須受害，然後進入榮耀。到了坐席的時候，我拿起餅來，祝謝了，擘開，遞給他們。他們的眼睛明亮了，這才認出是我。我便從他們面前消失了。他們彼此說：『在路上，他和我們說話，給我們講解聖經的時候，我們的心豈不是火熱的嗎？』", 
+                characters: [
+                    { name: "革流巴", role: "火熱者", desc: "那個陌生人講聖經講得太好了！我的心在燃燒。等等，他擘餅的姿勢...那是主！他真的復活了！我們的盼望沒有落空！快回耶路撒冷！" },
+                    { name: "另一個門徒", role: "驚喜者", desc: "我們在路上爭論，絕望。那個陌生人解開聖經時，心裡那種火熱的感覺...太熟悉了。原來他一直與我們同行。復活不是傳說，是我們親眼所見的事實！" }
+                ]
+            },
+            {
+                id: 41, title: "顯現給門徒", location: "耶路撒冷", coords: [31.775, 35.23], chapter: "路加福音 24:36-49", 
+                narrative: "正當他們談論這事的時候，我親自站在他們當中，說：『願你們平安！』他們驚慌害怕，以為是看見魂。我必須讓他們知道，復活是真實的。\n\n我說：『你們看我的手，我的腳，就知道實在是我了。摸我看看！魂無骨無肉，你們看，我是有的。』為了證實，我還在他們面前吃了一片燒魚。我開啟他們的心竅，使他們能明白聖經，知道基督必受害，第三日從死裡復活，並且人要奉我的名傳悔改、赦罪的道，從耶路撒冷起直傳到萬邦。我是真實復活的主，並要賜下父所應許的能力。", 
+                characters: [
+                    { name: "十一使徒", role: "篤定者", desc: "是骨是肉！他還吃了魚！這不是幻覺。我們的主真的回來了！以前不懂的經文，現在全懂了。我們是見證人，我們要將這福音傳到地極。" }
+                ]
+            },
+            {
+                id: 42, title: "升天", location: "伯大尼", coords: [31.772, 35.26], chapter: "路加福音 24:50-53", 
+                narrative: "我領他們出來，直到伯大尼的對面，舉手給他們祝福。正祝福的時候，我就離開他們，被帶到天上去了。這不是結束，而是榮耀的歸回。\n\n這不是永遠的離別，而是另一種同在的開始。他們就拜我，大大的歡喜，回耶路撒冷去，常在殿裡稱頌神。地上的事工已完成，天上的代求已開始。福音的火種已交在他們手中，將要燎原直到地極。人子的腳蹤，將藉著教會，繼續走遍全地。", 
+                characters: [
+                    { name: "十一使徒", role: "受託者", desc: "橄欖山上，他被接上升。雲彩接住了他。天使說他還要再來。我們不再憂愁，而是大大的歡喜。回耶路撒冷去！等候聖靈，開始那偉大的見證！" },
+                    { name: "門徒群眾", role: "敬拜者", desc: "看哪，他在雲彩中！榮耀歸於神！我們在殿裡要不住地讚美！" }
+                ]
+            },
+            {
+                id: 43, title: "永恆的呼召", location: "你的心門", coords: [31.772, 35.26], chapter: "現在", 
+                narrative: "親愛的朋友，你已經跟隨我走過了這段旅程。你看見了，這不僅僅是歷史，這是給你的一封情書。從伯利恆的馬槽到各各他的十字架，我走的每一步，都是為了尋找你。\n\n我嘗過孤單、被背叛、被羞辱的滋味，所以我能體恤你的軟弱。我戰勝了死亡，所以我能賜你新生命。這世界給不了你真正的平安，但我能。\n\n現在，這旅程的終點不是地圖上的一個點，而是你的心。看哪，我站在門外叩門。若你聽見我的聲音就開門，我要進到你那裡去，我與你，你與我一同坐席。你願意放下重擔，接受這份捨命的愛，並讓我作你生命的主嗎？\n\n不要懼怕，只要信。來跟從我，直到永恆。", 
+                characters: [
+                    { name: "你", role: "被愛者", desc: "親愛的讀者，這一切故事，最終都是為了讓你遇見祂。你願意回應這份愛嗎？\n\n如果你願意，請打開心門，用這禱告回應祂：『親愛的主耶穌，我承認自己需要祢。我相信祢為尋找拯救失喪的人而來，為我的罪死而復活。現在我願意敞開心，接受祢作我的救主與生命的主。求祢赦免我、帶領我，讓我一生跟隨祢。奉主耶穌的名，阿們。』" }
+                ]
+            }
+        ];
+
+        // --- Logic ---
+        let currentIndex = 0;
+        let map;
+        let markers = [];
+        let polyline;
+
+        function init() {
+            setTimeout(() => {
+                initMap();
+                loadEvent(currentIndex, true);
+                document.getElementById('intro-modal').classList.remove('hidden');
+            }, 300);
+        }
+
+        function initMap() {
+            map = L.map('map', { zoomControl: true, attributionControl: false }).setView([32.5, 35.5], 8);
+            map.invalidateSize();
+            L.tileLayer('https://mt{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&hl=zh-TW', {
+                subdomains: ['0', '1', '2', '3'], maxZoom: 20, attribution: '© Google Maps'
+            }).addTo(map);
+            events.forEach((evt, idx) => {
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class='marker-container' id='marker-${idx}'>
+                             <div class='marker-pin'><span class='marker-number'>${idx + 1}</span></div>
+                             <div class='marker-label'>${evt.location.split(' ')[0]}</div>
+                           </div>`,
+                    iconSize: [34, 46], iconAnchor: [17, 46]
+                });
+                const marker = L.marker(evt.coords, {icon: customIcon});
+                marker.on('click', () => jumpToEvent(idx));
+                markers.push(marker);
+            });
+            polyline = L.polyline([], { color: '#8b5a2b', weight: 3, opacity: 0.6, dashArray: '10, 10' }).addTo(map);
+        }
+
+        function updateMapVisuals(index, isInitial = false) {
+            map.invalidateSize();
+            markers.forEach((m, i) => {
+                if (i <= index) {
+                    if (!map.hasLayer(m)) m.addTo(map);
+                    const el = document.getElementById(`marker-${i}`);
+                    if (el) {
+                        if (i === index) {
+                            el.parentElement.classList.add('marker-active-parent');
+                            el.classList.add('marker-active');
+                        } else {
+                            el.parentElement.classList.remove('marker-active-parent');
+                            el.classList.remove('marker-active');
+                        }
+                    }
+                } else {
+                    if (map.hasLayer(m)) map.removeLayer(m);
+                }
+            });
+            if (polyline) {
+                const visiblePath = events.slice(0, index + 1).map(e => e.coords);
+                polyline.setLatLngs(visiblePath);
+            }
+            const evt = events[index];
+            if (evt && evt.coords) {
+                if (isInitial) map.setView(evt.coords, 10);
+                else map.flyTo(evt.coords, 10, { animate: true, duration: 1.5 });
+            }
+        }
+
+        function loadEvent(index, isInitial = false) {
+            const evt = events[index];
+            document.getElementById('progress-display').innerText = `${index + 1} / ${events.length}`;
+            if (map) updateMapVisuals(index, isInitial);
+
+            const charBadges = evt.characters.map(charData => {
+                const name = charData.name;
+                const baseData = baseBiographies[name] || { avatar: '👤' };
+                return `<button onclick="showBio('${name}')" class="flex items-center gap-2 bg-[#e6dcc3] hover:bg-[#dcd0b3] px-3 py-2 rounded-full border border-[#c9b79c] transition shadow-sm">
+                    <span class="text-xl">${baseData.avatar}</span>
+                    <span class="font-bold text-yellow-900 text-sm">${name}</span>
+                </button>`;
+            }).join('');
+
+            document.getElementById('event-content').innerHTML = `
+                <div class="scroll-paper p-8 rounded-lg mb-6 transform transition-all">
+                    <div class="flex justify-between items-start border-b border-stone-300 pb-4 mb-4">
+                        <div>
+                            <h2 class="text-3xl font-bold text-yellow-900 mb-1">${evt.title}</h2>
+                            <div class="flex items-center text-stone-500 text-sm gap-2">
+                                <span class="font-bold">📍 ${evt.location}</span>
+                                <span>|</span>
+                                <span class="italic font-serif">${evt.chapter}</span>
+                            </div>
+                        </div>
+                        <div class="text-5xl opacity-10 font-serif text-yellow-900 absolute top-4 right-8 select-none">${index + 1}</div>
+                    </div>
+                    <div class="prose prose-lg prose-stone max-w-none font-serif leading-loose text-justify text-stone-800">${evt.narrative.replace(/\n/g, '<br/>')}</div>
+                </div>
+                <div class="mt-6">
+                    <h3 class="text-sm font-bold text-stone-500 uppercase tracking-widest mb-3">關鍵人物 (點擊查看)</h3>
+                    <div class="flex flex-wrap gap-3">${charBadges}</div>
+                </div>
+            `;
+
+            document.getElementById('btn-prev').disabled = index === 0;
+            const nextBtn = document.getElementById('btn-next');
+            
+            // Hide next button on last event, wait for user interaction
+            if (index === events.length - 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+                nextBtn.innerHTML = `下個事件 <span>&#8594;</span>`;
+                nextBtn.onclick = nextEvent;
+                // Reset acts button if it exists
+                const actsBtn = document.getElementById('acts-btn');
+                if(actsBtn) actsBtn.remove();
+            }
+        }
+
+        function nextEvent() {
+            if (currentIndex < events.length - 1) {
+                currentIndex++;
+                loadEvent(currentIndex);
+            }
+        }
+
+        function prevEvent() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadEvent(currentIndex);
+            }
+        }
+
+        function jumpToEvent(index) {
+            currentIndex = index;
+            loadEvent(currentIndex);
+        }
+
+        function showBio(name) {
+            const baseData = baseBiographies[name] || { avatar: '👤' };
+            const currentEvent = events[currentIndex];
+            const charData = currentEvent.characters.find(c => c.name === name);
+
+            if (!charData) return;
+
+            document.getElementById('bio-avatar').innerText = baseData.avatar;
+            document.getElementById('bio-name').innerText = name;
+            document.getElementById('bio-role').innerText = charData.role;
+            document.getElementById('bio-desc').innerText = charData.desc;
+
+            const modal = document.getElementById('bio-modal');
+            const wrapper = document.getElementById('bio-content-wrapper');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                wrapper.classList.remove('scale-95', 'opacity-0');
+                wrapper.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeBio() {
+            const wrapper = document.getElementById('bio-content-wrapper');
+            const name = document.getElementById('bio-name').innerText;
+
+            wrapper.classList.remove('scale-100', 'opacity-100');
+            wrapper.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                document.getElementById('bio-modal').classList.add('hidden');
+                
+                // Trigger Acts button if closing 'You' on the last event
+                if (currentIndex === events.length - 1 && name === '你') {
+                    showActsButton();
+                }
+            }, 200);
+        }
+
+        function showActsButton() {
+            const container = document.getElementById('btn-next-container');
+            if(document.getElementById('acts-btn')) return;
+
+            const btn = document.createElement('a');
+            btn.id = 'acts-btn';
+            btn.href = 'acts-story.html'; // Updated link
+            btn.className = 'acts-btn-glow pointer-events-auto px-6 py-3 bg-blue-800 text-blue-100 rounded-lg shadow-lg hover:bg-blue-900 transition flex flex-col items-center justify-center text-center border-2 border-blue-400 no-underline mt-4';
+            btn.innerHTML = `
+                <span class="text-lg font-bold flex items-center gap-2">下一章：使徒行傳 <span>&#8594;</span></span>
+                <span class="text-xs opacity-80">故事還未結束，使徒後續精彩故事</span>
+            `;
+            container.appendChild(btn);
+        }
+
+        function startJourney() {
+            const modal = document.getElementById('intro-modal');
+            const content = modal.firstElementChild;
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 500);
+        }
+
+        document.getElementById('bio-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeBio();
+        });
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
