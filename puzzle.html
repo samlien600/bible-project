@@ -433,13 +433,33 @@
             </div>
         </div>
         
-        <div class="flex flex-wrap justify-center gap-2">
+        <!-- Desktop Buttons (Hidden on Mobile) -->
+        <div class="hidden md:flex flex-wrap justify-center gap-2">
             <button class="legend-btn" onclick="openPeriodModal('foundation')" style="--btn-color:#60A5FA; --btn-glow:rgba(96,165,250,0.4)"><span class="dot"></span> 創造與應許</button>
             <button class="legend-btn" onclick="openPeriodModal('exodus')" style="--btn-color:#F59E0B; --btn-glow:rgba(245,158,11,0.4)"><span class="dot"></span> 應許之地</button>
             <button class="legend-btn" onclick="openPeriodModal('kingdom')" style="--btn-color:#A855F7; --btn-glow:rgba(168,85,247,0.4)"><span class="dot"></span> 國度與先知</button>
             <button class="legend-btn" onclick="openPeriodModal('gospel')" style="--btn-color:#EF4444; --btn-glow:rgba(239,68,68,0.4)"><span class="dot"></span> 基督的成全</button>
             <button class="legend-btn" onclick="openPeriodModal('church')" style="--btn-color:#10B981; --btn-glow:rgba(16,185,129,0.4)"><span class="dot"></span> 聖靈與教會</button>
             <button class="legend-btn" onclick="openPeriodModal('eternity')" style="--btn-color:#22d3ee; --btn-glow:rgba(34,211,238,0.4)"><span class="dot"></span> 榮耀與再來</button>
+        </div>
+
+        <!-- Mobile Dropdown Menu (Visible on Mobile Only) -->
+        <div class="md:hidden w-full relative px-1">
+            <div class="relative">
+                <select onchange="if(this.value){ openPeriodModal(this.value); this.value=''; }" 
+                        class="w-full appearance-none bg-[rgba(255,255,255,0.8)] border border-[rgba(212,175,55,0.3)] text-gray-700 py-3 px-4 pr-10 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-[#D4AF37] font-serif font-bold text-base shadow-sm transition-all text-center">
+                    <option value="" disabled selected>— 選擇時期以探索 —</option>
+                    <option value="foundation">創造與應許</option>
+                    <option value="exodus">應許之地</option>
+                    <option value="kingdom">國度與先知</option>
+                    <option value="gospel">基督的成全</option>
+                    <option value="church">聖靈與教會</option>
+                    <option value="eternity">榮耀與再來</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#D4AF37]">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
         </div>
 
         <!-- Desktop Actions -->
@@ -530,7 +550,7 @@
             <div class="period-body">
                 <div class="mb-8 p-5 bg-divine-gold/5 rounded-xl border border-divine-gold/10">
                     <p class="modal-verse text-justify text-base font-normal leading-relaxed text-gray-600">
-                        這是一個關於「神的救贖計畫」的互動式體驗。透過方舟的意象，我們將聖經歷史中關鍵的人物拼湊成一幅宏大的馬賽克。這不僅是歷史的回顧，更是對你個人的邀請——因為在這幅救贖的藍圖中，有一個專屬於你的位置。
+                        這是一個關於「神的救贖計畫」的互動式體驗。透過方舟的意象，我們將聖經歷史中關鍵的人物拼湊成一幅宏大的拼圖。這不僅是歷史的回顧，更是對你個人的邀請——因為在這幅救贖的藍圖中，有一個專屬於你的位置。
                     </p>
                 </div>
                 <div class="help-step">
@@ -566,15 +586,14 @@
 
     <script src="puzzle_datas.js"></script>
     <script>
-		openHelpModal()
-	
-        // --- Whisper Text Rotation ---
+		// --- Whisper Text Rotation ---
         const whispers = [
 			"門，現在仍然敞開。",
 			"但聖經從未應許，它會一直敞開。",
 			"審判不是神的渴望，而是被拒絕的結果。",
 			"你被造，是為了光，而不是深淵。"
 		];
+
         let whisperIdx = 0;
         setInterval(() => {
             const el = document.getElementById('whisperText');
@@ -723,7 +742,10 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => { renderArk(); });
+        document.addEventListener('DOMContentLoaded', () => { 
+            openHelpModal();
+            renderArk(); 
+        });
     </script>
 </body>
 </html>
