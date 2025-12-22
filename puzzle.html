@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的拼圖 - 救贖方舟</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'divine-gold': '#D4AF37',
+                        'abyss-dark': '#02040a',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        display: ['"Cinzel"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float var(--float-duration) ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'pulse-slow': 'pulseSlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'text-shimmer': 'textShimmer 3s ease-in-out infinite alternate',
+                        'user-breath': 'userBreath 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '25%': { transform: 'translateY(4px) rotate(0.5deg)' },
+                            '50%': { transform: 'translateY(-8px) rotate(-0.5deg)' },
+                            '75%': { transform: 'translateY(2px) rotate(0.25deg)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        pulseSlow: {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.8' },
+                        },
+                        textShimmer: {
+                            '0%': { opacity: '0.6', textShadow: '0 0 10px rgba(212,175,55,0.2)' },
+                            '100%': { opacity: '1', textShadow: '0 0 20px rgba(212,175,55,0.6)' },
+                        },
+                        userBreath: {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(212,175,55,0.4)' },
+                            '50%': { transform: 'scale(1.03)', boxShadow: '0 0 15px 5px rgba(212,175,55,0.2)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Variables - Light Mode Only */
+        :root {
+            --bg-primary: #f8f5f0; 
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --tile-bg: #ffffff;
+            --tile-border: rgba(0, 0, 0, 0.08);
+            --modal-bg: #ffffff;
+            --btn-bg: rgba(0, 0, 0, 0.04);
+            --btn-border: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --outline-color: rgba(212, 175, 55, 0.8);
+            --whisper-color: rgba(255, 255, 255, 0.9);
+            
+            /* Abyss & Ocean Variables */
+            --ocean-gradient-top: rgba(59, 130, 246, 0.1);
+            --ocean-gradient-mid: rgba(30, 58, 138, 0.4);
+            --ocean-gradient-bot: #000000;
+            --wave-opacity: 0.3;
+
+            /* Animation Parameters */
+            --float-duration: 8s;
+            --wave-speed-1: 25s;
+            --wave-speed-2: 20s;
+            --wave-speed-3: 12s;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: background-color 0.8s ease;
+        }
+
+        /* Background Stars (Subtle) */
+        .bg-stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.8) 50%, transparent 0),
+                radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.6) 50%, transparent 0);
+            background-size: 500px 500px;
+            opacity: 0; 
+            z-index: 0;
+            transition: opacity 1s ease;
+        }
+
+        /* Header */
+        .header-glass {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 50;
+            padding: 1.25rem 2rem;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 20px -5px var(--shadow-color);
+        }
+
+        /* Main Viewport */
+        .main-viewport {
+            height: 100%; width: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding-top: 60px;
+            padding-bottom: 4vh; 
+            position: relative; z-index: 10;
+        }
+
+        /* Ark Grid */
+        .ark-scroll-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+            z-index: 20;
+        }
+        .ark-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .ark-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 0.75rem;
+            min-width: 800px; max-width: 1200px; width: 100%;
+            position: relative;
+        }
+        @media (min-width: 1024px) { .ark-container { min-width: 0; width: 95%; } }
+
+        /* Ark Outline */
+        .ark-outline {
+            position: absolute; top: -20px; left: -20px; right: -20px; bottom: -25px;
+            width: calc(100% + 40px); height: calc(100% + 50px);
+            z-index: -1; pointer-events: none; overflow: visible;
+        }
+        .ark-stroke {
+            fill: none; stroke: var(--outline-color); stroke-width: 2;
+            stroke-linejoin: round; stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+            transition: stroke 0.5s ease;
+            filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.25));
+        }
+
+        /* Rows */
+        .ark-row { display: grid; grid-template-columns: inherit; gap: inherit; grid-column: 1 / -1; }
+        #row-0 { grid-template-columns: repeat(4, 1fr); grid-column: 5 / span 4; margin-bottom: 0.75rem; }
+        #row-1 { grid-template-columns: repeat(4, 1fr); grid-column: 5 / span 4; }
+        #row-2 { grid-template-columns: repeat(6, 1fr); grid-column: 4 / span 6; }
+        #row-3 { grid-template-columns: repeat(12, 1fr); grid-column: 1 / -1; }
+        #row-4 { grid-template-columns: repeat(10, 1fr); grid-column: 2 / span 10; }
+
+        /* Tiles */
+        .tile {
+            aspect-ratio: 1;
+            background: var(--tile-bg);
+            border: 1px solid var(--tile-border);
+            border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative;
+            transition: all 0.3s ease; /* Faster reset for hover */
+            box-shadow: 0 4px 6px -1px var(--shadow-color);
+        }
+        .tile.dimmed { opacity: 0.2; filter: grayscale(90%) blur(1px); transform: scale(0.95); }
+        
+        /* RULE: Other biblical characters CANNOT move (scale/translate).
+           Only color/border changes to indicate clickability.
+        */
+        .tile:not(.tile-user):hover:not(.dimmed) { 
+            /* No transform here */
+            border-color: var(--theme-color);
+            background: var(--modal-bg);
+            box-shadow: 0 4px 10px -2px var(--shadow-color); /* Subtle shadow only */
+            z-index: 30;
+        }
+        
+        .tile-icon { font-size: 1.5rem; margin-bottom: 0.5rem; transition: transform 0.3s; }
+        .tile-name { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; transition: color 0.3s; }
+        .tile:hover .tile-name { color: var(--text-primary); }
+        .tile-jesus { grid-column: span 2; aspect-ratio: 2/1; background: linear-gradient(135deg, rgba(239,68,68,0.05), rgba(239,68,68,0.02)); border-color: #EF4444; }
+
+        /* THE USER TILE (SPECIAL & INTERACTIVE) */
+        .tile-user { 
+            border-color: #D4AF37; 
+            position: relative;
+            overflow: visible;
+            /* Allow movement for user tile only */
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s, background 0.3s;
+        }
+        
+        /* User Tile Hover Effect */
+        .tile-user:hover {
+            transform: translateY(-4px) scale(1.03);
+            background: var(--modal-bg);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            z-index: 40;
+        }
+
+        .tile-user::after {
+            content: '';
+            position: absolute; inset: -3px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            animation: pulse-border 3s infinite;
+            pointer-events: none;
+        }
+
+        /* User Status Labels Container */
+        .user-labels-container {
+            position: absolute;
+            bottom: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            height: 24px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Common Label Style */
+        .user-label {
+            position: absolute;
+            font-size: 0.75rem;
+            color: #D4AF37;
+            white-space: nowrap;
+            font-weight: 600;
+            background: var(--modal-bg);
+            padding: 2px 10px;
+            border-radius: 99px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* State B: Idle (Default Visible) */
+        .label-idle {
+            opacity: 1;
+            transform: scale(1);
+        }
+        /* State A: Hover (Default Hidden) */
+        .label-hover {
+            opacity: 0;
+            transform: scale(0.9);
+            border-color: #D4AF37;
+            color: var(--modal-bg);
+            background: #D4AF37; /* Inverted for emphasis */
+        }
+
+        /* Toggle on Parent Hover */
+        .tile-user:hover .label-idle {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        .tile-user:hover .label-hover {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        @keyframes pulse-border { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.02); } }
+
+        /* Legend & Buttons */
+        .legend-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; margin: 3px; border-radius: 99px;
+            font-size: 0.85rem; font-weight: 600;
+            border: 1px solid var(--btn-border); background: var(--btn-bg);
+            color: var(--text-secondary); cursor: pointer; transition: all 0.3s;
+        }
+        .legend-btn:hover, .legend-btn.active {
+            background: var(--btn-active-bg, var(--btn-bg));
+            border-color: var(--btn-color); color: var(--btn-color);
+            box-shadow: 0 0 15px var(--btn-glow);
+        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background-color: var(--btn-color); }
+
+        /* THE ABYSS (Ocean) */
+        .ocean-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            height: 22vh; 
+            pointer-events: none; z-index: 5;
+            /* Deep Gradient: Light top -> Dark Mid -> Abyss Black */
+            background: linear-gradient(to bottom, 
+                var(--ocean-gradient-top) 0%, 
+                var(--ocean-gradient-mid) 40%, 
+                var(--ocean-gradient-bot) 100%
+            );
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 100%);
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+        
+        .wave {
+            position: absolute; top: -50px; left: 0; width: 200%; height: 100px;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%231e3a8a" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,213.3C1248,203,1344,213,1392,218.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: 50% 100%; background-repeat: repeat-x;
+            opacity: var(--wave-opacity);
+            mix-blend-mode: soft-light;
+        }
+        .wave-1 { animation: wave var(--wave-speed-1) linear infinite; opacity: 0.3; }
+        .wave-2 { animation: wave var(--wave-speed-2) linear infinite reverse; opacity: 0.2; top: -40px; }
+        @keyframes wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* The Whisper Text (Floating Truth) */
+        .whisper-text {
+            position: absolute;
+            bottom: 30%; 
+            width: 100%;
+            text-align: center;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.95rem; /* Slightly Larger */
+            color: var(--whisper-color); 
+            letter-spacing: 0.1em;
+            pointer-events: none;
+            z-index: 6;
+            animation: text-shimmer 3s ease-in-out infinite alternate;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8); /* Stronger shadow */
+            font-weight: 600;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--modal-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; max-width: 500px; width: 100%;
+            transform: scale(0.95); transition: transform 0.3s;
+            box-shadow: 0 25px 50px -12px var(--shadow-color);
+            position: relative; overflow: hidden;
+            color: var(--text-primary); max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+        .modal-text { font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary); }
+        
+        .modal-verse { 
+            font-family: 'Noto Serif TC', serif; 
+            font-size: 0.95rem; 
+            line-height: 1.6; 
+            color: var(--text-primary); 
+            font-weight: 600; 
+        }
+        
+        .modal-ref {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            letter-spacing: 0.05em;
+            font-weight: 500;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        .period-header { padding: 20px 24px; border-bottom: 1px solid var(--glass-border); background: linear-gradient(to bottom, var(--tile-bg), transparent); }
+        .period-body { padding: 24px; }
+        
+        /* Action Button */
+        .action-btn {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text-secondary);
+            cursor: pointer; transition: all 0.3s; margin-left: 8px;
+        }
+        .action-btn:hover { background: var(--modal-bg); color: var(--text-primary); border-color: var(--text-primary); }
+        
+        /* Help Steps */
+        .help-step { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .help-icon-box { min-width: 40px; height: 40px; border-radius: 12px; background: var(--btn-bg); color: var(--divine-gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .help-content h4 { font-weight: 700; margin-bottom: 4px; }
+        .help-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+        .qa-box { background: rgba(0,0,0,0.03); border-radius: 12px; padding: 16px; margin-top: 20px; border: 1px solid var(--btn-border); }
+        .qa-question { font-weight: 700; color: var(--text-primary); margin-bottom: 8px; font-size: 0.95rem; }
+        .qa-answer { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="bg-stars"></div>
+
+    <!-- Header & Legend -->
+    <header class="header-glass flex flex-col xl:flex-row justify-between items-center gap-4">
+        <div class="flex items-center w-full xl:w-auto justify-between xl:justify-start">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-divine-gold to-yellow-600 flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-ship text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-display font-bold text-divine-gold tracking-widest leading-none">THE ARK</h1>
+                    <p class="text-xs text-gray-400 font-serif tracking-wide mt-1">救贖的拼圖</p>
+                </div>
+            </div>
+            <!-- Mobile Actions -->
+            <div class="flex xl:hidden">
+                <button class="action-btn" onclick="openHelpModal()" title="使用說明"><i class="fas fa-question"></i></button>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-2">
+            <button class="legend-btn" onclick="openPeriodModal('foundation')" style="--btn-color:#60A5FA; --btn-glow:rgba(96,165,250,0.4)"><span class="dot"></span> 創造與應許</button>
+            <button class="legend-btn" onclick="openPeriodModal('exodus')" style="--btn-color:#F59E0B; --btn-glow:rgba(245,158,11,0.4)"><span class="dot"></span> 應許之地</button>
+            <button class="legend-btn" onclick="openPeriodModal('kingdom')" style="--btn-color:#A855F7; --btn-glow:rgba(168,85,247,0.4)"><span class="dot"></span> 國度與先知</button>
+            <button class="legend-btn" onclick="openPeriodModal('gospel')" style="--btn-color:#EF4444; --btn-glow:rgba(239,68,68,0.4)"><span class="dot"></span> 基督的成全</button>
+            <button class="legend-btn" onclick="openPeriodModal('church')" style="--btn-color:#10B981; --btn-glow:rgba(16,185,129,0.4)"><span class="dot"></span> 聖靈與教會</button>
+            <button class="legend-btn" onclick="openPeriodModal('eternity')" style="--btn-color:#22d3ee; --btn-glow:rgba(34,211,238,0.4)"><span class="dot"></span> 榮耀與再來</button>
+        </div>
+
+        <!-- Desktop Actions -->
+        <div class="hidden xl:flex">
+            <button class="action-btn" onclick="openHelpModal()" title="使用說明"><i class="fas fa-question"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+        <!-- The Ark Container -->
+        <div class="ark-scroll-wrapper">
+            <div class="ark-container animate-float" id="arkGrid">
+                <!-- SVG Outline -->
+                <svg class="ark-outline" viewBox="0 0 120 54" preserveAspectRatio="none">
+                    <path class="ark-stroke" d="M 38 -2 L 82 -2 L 82 20 Q 82 22, 90 22 L 92 30 Q 92 32, 122 32 L 122 42 Q 122 55, 60 55 Q -2 55, -2 42 L -2 32 Q 28 32, 28 30 L 28 22 Q 38 22, 38 20 Z" />
+                    <path class="ark-stroke" d="M -2 32 L 122 32" style="opacity:0.3; stroke-width:1;" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- The Abyss (Replaced Ocean) -->
+        <div class="ocean-container">
+            <div class="wave wave-1"></div>
+            <div class="wave wave-2"></div>
+            <!-- The Whisper of Truth -->
+            <div class="whisper-text" id="whisperText">門現在仍然開著...</div>
+        </div>
+    </main>
+
+    <!-- 1. Period Modal -->
+    <div id="periodModal" class="modal-overlay" onclick="if(event.target===this) closeModal('periodModal')">
+        <div class="modal-content">
+            <div class="period-header flex items-center justify-between">
+                <h3 class="modal-title flex items-center" id="periodTitle"></h3>
+                <button onclick="closeModal('periodModal')" class="text-gray-400 hover:text-divine-gold"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="period-body">
+                <div class="mb-6">
+                    <i class="fas fa-quote-left text-divine-gold/40 text-2xl mb-3 block"></i>
+                    <p id="periodDesc" class="modal-text text-justify font-serif"></p>
+                </div>
+                <button onclick="applyPeriodFilter()" class="w-full py-3 mt-2 bg-divine-gold/10 border border-divine-gold/30 hover:bg-divine-gold hover:text-white text-divine-gold rounded-xl transition-all duration-300 text-base font-bold shadow-sm">
+                    <i class="fas fa-search mr-2"></i> 查看此時期人物
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Character Modal -->
+    <div id="charModal" class="modal-overlay" onclick="if(event.target===this) closeModal('charModal')">
+        <div class="modal-content">
+            <div class="h-1.5 w-full bg-gradient-to-r from-transparent via-divine-gold to-transparent opacity-50"></div>
+            <button onclick="closeModal('charModal')" class="absolute top-4 right-4 text-gray-400 hover:text-divine-gold"><i class="fas fa-times text-xl"></i></button>
+            
+            <div class="p-8 text-center">
+                <div id="modalIconBox" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 border-2 border-white/10 bg-opacity-10 relative shadow-lg">
+                    <div class="absolute inset-0 rounded-full opacity-20 bg-current blur-md"></div>
+                    <i id="modalIcon" class="text-3xl relative z-10"></i>
+                </div>
+
+                <h3 id="modalName" class="modal-title mb-2 font-display"></h3>
+                <p id="modalDesc" class="text-sm text-divine-gold font-bold mb-6 uppercase tracking-widest"></p>
+
+                <div class="bg-divine-gold/5 rounded-xl p-6 mb-6 border border-divine-gold/10 relative text-left">
+                    <i class="fas fa-quote-left absolute -top-3 -left-2 text-divine-gold/30 text-3xl"></i>
+                    <p id="modalDestiny" class="modal-text"></p> 
+                </div>
+
+                <div class="border-t border-dashed border-gray-500/30 pt-6 mt-2">
+                    <div class="flex items-center justify-center mb-3">
+                        <span class="text-xs text-divine-gold uppercase tracking-wider font-bold bg-divine-gold/10 px-3 py-1 rounded-full">關鍵經文</span>
+                    </div>
+                    <p id="modalVerse" class="modal-verse"></p>
+                    <p id="modalRef" class="modal-ref"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Help Modal -->
+    <div id="helpModal" class="modal-overlay" onclick="if(event.target===this) closeModal('helpModal')">
+        <div class="modal-content">
+            <div class="period-header flex items-center justify-between">
+                <h3 class="modal-title flex items-center"><i class="fas fa-compass text-divine-gold mr-3"></i> 探索指引</h3>
+                <button onclick="closeModal('helpModal')" class="text-gray-400 hover:text-divine-gold"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="period-body">
+                <div class="mb-8 p-5 bg-divine-gold/5 rounded-xl border border-divine-gold/10">
+                    <p class="modal-verse text-justify text-base font-normal leading-relaxed text-gray-600">
+                        這是一個關於「神的救贖計畫」的互動式體驗。透過方舟的意象，我們將聖經歷史中關鍵的人物拼湊成一幅宏大的馬賽克。這不僅是歷史的回顧，更是對你個人的邀請——因為在這幅救贖的藍圖中，有一個專屬於你的位置。
+                    </p>
+                </div>
+                <div class="help-step">
+                    <div class="help-icon-box"><i class="fas fa-hand-pointer"></i></div>
+                    <div class="help-content">
+                        <h4>點擊拼圖</h4>
+                        <p>方舟上的每一塊拼圖都代表一位聖經人物。點擊圖示，發掘神對他們生命的獨特命定。</p>
+                    </div>
+                </div>
+                <div class="help-step">
+                    <div class="help-icon-box"><i class="fas fa-user-circle"></i></div>
+                    <div class="help-content">
+                        <h4>「你」的位置</h4>
+                        <p>請留意你的拼圖狀態，這是對你個人的邀請。</p>
+                    </div>
+                </div>
+                
+                <!-- Theological Q&A - Elegant Handling of Hell -->
+                <div class="qa-box">
+                    <div class="qa-question"><i class="fas fa-question-circle text-divine-gold mr-2"></i> 關於結局：聖經是否真的提到地獄？</div>
+                    <div class="qa-answer">
+                        是的。耶穌比任何人都更清楚地談到它，因為祂不願有一人沉淪。<br><br>
+                        地獄不是神為了折磨人而設計的刑場，而是當人堅決拒絕神的同在時，神尊重其選擇所帶來的自然結果——與生命源頭永遠的隔絕。這正是方舟存在的意義：這是一條已經預備好的逃生之路。
+                    </div>
+                </div>
+                
+                <button onclick="closeModal('helpModal')" class="w-full py-3 mt-4 bg-divine-gold text-white hover:opacity-90 rounded-xl transition-all duration-300 text-base font-bold shadow-md">
+                    開始探索
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="puzzle_datas.js"></script>
+    <script>
+		openHelpModal()
+	
+        // --- Whisper Text Rotation ---
+        const whispers = [
+			"門，現在仍然敞開。",
+			"但聖經從未應許，它會一直敞開。",
+			"審判不是神的渴望，而是被拒絕的結果。",
+			"你被造，是為了光，而不是深淵。"
+		];
+        let whisperIdx = 0;
+        setInterval(() => {
+            const el = document.getElementById('whisperText');
+            el.style.opacity = 0;
+            setTimeout(() => {
+                whisperIdx = (whisperIdx + 1) % whispers.length;
+                el.innerText = whispers[whisperIdx];
+                el.style.opacity = 0.6; // Keep low opacity state consistent with CSS
+            }, 1500);
+        }, 6000);
+
+        // --- Render Logic ---
+        function renderArk() {
+            const container = document.getElementById('arkGrid');
+            container.querySelectorAll('.ark-row').forEach(r => r.remove());
+
+            const renderRows = [
+                { id: 'row-0', data: ARK_DATA.slice(30, 34) },
+                { id: 'row-1', data: ARK_DATA.slice(26, 30) },
+                { id: 'row-2', data: ARK_DATA.slice(20, 26) },
+                { id: 'row-3', data: [...ARK_DATA.slice(10, 15), JESUS_DATA, ...ARK_DATA.slice(15, 20)] },
+                { id: 'row-4', data: ARK_DATA.slice(0, 10) }
+            ];
+
+            renderRows.forEach((rowConfig, idx) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.id = rowConfig.id;
+                rowDiv.className = 'ark-row';
+                rowDiv.style.gridRow = idx + 1; 
+                
+                rowConfig.data.forEach((item, itemIdx) => {
+                    const tile = createTile(item, idx * 5 + itemIdx);
+                    rowDiv.appendChild(tile);
+                });
+                container.appendChild(rowDiv);
+            });
+        }
+
+        function createTile(item, delayIdx) {
+            const tile = document.createElement('div');
+            let themeColor = getColor(item.theme);
+            let classes = `tile animate-fade-in group`;
+            
+            if (item.isJesus) classes += ' tile-jesus';
+            if (item.isUser) classes += ' tile-user';
+            
+            tile.className = classes;
+            tile.style.animationDelay = `${delayIdx * 30}ms`;
+            tile.style.setProperty('--theme-color', themeColor);
+            
+            tile.dataset.themes = `${item.theme} ${item.isJesus ? 'jesus' : ''} ${item.isUser ? 'user eternity' : ''} ${item.secondaryTheme || ''}`;
+
+            const iconColor = item.isJesus ? 'text-red-500' : (item.isUser ? 'text-divine-gold' : `text-${item.color.split('-')[1]}-400`);
+            
+            // Tile Inner HTML
+            let htmlContent = `
+                <i class="fas ${item.icon} tile-icon ${iconColor} opacity-80 group-hover:opacity-100"></i>
+                <span class="tile-name group-hover:text-primary">${item.name}</span>
+            `;
+            
+            // State A & B Implementation for User Tile
+            if (item.isUser) {
+                // State B (Idle): "你站在哪裡？"
+                // State A (Hover): "門仍然開著"
+                htmlContent += `
+                    <div class="user-labels-container">
+                        <span class="user-label label-idle">你站在哪裡？</span>
+                        <span class="user-label label-hover">門仍然開著</span>
+                    </div>
+                `;
+            }
+
+            tile.innerHTML = htmlContent;
+            tile.onclick = () => openCharModal(item);
+            return tile;
+        }
+
+        function getColor(theme) {
+            const colors = { foundation: '#60A5FA', exodus: '#F59E0B', kingdom: '#A855F7', gospel: '#EF4444', church: '#10B981', eternity: '#22d3ee', user: '#D4AF37', jesus: '#EF4444' };
+            return colors[theme] || '#fff';
+        }
+
+        // --- Interaction ---
+        let activePeriod = null;
+
+        function openPeriodModal(theme) {
+            activePeriod = theme; 
+            const data = STORY_DATA[theme];
+            document.getElementById('periodTitle').innerHTML = `<i class="fas ${data.icon} mr-4 ${data.color}"></i> ${data.title}`;
+            document.getElementById('periodDesc').innerText = data.desc;
+            document.getElementById('periodModal').classList.add('active');
+        }
+
+        function applyPeriodFilter() {
+            closeModal('periodModal');
+            if(!activePeriod) return;
+            document.querySelectorAll('.tile').forEach(tile => {
+                const themes = tile.dataset.themes.split(' ');
+                let match = themes.includes(activePeriod);
+                if (activePeriod === 'gospel' && themes.includes('jesus')) match = true;
+                
+                if (match) {
+                    tile.classList.remove('dimmed');
+                    if(tile.classList.contains('tile-user')) {
+                         tile.style.transform = 'scale(1.05)';
+                    }
+                    setTimeout(() => tile.style.transform = '', 300);
+                } else {
+                    tile.classList.add('dimmed');
+                }
+            });
+            document.querySelectorAll('.legend-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function openCharModal(item) {
+            // State C: Clicked -> "你被邀請進入"
+            if (item.isUser) {
+                document.getElementById('modalName').innerText = "你被邀請進入"; // Override Name
+                document.getElementById('modalVerse').innerText = "因為他說：「在悅納的時候，我應允了你；在拯救的日子，我搭救了你。」看哪，現在正是悅納的時候！現在正是拯救的日子；"; 
+                document.getElementById('modalRef').innerText = "哥林多後書 6:2"; 
+            } else {
+                document.getElementById('modalName').innerText = item.name;
+                document.getElementById('modalRef').innerText = item.ref;
+                document.getElementById('modalVerse').innerText = item.verse || "";
+            }
+
+            document.getElementById('modalDestiny').innerText = item.destiny;
+            document.getElementById('modalDesc').innerText = item.desc;
+            
+            const icon = document.getElementById('modalIcon');
+            icon.className = `fas ${item.icon}`;
+            
+            document.getElementById('modalIconBox').style.color = getColor(item.theme);
+            document.getElementById('modalIconBox').style.borderColor = getColor(item.theme);
+            document.getElementById('modalIconBox').style.backgroundColor = getColor(item.theme) + '1A'; 
+            
+            document.getElementById('charModal').classList.add('active');
+        }
+
+        function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        document.querySelector('.main-viewport').addEventListener('click', (e) => {
+            if(e.target.classList.contains('main-viewport') || e.target.classList.contains('ocean-container')) {
+                document.querySelectorAll('.tile').forEach(t => t.classList.remove('dimmed'));
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => { renderArk(); });
+    </script>
+</body>
+</html>
