@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>大衛的一生與神的視角</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        :root {
+            --book-width: 420px; 
+            --book-height: 500px;
+            --duration: 0.8s;
+            --paper-color: #fdfbf7;
+            --cover-color: #5d4037;
+            --text-color: #3e2723;
+        }
+
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #2c2c2c;
+            background-image: radial-gradient(circle at center, #3a3a3a 0%, #1a1a1a 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-color);
+            touch-action: none; 
+        }
+
+        .scene {
+            position: relative;
+            width: var(--book-width);
+            height: var(--book-height);
+            perspective: 1500px;
+            transition: transform 0.5s ease-out;
+        }
+
+        .book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother transition for pan/flip */
+        }
+
+        .paper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform var(--duration) cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-color: var(--paper-color);
+            padding: 1.2rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e0e0e0;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y; 
+            scrollbar-width: thin;
+            scrollbar-color: #d7ccc8 transparent;
+        }
+
+        .front::-webkit-scrollbar, .back::-webkit-scrollbar { width: 4px; }
+        .front::-webkit-scrollbar-thumb, .back::-webkit-scrollbar-thumb { background-color: #d7ccc8; border-radius: 2px; }
+
+        .front {
+            z-index: 2;
+            background-image: linear-gradient(to right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 10%);
+        }
+
+        .back {
+            z-index: 1;
+            transform: rotateY(180deg);
+            background-image: linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 10%);
+        }
+
+        .paper.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        /* Typography */
+        .page-number {
+            margin-top: auto;
+            padding-top: 0.4rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8d6e63;
+            font-weight: bold;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .chapter-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #5d4037;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #d7ccc8;
+            padding-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 0.75rem; 
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            text-align: justify;
+        }
+
+        .bible-verse {
+            font-style: italic;
+            color: #4e342e;
+            background-color: #efebe9;
+            padding: 0.5rem;
+            border-left: 3px solid #8d6e63;
+            margin: 0.5rem 0;
+            font-size: 0.7rem;
+            line-height: 1.4;
+        }
+
+        .guide-list li {
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
+            padding-left: 1rem;
+            position: relative;
+            line-height: 1.4;
+            color: #4e342e;
+        }
+        .guide-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #8d6e63;
+            font-weight: bold;
+        }
+
+        /* Cover Specifics */
+        .cover-design {
+            background-color: var(--cover-color);
+            color: #fdfbf7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 3px solid #3e2723;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            overflow: hidden;
+        }
+        .cover-title {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.2;
+        }
+        .cover-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            opacity: 0.6;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .btn-nav {
+            position: fixed;
+            bottom: 30px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 0.85rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-nav:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
+        .btn-prev { left: 20px; }
+        .btn-next { right: 20px; }
+
+        @media (min-width: 1024px) {
+            .btn-nav { opacity: 0.6; }
+            .btn-nav:hover { opacity: 1; }
+        }
+
+        .icon-large {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            color: #8d6e63;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            color: #3e2723;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal.open { transform: scale(1); }
+        .modal h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #5d4037; font-weight: bold; }
+        .modal p { font-size: 1.0rem; margin-bottom: 0.5rem; line-height: 1.5; font-weight: 500; }
+        .btn-prayer {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+        .btn-prayer:hover { transform: scale(1.05); background: #b45309; }
+        .btn-close {
+            margin-top: 1.5rem;
+            background: #8d6e63;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Buttons -->
+    <button class="btn-nav btn-prev" onclick="goPrev()">❮ 上一頁</button>
+    <button class="btn-nav btn-next" onclick="goNext()">下一頁 ❯</button>
+
+    <div class="scene" id="scene">
+        <!-- Book Content will be generated by JS -->
+        <div class="book" id="book"></div>
+        <div class="hint">手機請使用橫向瀏覽體驗更佳，可滑動翻頁</div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="prayer-modal" class="modal-overlay" onclick="closePrayerModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h3 id="modal-title"></h3>
+            <div id="modal-content"></div>
+            <button class="btn-close" onclick="closePrayerModal()">阿們 (關閉)</button>
+        </div>
+    </div>
+
+    <!-- Import Book Data -->
+    <script src="david_book_datas.js"></script>
+
+    <script>
+        // DOM Elements
+        const prevBtn = document.querySelector('.btn-prev');
+        const nextBtn = document.querySelector('.btn-next');
+        const book = document.querySelector('#book');
+        const scene = document.querySelector('#scene');
+
+        // State
+        let currentLocation = 1;
+        let numOfPapers = 0; 
+        let maxLocation = 0;
+        let mobileViewMode = 'left'; // 'left' or 'right'
+
+        if (typeof window.bookData === 'undefined') {
+            book.innerHTML = '<div class="text-white text-center p-4">Error: david_book_datas.js not loaded.</div>';
+        }
+
+        // --- Render Book Content from Data ---
+        function renderBook() {
+            const data = window.bookData;
+            book.innerHTML = '';
+
+            data.forEach((paperData, index) => {
+                const paper = document.createElement('div');
+                paper.className = 'paper';
+                paper.id = `p${index + 1}`;
+                paper.style.zIndex = data.length - index;
+
+                // Front
+                const front = document.createElement('div');
+                front.className = 'front';
+                renderPageContent(front, paperData.front);
+                if (paperData.front.type !== 'cover') {
+                    const num = document.createElement('div');
+                    num.className = 'page-number';
+                    num.innerText = (index * 2); 
+                    front.appendChild(num);
+                }
+                paper.appendChild(front);
+
+                // Back
+                const back = document.createElement('div');
+                back.className = 'back';
+                renderPageContent(back, paperData.back);
+                if (paperData.back.type !== 'back_cover') {
+                    const num = document.createElement('div');
+                    num.className = 'page-number';
+                    num.innerText = (index * 2) + 1;
+                    back.appendChild(num);
+                }
+                paper.appendChild(back);
+
+                book.appendChild(paper);
+            });
+            
+            attachListeners();
+        }
+
+        function renderPageContent(container, content) {
+            if (!content) return;
+
+            if (content.type === 'cover') container.classList.add('cover-design');
+            if (content.type === 'back_cover') container.classList.add('cover-design');
+            if (content.type === 'comparison') container.classList.add('bg-stone-100');
+
+            switch (content.type) {
+                case 'cover':
+                    container.innerHTML = `
+                        <div class="mb-3 text-5xl">${content.icon}</div>
+                        <h1 class="cover-title">${content.title}</h1>
+                        <p class="cover-subtitle">${content.subtitle}</p>
+                        <div class="mt-6 text-xs opacity-75 font-sans border border-white/30 px-3 py-1 rounded-full">
+                            ${content.hint}
+                        </div>
+                    `;
+                    break;
+
+                case 'guide':
+                    container.innerHTML = `
+                        <h2 class="chapter-title text-amber-900 border-amber-900/30">${content.title}</h2>
+                        ${content.paragraphs.map(p => `<p>${p}</p>`).join('')}
+                        ${content.list ? `<ul class="guide-list mt-3">${content.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
+                        ${content.footer ? `<p class="mt-auto text-center text-xs font-bold text-amber-800 italic border-t border-amber-900/20 pt-2">${content.footer}</p>` : ''}
+                    `;
+                    break;
+
+                case 'story':
+                    let html = '';
+                    if (content.icon) html += `<div class="text-center icon-large">${content.icon}</div>`;
+                    html += `<h2 class="chapter-title">${content.title}</h2>`;
+                    if (content.paragraphs) {
+                        content.paragraphs.forEach(p => html += `<p>${p}</p>`);
+                    }
+                    if (content.verse) {
+                        html += `<div class="bible-verse">${content.verse}<br><span class="text-xs text-gray-600 block text-right mt-1">${content.verseRef}</span></div>`;
+                    }
+                    if (content.footer) {
+                        html += `
+                        <div class="mt-auto pt-2 border-t border-amber-900/20">
+                            <span class="inline-block text-xs font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded mb-1">【神的視角】</span>
+                            <p class="text-xs text-gray-600 leading-relaxed">${content.footer}</p>
+                        </div>`;
+                    }
+                    container.innerHTML = html;
+                    break;
+
+                case 'transition':
+                    container.innerHTML = `
+                        <div class="h-full flex flex-col justify-center items-center text-center">
+                            <h2 class="text-xl font-bold mb-3 text-amber-900">${content.title}</h2>
+                            <div class="w-12 h-1 bg-amber-800 mb-4"></div>
+                            <p class="text-base leading-loose font-serif text-gray-800">${content.content}</p>
+                            <p class="mt-4 text-amber-700 font-bold animate-bounce text-xs">${content.hint}</p>
+                        </div>
+                    `;
+                    break;
+
+                case 'comparison':
+                    container.innerHTML = `
+                        <div class="h-full flex flex-col p-2 border-4 border-double border-amber-900/20 rounded-lg">
+                            <div class="text-center mb-1"><span class="text-2xl">${content.icon}</span></div>
+                            <h2 class="text-base font-bold text-center text-amber-900 mb-2">${content.title}</h2>
+                            <div class="space-y-2 flex-grow">
+                                <div class="flex items-start bg-white p-2 rounded shadow-sm">
+                                    <div class="bg-gray-300 text-gray-700 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mr-2 mt-0.5 font-bold text-xs">人</div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-xs">${content.human.title}</h3>
+                                        <p class="text-xs text-gray-600 leading-tight">${content.human.desc}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start bg-amber-50 p-2 rounded shadow-sm border border-amber-100">
+                                    <div class="bg-amber-600 text-white w-5 h-5 rounded-full flex items-center justify-center shrink-0 mr-2 mt-0.5 font-bold text-xs">神</div>
+                                    <div>
+                                        <h3 class="font-bold text-amber-900 text-xs">${content.god.title}</h3>
+                                        <p class="text-xs text-gray-800 leading-tight">${content.god.desc}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 bg-white p-2 shadow-sm border-l-3 border-amber-600">
+                                <p class="font-bold text-xs text-center text-amber-900 leading-tight">${content.verse}<br><span class="text-xs font-normal text-gray-500">${content.verseRef}</span></p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'back_cover':
+                    let backHtml = `<h2 class="text-xl font-bold mb-2">${content.title}</h2>`;
+                    backHtml += `<h3 class="text-base mb-3 opacity-80">${content.subtitle}</h3>`;
+                    backHtml += `<div class="px-1 text-xs leading-loose opacity-90 text-left">`;
+                    content.content.forEach(line => backHtml += `${line} `);
+                    backHtml += `</div>`;
+                    
+                    if (content.actionButton) {
+                        backHtml += `<br><br><div class="mt-3 text-center">
+                            <button class="btn-prayer" onclick="openPrayerModal()">
+                                ${content.actionButton.text}
+                            </button>
+                        </div>`;
+                    }
+
+                    backHtml += `<div class="mt-4 text-2xl">${content.footerIcon}</div>`;
+                   // backHtml += `<div class="mt-1 text-xs opacity-50 font-sans">${content.footerText}</div>`;
+                    container.innerHTML = backHtml;
+                    break;
+            }
+        }
+
+        // --- Logic & Events ---
+
+        function attachListeners() {
+            const papers = document.querySelectorAll('.paper');
+            papers.forEach(p => {
+                const front = p.querySelector('.front');
+                const back = p.querySelector('.back');
+                if(front) front.addEventListener("click", (e) => {
+                    if(window.getSelection().toString().length > 0) return;
+                    goNext();
+                });
+                if(back) back.addEventListener("click", (e) => {
+                    if(window.getSelection().toString().length > 0) return;
+                    if (e.target.tagName === 'BUTTON') return;
+                    goPrev();
+                });
+            });
+        }
+
+        function goNext() {
+            const isMobile = window.innerWidth < 768;
+            
+            if (currentLocation < maxLocation) {
+                // Mobile: Pan within spread logic
+                // If in spread (loc > 1) and viewing left, pan to right
+                if (isMobile && currentLocation > 1 && mobileViewMode === 'left') {
+                    mobileViewMode = 'right';
+                    updateLayout();
+                    return;
+                }
+
+                const paper = document.querySelector(`#p${currentLocation}`);
+                if(paper) {
+                    paper.classList.add("flipped");
+                    paper.style.zIndex = currentLocation; 
+                }
+                currentLocation++;
+                
+                // After flipping, if mobile, start at left side of new spread
+                if (isMobile) {
+                    mobileViewMode = 'left';
+                }
+                
+                updateLayout(); 
+            }
+        }
+
+        function goPrev() {
+            const isMobile = window.innerWidth < 768;
+            
+            if (currentLocation > 1) {
+                // Mobile: Pan within spread logic
+                // If viewing right, pan to left
+                const isBookClosed = (currentLocation === 1 || currentLocation === maxLocation);
+                if (isMobile && !isBookClosed && mobileViewMode === 'right') {
+                    mobileViewMode = 'left';
+                    updateLayout();
+                    return;
+                }
+
+                currentLocation--;
+                const paper = document.querySelector(`#p${currentLocation}`);
+                if(paper) {
+                    paper.classList.remove("flipped");
+                    paper.style.zIndex = numOfPapers - (currentLocation - 1); 
+                }
+                
+                // After flipping back, if mobile, show right side of previous spread
+                if (isMobile && currentLocation > 1) {
+                    mobileViewMode = 'right';
+                }
+                
+                updateLayout(); 
+            }
+        }
+
+        function updateLayout() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const isMobile = width < 768;
+            
+            const bookBaseW = 420; 
+            const bookBaseH = 500;
+            
+            const isBookClosed = (currentLocation === 1 || currentLocation === maxLocation);
+            
+            // Mobile: Scale based on single page width
+            // Desktop: Scale based on spread width (if open)
+            const targetLogicalW = (isMobile) ? bookBaseW : (isBookClosed ? bookBaseW : (bookBaseW * 2));
+            
+            let scale = Math.min(
+                (width * 0.95) / targetLogicalW,
+                (height * 0.92) / bookBaseH
+            );
+            
+            if (scale > 2.5) scale = 2.5;
+
+            scene.style.transform = `scale(${scale})`;
+            
+            // Positioning Logic
+            let translateX = 0;
+            
+            if (isBookClosed) {
+                // Cover or Back Cover
+                if (currentLocation === 1) {
+                    translateX = 0; // Center Cover
+                } else {
+                    // Back Cover (Last Page Flipped)
+                    // On Desktop: spine is centered, page projects left. We need to shift right to center page.
+                    // On Mobile: same logic, we want the visible page centered.
+                    // Since "flipped" pages are to the left of spine [-W, 0].
+                    // We need to shift book right by 100% of W? 
+                    // Let's assume 100% means shifting the container by 1 book width.
+                    translateX = 100;
+                }
+            } else {
+                // Open Book (Spread)
+                if (isMobile) {
+                    if (mobileViewMode === 'left') {
+                        // Viewing Left Page (Back of Prev Paper).
+                        // It sits at [-W, 0]. Center is -W/2.
+                        // We want -W/2 to be at 0 (Screen Center).
+                        // Shift Book Right by W/2. -> TranslateX = 100%? (Since 100% = 420px?)
+                        // Wait, transform is relative to element width. 
+                        // If .book width is 420px. translateX(100%) moves it 420px right.
+                        // We need to move it so that [-420, 0] is centered. 
+                        // Center of [-420, 0] is -210.
+                        // We want -210 to be at 0. So add 210.
+                        // 210 is 50% of 420. So translateX(50%).
+                        // BUT, the scene centers the element already.
+                        // Default (0%): Spine is at center. Left Page is [-210, 0] relative to visual center?
+                        // No, Spine is left edge of Paper.
+                        // .paper { left: 0 }. Front is [0, 420]. Back is [-420, 0] (rotated).
+                        // So at 0%, Front is right of center, Back is left of center.
+                        // To center Left Page (Back): Move Right by 210px (50%).
+                        translateX = 100; 
+                    } else {
+                        // Viewing Right Page (Front of Current Paper).
+                        // It sits at [0, W]. Center is W/2 (210).
+                        // We want 210 to be at 0. Subtract 210.
+                        // So translateX(-50%)?
+                        // Let's stick to 0 for Right Page if 0 centers the spine (and thus right page is right half).
+                        // Wait, if 0 centers spine, Right page is off-center to right.
+                        // To center Right page: Move Left by 210px (50%).
+                        translateX = 0;
+                    }
+                } else {
+                    // Desktop Spread: Center the spine (50% shift to account for left-origin?)
+                    // Current CSS: .book width 100%. Scene width = Book width.
+                    // If we want spine at center, we usually need translateX(50%) because...
+                    // Actually, if we want spread, we want spine at center.
+                    // Default 0: Book starts at left edge of scene. Spine is at left edge.
+                    // Scene is centered. So Spine is at Left edge of centered Scene?
+                    // No, scene width = 420.
+                    // If we open book, width is 840.
+                    // We want spine (x=0 inside book) to be at screen center.
+                    // If scene is centered, left edge of scene is at screen center - 210.
+                    // So spine is at screen center - 210.
+                    // To move spine to screen center, we translate +210 (+50%).
+                    translateX = 50;
+                }
+            }
+            
+            book.style.transform = `translateX(${translateX}%)`;
+        }
+
+        function openPrayerModal() {
+            const lastPage = window.bookData[window.bookData.length - 1];
+            if (lastPage && lastPage.back.actionButton) {
+                const data = lastPage.back.actionButton;
+                document.getElementById('modal-title').innerText = data.modalTitle;
+                document.getElementById('modal-content').innerHTML = data.modalContent.map(p => `<p>${p}</p>`).join('');
+                
+                const modal = document.getElementById('prayer-modal');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.querySelector('.modal').classList.add('open'), 10);
+            }
+        }
+
+        function closePrayerModal(event) {
+            const modal = document.getElementById('prayer-modal');
+            modal.querySelector('.modal').classList.remove('open');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        const initInterval = setInterval(() => {
+            if (window.bookData) {
+                clearInterval(initInterval);
+                numOfPapers = window.bookData.length;
+                maxLocation = numOfPapers + 1;
+                renderBook();
+                updateLayout();
+            }
+        }, 100);
+
+        window.addEventListener('resize', updateLayout);
+
+        document.addEventListener('keydown', function(event) {
+            if(event.key === "ArrowRight") goNext();
+            else if(event.key === "ArrowLeft") goPrev();
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) goNext();
+            else if (touchEndX > touchStartX + 50) goPrev();
+        }, false);
+
+    </script>
+</body>
+</html>
