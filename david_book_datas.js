@@ -5,7 +5,7 @@
 // 3. 上帝的第一人稱僅限於聖經原文直接引用。
 
 window.bookData = [
-    // Paper 1: Cover & Intro (How to use)
+     // Paper 1: 封面 & 目錄
     {
         front: {
             type: "cover",
@@ -15,6 +15,31 @@ window.bookData = [
             hint: "點擊 或 滑動 翻閱"
         },
         back: {
+            type: "guide",
+            title: "目錄",
+            paragraphs: [
+                "歡迎進入這段調整眼光的旅程。以下是本書的章節安排："
+            ],
+            list: [
+                "<strong>導讀：</strong>如何使用 & 本書目的",
+                "<strong>前言：</strong>主角介紹：大衛",
+                "<strong>第一章：</strong>被揀選的牧人",
+                "<strong>第二章：</strong>靠名得勝",
+                "<strong>第三章：</strong>曠野的保守",
+                "<strong>第四章：</strong>在神面前的卑微",
+                "<strong>第五章：</strong>神的大衛之約",
+                "<strong>第六章：</strong>公義的管教",
+                "<strong>第七章：</strong>患難中的投靠",
+                "<strong>第八章：</strong>順服神的安排",
+                "<strong>結語：</strong>核心啟示 & 視角對照",
+                "<strong>書本之外的故事</strong>"
+            ],
+            footer: "請翻頁開始閱讀..."
+        }
+    },
+    // Paper 2: 導讀 (如何使用 & 目的)
+    {
+        front: {
             type: "guide",
             title: "如何使用本書",
             paragraphs: [
@@ -27,11 +52,8 @@ window.bookData = [
                 "<strong>應用：</strong>將您的生命代入，神如何看您現在的處境？"
             ],
             footer: "願您在閱讀中，遇見那位書寫您生命故事的神。"
-        }
-    },
-    // Paper 2: Purpose & Chapter 1
-    {
-        front: {
+        },
+        back: {
             type: "guide",
             title: "本書的目的",
             paragraphs: [
@@ -44,6 +66,24 @@ window.bookData = [
                 "確信您的生命也在神的手中，祂必負責到底。"
             ],
             footer: "「耶和華是我的牧者，我必不致缺乏。」"
+        },
+    },
+    // Paper 3: 介紹 & 第一章
+    {
+        front: {
+            type: "guide", 
+            title: "主角介紹：大衛",
+            paragraphs: [
+                "<strong>大衛 (David)</strong>，意為「被愛的」。他是耶西的第八個兒子，屬猶大支派，生於伯利恆。",
+                "他的一生充滿傳奇色彩，集多種身分於一身：他是曠野中孤獨的<strong>牧羊人</strong>，是戰場上英勇的<strong>戰士</strong>，是宮廷中撫琴驅魔的<strong>音樂家</strong>，更是寫下大量讚美詩篇的<strong>詩人</strong>，最終成為以色列最偉大的<strong>君王</strong>。",
+                "聖經形容他是「合神心意的人」。這並非因為他完美無罪，而是因為他在軟弱跌倒時，擁有一顆真實悔改、單單依靠神的心。"
+            ],
+            list: [
+                "<strong>關鍵特質：</strong>謙卑、信心、順服、敬拜。",
+                "<strong>歷史地位：</strong>統一以色列王國，定都耶路撒冷。",
+                "<strong>屬靈意義：</strong>他是耶穌基督肉身的先祖，預表那要在永恆中作王的彌賽亞。"
+            ],
+            footer: "「我尋得耶西的兒子大衛，他是合我心意的人，凡事要遵行我的旨意。」"
         },
         back: {
             type: "story",
