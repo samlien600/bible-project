@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>約伯記：人生七大哉問</title>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script> 
+    <style>
+        :root {
+            --primary-bg: #121212; /* 更深邃的黑背景 */
+            --card-back: #1e1e1e;
+            --card-front: #f5f5f7;
+            --accent-gold: #d4af37; /* 更具質感的金 */
+            --accent-gold-glow: rgba(212, 175, 55, 0.4);
+            --text-color: #333;
+            --text-light: #f0f0f0;
+            --locked-color: #555;
+            --question-color: #c0392b; 
+            --bible-color: #2980b9; 
+            --answer-color: #27ae60; 
+            --prayer-bg: #fffbf0;
+            --prayer-border: #f39c12;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 滾動條美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            max-width: 800px;
+            width: 100%;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-family: "Georgia", "Times New Roman", serif;
+            color: var(--text-light);
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        h1 span {
+            color: var(--accent-gold);
+            display: block;
+            font-size: 0.5em;
+            margin-top: 8px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: sans-serif;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 進度條 */
+        .progress-container {
+            width: 85%;
+            max-width: 600px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-gold), #f1c40f);
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 10px var(--accent-gold-glow);
+        }
+
+        /* 卡牌網格區 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            width: 90%;
+            max-width: 1200px;
+            padding-bottom: 80px;
+        }
+
+        /* 卡牌本體設定 */
+        .card-container {
+            perspective: 1500px; /* 增加透視感 */
+            height: 680px; 
+            cursor: pointer;
+            width: 100%;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-container.flipped .card {
+            transform: rotateY(180deg);
+        }
+
+        .card-container.locked {
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: scale(0.98);
+            transition: all 0.3s ease;
+        }
+        
+        /* 為下一個可解鎖的卡牌添加呼吸效果 */
+        .card-container:not(.locked):not(.flipped) {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            padding: 0; /* 內容自己控制 padding */
+            box-sizing: border-box;
+            overflow: hidden; /* 圓角裁切 */
+            background-color: var(--card-front);
+        }
+
+        /* 正面 */
+        .front {
+            background: linear-gradient(135deg, #2b323b 0%, #1e1e1e 100%);
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            padding: 30px;
+        }
+
+        .front::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 20px;
+            border: 1px solid var(--accent-gold);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .front .q-number {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .front h3 {
+            font-size: 2.4rem;
+            margin: 0;
+            font-family: "Georgia", serif;
+            line-height: 1.2;
+            background: linear-gradient(to bottom, #fff, #bbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .front .q-mark {
+            font-size: 8rem;
+            color: rgba(255,255,255,0.03);
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 1.5rem;
+            color: var(--locked-color);
+            display: none;
+        }
+
+        .card-container.locked .lock-icon {
+            display: block;
+        }
+        
+        .card-container.locked .front h3 {
+            opacity: 0.3;
+            -webkit-text-fill-color: #777;
+        }
+
+        /* 背面 */
+        .back {
+            background-color: #fff;
+            color: var(--text-color);
+            transform: rotateY(180deg);
+            align-items: stretch;
+            justify-content: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .back-header {
+            background: var(--primary-bg);
+            color: var(--accent-gold);
+            padding: 18px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-gold);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            letter-spacing: 1px;
+        }
+
+        .q-section {
+            padding: 25px 25px 15px;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .q-section:last-child {
+            border-bottom: none;
+            padding-bottom: 30px;
+        }
+
+        .q-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .q-label::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .human-voice { color: var(--question-color); }
+        .human-voice::before { background-color: var(--question-color); }
+        
+        .bible-voice { color: var(--bible-color); }
+        .bible-voice::before { background-color: var(--bible-color); }
+        
+        .divine-voice { color: var(--answer-color); }
+        .divine-voice::before { background-color: var(--answer-color); }
+
+        /* 列表樣式優化 */
+        .q-list {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .q-list li {
+            margin-bottom: 12px;
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .q-list li::before {
+            content: "•";
+            color: var(--question-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        /* 經文區塊優化 */
+        .bible-box {
+            background-color: #f4f9fd;
+            margin: 10px 20px;
+            border-radius: 8px;
+            padding: 20px;
+            border: none;
+            border-left: 4px solid var(--bible-color);
+        }
+
+        .bible-text {
+            font-family: "Georgia", serif;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .bible-ref {
+            display: block;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        
+        /* 啟示區塊樣式 */
+        .answer-box {
+            background-color: #fdfefe;
+            flex-grow: 1;
+        }
+        
+        .answer-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #333;
+            margin: 0;
+            text-align: justify;
+        }
+
+        /* 終極拼圖區塊 */
+        #final-revelation {
+            width: 90%;
+            max-width: 800px;
+            background: #fff;
+            color: #1a252f;
+            padding: 60px 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s ease;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.3);
+            border: 1px solid var(--accent-gold);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #final-revelation::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--accent-gold), #f1c40f);
+        }
+
+        #final-revelation.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #final-revelation h2 {
+            font-family: "Georgia", serif;
+            font-size: 2.4rem;
+            margin-top: 0;
+            color: var(--primary-bg);
+        }
+        
+        .final-divider {
+            height: 3px;
+            width: 60px;
+            background: var(--accent-gold);
+            margin: 25px auto;
+            border-radius: 2px;
+        }
+
+        .final-text {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #444;
+            text-align: justify;
+            text-align-last: center;
+        }
+
+        .final-quote {
+            margin: 40px 0;
+            font-size: 1.6rem;
+            font-family: "Georgia", serif;
+            color: var(--primary-bg);
+            font-weight: bold;
+            font-style: italic;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .final-quote::before, .final-quote::after {
+            content: "“";
+            font-size: 3rem;
+            color: var(--accent-gold);
+            opacity: 0.3;
+            position: absolute;
+            font-family: serif;
+        }
+        .final-quote::before { top: -20px; left: -30px; }
+        .final-quote::after { content: "”"; bottom: -40px; right: -30px; }
+
+        /* 禱告卡樣式 */
+        .prayer-card {
+            background-color: var(--prayer-bg);
+            border: 2px dashed var(--prayer-border);
+            border-radius: 15px;
+            padding: 35px;
+            margin-top: 50px;
+            text-align: left;
+            position: relative;
+        }
+
+        .prayer-card::before {
+            content: "🙏";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 2px solid var(--prayer-border);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .prayer-title {
+            color: #d35400;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 15px;
+        }
+
+        .prayer-content {
+            font-family: "Georgia", serif;
+            color: #2c3e50;
+            line-height: 2;
+            font-size: 1.1rem;
+        }
+
+        /* Modal 優化 */
+        .modal {
+            display: flex;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px); /* 磨砂玻璃效果 */
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            padding: 20px;
+        }
+
+        .modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-content {
+            background-color: var(--glass-bg);
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--accent-gold);
+            animation: modalFadeIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 彈跳效果 */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-content h2 {
+            font-family: "Georgia", serif;
+            color: var(--primary-bg);
+            margin-top: 0;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .modal-content p {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: #444;
+            text-align: left;
+        }
+        
+        .modal-content .bible-ref {
+            font-style: normal;
+            color: var(--accent-gold);
+            font-weight: 700;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .modal-content ul {
+            text-align: left;
+            margin: 20px 0 30px;
+            padding-left: 0;
+            list-style: none;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .modal-content li {
+            margin-bottom: 12px;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #555;
+        }
+        
+        .modal-content li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modal-content li::before {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 1.2rem;
+        }
+        
+        .modal-content li:nth-child(1)::before { content: "🔐"; }
+        .modal-content li:nth-child(2)::before { content: "🃏"; }
+        .modal-content li:nth-child(3)::before { content: "🧩"; }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-gold), #b8860b);
+            color: #fff;
+            border: none;
+            padding: 14px 50px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(184, 134, 11, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.4);
+        }
+        
+        .modal-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* --- 手機版適配調整 (Mobile Optimization) --- */
+        @media (max-width: 768px) {
+            header { padding: 40px 20px 20px; }
+            h1 { font-size: 2.2rem; margin-bottom: 5px; }
+            .subtitle { font-size: 0.95rem; margin-bottom: 10px; }
+            
+            .card-grid { 
+                width: 92%; 
+                gap: 25px; 
+                grid-template-columns: 1fr; /* 單欄 */
+            }
+            
+            /* 卡牌高度改為視窗高度的比例，避免過長或過短 */
+            .card-container { 
+                height: 75vh; 
+                min-height: 550px; /* 最小高度保障 */
+                max-height: 750px;
+            } 
+            
+            .front h3 { font-size: 2rem; }
+            .front .q-mark { font-size: 6rem; bottom: -10px; }
+            
+            /* 背面內容調整 */
+            .q-section { padding: 20px 20px 15px; }
+            .bible-box { margin: 10px 15px; padding: 15px; }
+            .back-header { padding: 15px; position: sticky; top: 0; }
+            
+            /* 終極拼圖 */
+            #final-revelation { width: 92%; padding: 40px 25px; }
+            #final-revelation h2 { font-size: 1.8rem; }
+            .final-text { text-align: justify; text-align-last: left; font-size: 1rem; }
+            .final-quote { font-size: 1.3rem; margin: 30px 0; }
+            .prayer-card { padding: 25px 20px; }
+            .prayer-content { font-size: 1rem; line-height: 1.7; }
+            
+            /* Modal 手機版 */
+            .modal-content { 
+                padding: 30px 20px; 
+                max-height: 85vh; 
+            }
+            .modal-content h2 { font-size: 1.5rem; }
+            .modal-btn { width: 100%; }
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 說明彈窗 -->
+    <div id="intro-modal" class="modal">
+        <div class="modal-content">
+            <h2>歡迎來到<br>約伯記的心靈旅程</h2>
+            <p>《約伯記》出自<span class="bible-ref">舊約聖經</span>，是一部探討義人為何受苦、以及人類如何面對失控人生的古老智慧書。</p>
+            <p>這是一場循序漸進的體驗：</p>
+            <ul>
+                <li><strong>解鎖機制</strong>：卡牌必須按順序翻開，象徵人生無法跳過過程直接看結局。</li>
+                <li><strong>翻轉思考</strong>：點擊卡牌，正面是我們心中的吶喊，背面是來自永恆的啟示。</li>
+                <li><strong>最終拼圖</strong>：完成七個大哉問後，將揭示苦難的終極意義與解答。</li>
+            </ul>
+            <button class="modal-btn" onclick="closeModal()">開始旅程</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>約伯記<span>The Book of Job</span></h1>
+        <div class="subtitle">如果生命是一場無法預測的風暴，我們該如何錨定靈魂？<br>翻開七張卡牌，直面人生最尖銳的七個大哉問。</div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- 卡牌區 -->
+    <div class="card-grid">
+        
+        <!-- Q1 (1:9) -->
+        <div class="card-container" id="card-1" onclick="flipCard(1)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 01</div>
+                    <h3>為何是我？<br>Why Me?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「受害者」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>我努力工作、定期健檢、對人友善。我以為只要夠自律，就能掌控人生。</li>
+                            <li>結果呢？裁員名單有我，癌症報告寫著我的名字。</li>
+                            <li>這世界根本沒有邏輯！我那一生的「乖」，到底換來了什麼？</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「撒但回答耶和華說：『約伯敬畏神，豈是無故呢？』」</p>
+                        <span class="bible-ref">約伯記 1:9 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">苦難並不總是「善有善報」的數學公式。這不是對你罪行的懲罰，而是一場關於「信心」的屬靈爭戰。這挑戰了我們的動機：如果神收回了圍繞你的籬笆和賜福，你還願意敬畏祂嗎？撒但賭你的愛是廉價的（為了好處），但神賭你的愛是無價的。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2 (3:11) -->
+        <div class="card-container locked" id="card-2" onclick="flipCard(2)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 02</div>
+                    <h3>活著有何意義？<br>Meaning of Pain?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「絕望」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>滑開手機，每個人都在曬幸福，好像只有我在崩潰邊緣。</li>
+                            <li>藥也吃了，諮商也去了，但我還是找不到起床的理由。</li>
+                            <li>如果人生只是為了受苦和付帳單，為什麼不現在就結束？</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「我為何不出母胎而死？為何不出母腹絕氣？」</p>
+                        <span class="bible-ref">約伯記 3:11 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">神沒有因為約伯咒詛自己的生日而擊殺他。祂知道真實的痛需要出口。誠實的哀嘆勝過虛假的讚美。在絕望中依然向神呼喊，哪怕是憤怒的質問，也是一種深沈的信心。活著的意義，有時僅僅在於：你還在，而祂還沒有放手。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3 (40:8) - Is God Fair? - Previously Q4 -->
+        <div class="card-container locked" id="card-3" onclick="flipCard(3)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 03</div>
+                    <h3>神公平嗎？<br>Is God Fair?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「公義」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>打開新聞，戰爭、飢荒、貪官污吏逍遙法外；誠實的人卻繳不起房租。</li>
+                            <li>如果真的有神，祂是在滑手機嗎？</li>
+                            <li>這世界如果是祂設計的，那祂若不是無能，就是冷血。我要控告這位缺席的上帝！</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「你豈可廢棄我所擬定的？豈可定我有罪，好顯自己為義嗎？」</p>
+                        <span class="bible-ref">約伯記 40:8 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">我們常常站在法官的位置，試圖用有限的「公平」觀念去審判造物主。但神不是被告，祂是偉大的設計師。我們看見的是混亂的線頭，祂看見的是宏偉的織錦。祂沒有給我們解釋每一個細節，因為人的頭腦裝不下宇宙的藍圖；祂給我們的是祂絕對的主權。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q4 (42:2) - Who's in Control? - Previously Q5 -->
+        <div class="card-container locked" id="card-4" onclick="flipCard(4)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 04</div>
+                    <h3>誰在掌權？<br>Who's in Control?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「失控」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>全球暖化、股市崩盤、AI 取代工作... 這個世界變得太快、太危險。</li>
+                            <li>我拼命想抓住一點安全感，但一場疫情、一場戰爭就能讓一切歸零。</li>
+                            <li>這種隨時會失控的焦慮感，讓我無法呼吸。</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「我知道，你萬事都能做；你的旨意不能攔阻。」</p>
+                        <span class="bible-ref">約伯記 42:2 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">神向約伯展示了兇猛的鱷魚和巨大的河馬，這些都是人類無法馴服的野性力量。這世界充滿了我們無法控制的風險與混亂，但這一切都在神的權柄之下。真正的平安，不是你可以掌控一切，而是你知道誰在掌管一切。放下控制欲吧，那是你焦慮的根源。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5 (42:5) - Where is the Answer? - Previously Q6 -->
+        <div class="card-container locked" id="card-5" onclick="flipCard(5)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 05</div>
+                    <h3>答案在哪裡？<br>Where is the Answer?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「看見」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>我不要心靈雞湯，我不要神學理論。我在黑夜裡哭喊，回應我的只有冷氣機的嗡嗡聲。</li>
+                            <li>神啊，祢為什麼「已讀不回」？如果祢是真的，就給我一個信號啊！</li>
+                            <li>這種沈默，比受苦本身更讓我崩潰。</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「我從前風聞有你，現在親眼看見你。」</p>
+                        <span class="bible-ref">約伯記 42:5 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">最終，約伯得到的不是一份「苦難說明書」，而是神親自的顯現。當神在旋風中說話，約伯的痛苦並沒有馬上消失，但他的觀點改變了：從「風聞有神」變成了「親眼見神」。你靈魂深處最渴求的其實不是邏輯上的答案，而是「以馬內利」——知道神真實地與你同在。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6 (42:7) - Is it Karma? - Previously Q3 -->
+        <div class="card-container locked" id="card-6" onclick="flipCard(6)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 06</div>
+                    <h3>這是報應嗎？<br>Is it Karma?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「因果」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>朋友說：「你要正向思考，是你吸引了負能量。」</li>
+                            <li>網路上說：「一切都是因果，是你前世的問題。」</li>
+                            <li>這種說法比災難更傷人！好像我受苦是因為我不夠好。我不需要這種有毒的正能量。</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「耶和華對約伯說話以後，就對提幔人以利法說：「我的怒氣向你和你兩個朋友發作，因為你們議論我不如我的僕人約伯說的是。」</p>
+                        <span class="bible-ref">約伯記 42:7 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">神拒絕這種將祂貶低為「販賣機」的成功神學。神後來責備了約伯的朋友，因為他們用冷冰冰的教條去框住奧祕的苦難。在這個破碎的世界裡，義人受苦是一個深奧的謎。你的價值不取決於你現在的遭遇，也不取決於別人的評價。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q7 (42:10) - How to Heal? -->
+        <div class="card-container locked" id="card-7" onclick="flipCard(7)">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="q-number">Question 07</div>
+                    <h3>如何走出傷痛？<br>How to Heal?</h3>
+                    <div class="q-mark">?</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                <div class="card-face back">
+                    <div class="back-header">關於「饒恕」</div>
+                    <div class="q-section">
+                        <span class="q-label human-voice">現代人的吶喊</span>
+                        <ul class="q-list">
+                            <li>那些在我落魄時落井下石的人，那些在背後捅刀的「朋友」，我這輩子都不會原諒。</li>
+                            <li>叫我原諒？那太便宜他們了！</li>
+                            <li>但我發現，抱著這團火，燒傷的只有我自己。我該怎麼放手？</li>
+                        </ul>
+                    </div>
+                    <div class="q-section bible-box">
+                        <span class="q-label bible-voice">聖經經文</span>
+                        <p class="bible-text">「 約伯為他的朋友祈禱。耶和華就使約伯從苦境轉回，並且耶和華賜給他的比他從前所有的加倍。」</p>
+                        <span class="bible-ref">約伯記 42:10 (CUNP-神版)</span>
+                    </div>
+                    <div class="q-section answer-box">
+                        <span class="q-label divine-voice">約伯記的啟示</span>
+                        <p class="answer-text">醫治的關鍵時刻，發生在約伯「為朋友禱告」的時候。在那一刻，他選擇不再當一個受害者，而是成為一個祝福者。當你順服神去祝福那些傷害你的人，苦毒的鎖鏈就斷開了。饒恕不是為了對方，而是神賜給你釋放自己的鑰匙，讓你從苦境中轉回，生命變得更加寬廣。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 終極拼圖：隱藏直到全部翻開 -->
+    <div id="final-revelation">
+        <h2>大哉問的終章：答案是「誰」</h2>
+        <div class="final-divider"></div>
+        <div class="final-text">
+            <p>我們走過了七個大哉問，卻發現《約伯記》沒有給出一個邏輯上的「標準答案」。神從未解釋天上的賭局，也未說明苦難的數學公式。</p>
+            <p>然而，約伯得到了比「解釋」更珍貴的東西——<strong>神的同在</strong>。</p>
+            <p>當神在旋風中親自顯現，約伯的痛苦並沒有馬上消失，但他的<strong>「孤單」</strong>消失了。他發現，那位創造星辰、管理巨獸的主宰，竟然願意親自來到他的廢墟中與他對話。</p>
+            <p>苦難的終極意義，不在於釐清「為什麼發生」(Why)，而在於發現「是誰在掌權」(Who)。當我們擁有了神自己，我們就擁有了面對一切風暴的勇氣。</p>
+        </div>
+        
+        <div class="final-quote">
+            「我從前風聞有你，<br>現在親眼看見你。」
+        </div>
+
+        <div class="prayer-card">
+            <div class="prayer-title">🙏 決志禱告：在風暴中抓住神</div>
+            <div class="prayer-content">
+                親愛的天父：<br><br>
+                我承認，面對生命中的風暴與苦難，我常常感到憤怒、困惑，甚至想放棄。我一直在問「為什麼是我」，卻找不到答案。<br><br>
+                但今天，我選擇不再執著於「解釋」，而是轉向「祢」。我願意相信，即使在失控的環境中，祢依然掌權。求祢赦免我曾經的驕傲與不信，醫治我受傷的心。<br><br>
+                主啊，我不需要知道明天的所有細節，我只需要知道祢與我同在。求祢幫助我，像約伯一樣，在苦難中不是看見絕望，而是親眼看見祢的榮耀。<br><br>
+                奉耶穌基督的名禱告，阿們。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProgress = 0;
+        const totalCards = 7;
+
+        function flipCard(cardId) {
+            const cardContainer = document.getElementById(`card-${cardId}`);
+            
+            // 檢查是否鎖定
+            if (cardContainer.classList.contains('locked')) {
+                if (cardId !== currentProgress + 1) {
+                    cardContainer.style.animation = "shake 0.5s";
+                    setTimeout(() => cardContainer.style.animation = "", 500);
+                    return;
+                }
+            }
+
+            if (cardContainer.classList.contains('flipped')) {
+                return; 
+            }
+
+            cardContainer.classList.remove('locked');
+            cardContainer.classList.add('flipped');
+            currentProgress = cardId;
+
+            // 更新進度條
+            const percent = (currentProgress / totalCards) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            // 解鎖下一張牌
+            if (currentProgress < totalCards) {
+                const nextCard = document.getElementById(`card-${currentProgress + 1}`);
+                nextCard.style.opacity = "1";
+                nextCard.style.filter = "grayscale(0)";
+                nextCard.querySelector('.lock-icon').style.display = "none";
+                nextCard.querySelector('.front h3').style.opacity = "1";
+            }
+
+            // 完成
+            if (currentProgress === totalCards) {
+                setTimeout(() => {
+                    const revelation = document.getElementById('final-revelation');
+                    revelation.classList.add('visible');
+                    revelation.scrollIntoView({ behavior: 'smooth' });
+                }, 800);
+            }
+        }
+
+        // 關閉說明彈窗的函式
+        function closeModal() {
+            document.getElementById('intro-modal').classList.add('hidden');
+        }
+
+        // 自動顯示彈窗
+        window.onload = function() {
+            // 初始化
+        };
+    </script>
+    
+    <style>
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+
+</body>
+</html>
