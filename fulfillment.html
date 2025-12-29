@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>看見耶穌：舊約中的基督</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bible: {
+                            gold: '#C5A059',
+                            goldLight: '#E0C07F',
+                            dark: '#1A1816',
+                            cream: '#F9F7F2',
+                            creamDark: '#F0ECE4',
+                            red: '#8B0000',
+                            redLight: '#A52A2A',
+                            stone: '#5C5552'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                        'glow': '0 0 20px rgba(197, 160, 89, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F9F7F2;
+            color: #1A1816;
+            background-image: radial-gradient(#E5E0D8 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .hero-pattern {
+            background-color: #1A1816;
+            background-image: linear-gradient(rgba(26, 24, 22, 0.85), rgba(26, 24, 22, 0.95)), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C5A059' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F7F2; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5A059; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a88645; 
+        }
+
+        /* Card Hover Effects */
+        .book-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Filter Button Active State */
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn.active {
+            background-color: #1A1816;
+            color: #C5A059;
+            border-color: #1A1816;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fade In Up Animation Utility */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Menu Link Animation */
+        .mobile-link {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #mobile-menu.open .mobile-link {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #mobile-menu.open .mobile-link:nth-child(2) { transition-delay: 0.1s; } /* Logo container */
+        #mobile-menu.open .mobile-link:nth-child(3) { transition-delay: 0.2s; }
+        #mobile-menu.open .mobile-link:nth-child(4) { transition-delay: 0.3s; }
+        #mobile-menu.open .mobile-link:nth-child(5) { transition-delay: 0.4s; }
+        #mobile-menu.open .mobile-link:nth-child(6) { transition-delay: 0.5s; }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-bible-gold selection:text-white">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 bg-bible-dark/95 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <div class="w-10 h-10 rounded-full bg-bible-gold flex items-center justify-center text-bible-dark group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book-bible text-xl"></i>
+                    </div>
+                    <span class="text-white font-serif font-bold text-xl tracking-wider group-hover:text-bible-gold transition-colors">指向基督</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="text-gray-300 hover:text-bible-gold px-3 py-2 rounded-md text-sm font-medium transition tracking-wide">首頁</a>
+                        <a href="#foundation" class="text-gray-300 hover:text-bible-gold px-3 py-2 rounded-md text-sm font-medium transition tracking-wide">核心經文</a>
+                        <a href="#books" class="bg-bible-gold text-bible-dark hover:bg-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg hover:shadow-glow transition-all transform hover:-translate-y-0.5">
+                            探索舊約
+                        </a>
+                        <a href="#conclusion" class="text-gray-300 hover:text-bible-gold px-3 py-2 rounded-md text-sm font-medium transition tracking-wide">結語</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white p-2 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay (Moved OUTSIDE nav to ensure full viewport coverage) -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] bg-bible-dark/98 backdrop-blur-xl transform translate-x-full transition-transform duration-500 md:hidden flex flex-col justify-center items-center space-y-8 shadow-2xl">
+        <button id="close-menu-btn" class="absolute top-6 right-6 text-gray-400 hover:text-white p-2 hover:rotate-90 transition-transform duration-300">
+            <i class="fas fa-times text-3xl"></i>
+        </button>
+        
+        <!-- Mobile Menu Logo -->
+        <div class="mobile-link flex flex-col items-center space-y-3 mb-4">
+            <div class="w-16 h-16 rounded-full bg-bible-gold flex items-center justify-center text-bible-dark shadow-glow">
+                <i class="fas fa-book-bible text-3xl"></i>
+            </div>
+            <span class="text-white font-serif font-bold text-xl tracking-widest">指向基督</span>
+        </div>
+
+        <a href="#home" class="mobile-link text-2xl font-serif text-white hover:text-bible-gold transition transform hover:scale-105">首頁</a>
+        <a href="#foundation" class="mobile-link text-2xl font-serif text-white hover:text-bible-gold transition transform hover:scale-105">核心經文</a>
+        <a href="#books" class="mobile-link text-2xl font-serif text-bible-gold font-bold border-b-2 border-bible-gold pb-1 transform hover:scale-105">探索舊約</a>
+        <a href="#conclusion" class="mobile-link text-2xl font-serif text-white hover:text-bible-gold transition transform hover:scale-105">結語</a>
+        
+        <div class="mobile-link mt-8 pt-8 border-t border-white/10 text-gray-500 text-sm tracking-widest uppercase">
+            Soli Deo Gloria
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative hero-pattern pt-32 pb-24 lg:pt-56 lg:pb-40 overflow-hidden flex items-center justify-center min-h-[80vh]">
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center fade-in-up">
+            <div class="inline-block mb-6 px-4 py-1 rounded-full border border-bible-gold/30 bg-bible-gold/10 text-bible-gold text-sm tracking-[0.2em] font-serif uppercase">The Old Testament</div>
+            <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-8 leading-tight drop-shadow-lg">
+                舊約聖經<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-bible-gold to-yellow-200">都在訴說祂的故事</span>
+            </h1>
+            <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-300 font-light leading-relaxed">
+                從創世記的創造到瑪拉基書的預言，舊約中的每一卷書<br class="hidden md:block">都是指向耶穌基督的影子、預表與應許。
+            </p>
+            <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4 px-4">
+                <a href="#foundation" class="px-8 py-4 border border-bible-gold text-bible-gold rounded-full font-bold hover:bg-bible-gold hover:text-bible-dark transition-all duration-300 w-full sm:w-auto">
+                    閱讀核心經文
+                </a>
+                <a href="#books" class="px-8 py-4 bg-bible-red text-white rounded-full font-bold shadow-lg hover:bg-red-700 hover:shadow-glow transition-all duration-300 w-full sm:w-auto flex items-center justify-center gap-2">
+                    開始探索 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Decoration Gradient -->
+        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#F9F7F2] to-transparent"></div>
+    </section>
+
+    <!-- Foundation Section -->
+    <section id="foundation" class="py-20 md:py-32 max-w-6xl mx-auto px-4">
+        <div class="text-center mb-16 fade-in-up">
+            <span class="text-bible-red font-bold tracking-[0.2em] uppercase text-xs md:text-sm">Our Foundation</span>
+            <!-- 標題修改 -->
+            <h2 class="text-3xl md:text-5xl font-serif font-bold text-bible-dark mt-3">從迷惘到火熱：以馬忤斯路上的遇見</h2>
+            <div class="h-1 w-24 bg-bible-gold mx-auto mt-6 rounded-full"></div>
+        </div>
+
+        <!-- Background Context -->
+        <div class="mb-12 bg-white/60 p-8 rounded-2xl border-l-4 border-bible-stone max-w-5xl mx-auto backdrop-blur-sm fade-in-up delay-100 shadow-soft">
+            <h3 class="font-bold text-lg text-bible-stone mb-4 uppercase tracking-wide">
+                <i class="fas fa-history mr-2"></i>背景詳解：復活日的關鍵時刻
+            </h3>
+            <div class="grid md:grid-cols-2 gap-8 text-gray-700 leading-relaxed font-serif text-lg">
+                <div>
+                    <h4 class="font-bold text-bible-dark mb-3 flex items-center text-xl">
+                        <i class="far fa-clock mr-2 text-bible-gold"></i> 下午：以馬忤斯路上的困惑
+                    </h4>
+                    <div class="space-y-3 text-base text-justify">
+                        <p>
+                            那是七日的第一日，革流巴與同伴正從耶路撒冷走向約十一公里外的以馬忤斯。他們的腳步沉重，臉上帶著愁容，因為他們素來盼望能救贖以色列的那位拿撒勒人耶穌，三天前被釘死在十字架上了。
+                        </p>
+                        <p>
+                            雖然聽聞婦女們說祂活了，但他們理智上無法接受。就在這信仰崩塌的時刻，復活的主親自走近同行，雖未被認出，卻耐心聆聽他們的絕望。主責備他們信得太遲鈍，並沿路從摩西和眾先知講起，將經文解開。這不僅是一堂神學課，更是對受傷心靈的親自牧養，使他們冰冷的心重新火熱起來。
+                        </p>
+                    </div>
+                </div>
+                <div class="md:border-l md:border-bible-stone/20 md:pl-8">
+                    <h4 class="font-bold text-bible-dark mb-3 flex items-center text-xl">
+                        <i class="fas fa-moon mr-2 text-bible-gold"></i> 晚上：耶路撒冷樓房的顯現
+                    </h4>
+                    <div class="space-y-3 text-base text-justify">
+                        <p>
+                            被主點燃的兩個門徒顧不得天色已晚，立時起身趕回耶路撒冷。當時十一個使徒因怕猶太人，將門緊緊關閉，但內部卻因「主果然復活，已經現給西門看了」的消息而騷動不已。
+                        </p>
+                        <p>
+                            就在他們彼此分享時，耶穌親自站在當中說：「願你們平安！」祂展示帶釘痕的手腳，甚至吃了一片燒魚，證實祂不是魂，而是有骨有肉的復活身體。接著，祂開啟全體門徒的心竅，正式宣告舊約的三重架構——律法、先知與詩篇——都必須應驗在祂身上，並託付他們從耶路撒冷起，將悔改赦罪的道傳遍萬邦。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripture -->
+        <div class="max-w-5xl mx-auto fade-in-up delay-200">
+            <div class="bg-white p-8 md:p-12 rounded-2xl shadow-2xl border-t-8 border-bible-gold relative">
+                <i class="fas fa-quote-left text-5xl text-bible-gold/10 absolute top-6 left-6"></i>
+                <i class="fas fa-quote-right text-5xl text-bible-gold/10 absolute bottom-6 right-6"></i>
+                
+                <div class="grid md:grid-cols-2 gap-12 relative z-10">
+                    <!-- Quote 1: Emmaus Road (vv. 25-27) -->
+                    <div class="text-center md:text-left flex flex-col justify-center">
+                        <div class="mb-3 flex justify-center md:justify-start">
+                            <span class="text-xs font-bold tracking-widest text-bible-stone/60 uppercase border border-bible-stone/20 px-2 py-1 rounded">在路上</span>
+                        </div>
+                        <blockquote class="font-serif text-lg leading-relaxed text-bible-dark font-medium mb-4">
+                            「耶穌對他們說：『無知的人哪，先知所說的一切話，你們的心信得太遲鈍了。基督這樣受害，又進入他的榮耀，豈不是應當的嗎？』於是從<span class="text-bible-red bg-red-50 px-1 rounded">摩西和眾先知</span>起，凡經上所指着自己的話都給他們講解明白了。」
+                        </blockquote>
+                        
+                        <!-- 經文出處在最下方 -->
+                        <div class="mt-1 flex flex-col md:items-start items-center">
+                            <h4 class="text-bible-stone font-serif italic text-lg">路加福音 24:25-27</h4>
+                        </div>
+                    </div>
+
+                    <!-- Divider for Mobile -->
+                    <div class="md:hidden h-px bg-gray-200 w-full"></div>
+
+                    <!-- Quote 2: Upper Room (vv. 44-45) -->
+                    <div class="text-center md:text-left flex flex-col justify-center md:border-l md:border-gray-100 md:pl-12">
+                        <!-- 位置標籤移到最上方 -->
+                        <div class="mb-3 flex justify-center md:justify-start">
+                            <span class="text-xs font-bold tracking-widest text-bible-stone/60 uppercase border border-bible-stone/20 px-2 py-1 rounded">在耶路撒冷</span>
+                        </div>
+
+                        <blockquote class="font-serif text-lg leading-relaxed text-bible-dark font-medium mb-4">
+                            「耶穌對他們說：『這就是我從前與你們同在之時所告訴你們的話說：<span class="text-bible-red bg-red-50 px-1 rounded">摩西的律法、先知的書，和詩篇</span>上所記的，凡指着我的話都必須應驗。』於是耶穌開他們的心竅，使他們能明白聖經。」
+                        </blockquote>
+                        
+                        <!-- 經文出處在最下方 -->
+                        <div class="mt-1 flex flex-col md:items-start items-center">
+                            <h4 class="text-bible-stone font-serif italic text-lg">路加福音 24:44-45</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Principle Info -->
+        <div class="mt-12 bg-bible-gold/10 p-8 rounded-2xl border border-bible-gold/20 text-center max-w-3xl mx-auto fade-in-up delay-300">
+            <h3 class="font-bold text-xl text-bible-dark mb-3"><i class="fas fa-info-circle mr-2"></i>解經原則</h3>
+            <p class="text-gray-700 text-lg">
+                耶穌親自教導我們，舊約不是散亂的歷史，而是一個完整的<strong>救贖歷史</strong>，其核心焦點只有一個：<strong>耶穌基督的受難與榮耀</strong>。
+            </p>
+        </div>
+    </section>
+
+    <!-- The Books Section -->
+    <section id="books" class="py-20 bg-white relative">
+        <!-- Background Decor -->
+        <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-[#F9F7F2] to-white"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-bible-dark">舊約中的基督</h2>
+                <p class="mt-4 text-gray-500 text-lg">共有 39 卷書，點擊下方分類，探索每一卷書如何預表那位救主。</p>
+            </div>
+
+            <!-- Filter Buttons (Mobile Scrollable) -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12 sticky top-20 z-30 bg-white/95 backdrop-blur py-4 -mx-4 px-4 shadow-sm md:static md:bg-transparent md:shadow-none md:p-0 fade-in-up delay-100" id="filters">
+                <button class="category-btn active px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="all">全部 (39)</button>
+                <button class="category-btn px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="law">律法書 (5)</button>
+                <button class="category-btn px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="history">歷史書 (12)</button>
+                <button class="category-btn px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="poetry">詩歌智慧書 (5)</button>
+                <button class="category-btn px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="major_prophets">大先知書 (5)</button>
+                <button class="category-btn px-6 py-2.5 rounded-full border border-gray-200 bg-white text-gray-600 font-bold hover:bg-gray-50 text-sm md:text-base whitespace-nowrap" data-filter="minor_prophets">小先知書 (12)</button>
+            </div>
+
+            <!-- Grid Container -->
+            <div id="books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[500px]">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section id="conclusion" class="py-24 bg-bible-dark text-bible-cream relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div class="absolute right-0 top-0 w-96 h-96 bg-bible-gold rounded-full filter blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute left-0 bottom-0 w-64 h-64 bg-bible-gold rounded-full filter blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center fade-in-up">
+            <h2 class="text-3xl md:text-5xl font-serif font-bold text-bible-gold mb-10 tracking-tight">結語：救贖歷史的宏大敘事</h2>
+            <div class="w-24 h-1 bg-bible-gold mx-auto mb-12 rounded-full"></div>
+            
+            <div class="space-y-8 text-lg md:text-xl leading-relaxed font-light text-gray-300 text-justify">
+                <p>
+                    當我們縱覽舊約這 39 卷書時，我們看見的不是零散的歷史片段，也不是枯燥的律法條文，而是一幅<strong>貫穿亙古的救贖藍圖</strong>。整本聖經雖然由不同時代、不同背景的作者寫成，卻由同一位聖靈默示，共同講述這一個宏大的故事：<strong>神如何尋回祂失喪的百姓</strong>。
+                </p>
+                <p>
+                    舊約是<strong>應許</strong>，新約是<strong>應驗</strong>；舊約是<strong>預備</strong>，新約是<strong>成全</strong>。從伊甸園中「女人的後裔」，到亞伯拉罕的「萬國得福」；從逾越節的「代罪羔羊」，到大衛的「永恆國度」，所有的線索都匯聚在十字架上。如同使徒保羅所宣告：「神的應許，不論有多少，在基督都是是的」（林後 1:20）。
+                </p>
+                <p>
+                    若沒有基督，舊約是一部沒有結局的小說，是一場沒有新郎的婚禮。但藉著基督的亮光，我們看見律法不再是定罪的規條，而是恩典的影兒；歷史不再是人類的失敗紀錄，而是神信實的見證。基督是那<strong>更美的實體</strong>，祂成全了律法，滿足了公義，並將我們帶入與父神和好的榮耀中。
+                </p>
+                <p>
+                    願我們每一次翻開舊約，都能經歷以馬忤斯路上的「心裡火熱」。不單是頭腦明白真理，而是在基督被看見、聖經被解開的時候，我們的心自然被恩典更新，將榮耀歸給那位<strong>昔在、今在、以後永在的全能者</strong>。因為預言中的靈意，乃是為耶穌作見證（啟 19:10）。
+                </p>
+            </div>
+
+            <div class="mt-16 pt-10 border-t border-bible-gold/20 grid md:grid-cols-2 gap-8 items-center text-left">
+                <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+                     <p class="font-serif text-xl italic text-bible-gold leading-normal mb-3">
+                        「神的應許，不論有多少，<br>在基督都是是的。<br>所以藉着他也都是實在的，<br>叫神因我們得榮耀。」
+                    </p>
+                    <p class="text-xs tracking-widest text-gray-500 uppercase font-bold">— 哥林多後書 1:20</p>
+                </div>
+                <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+                    <p class="font-serif text-xl italic text-bible-gold leading-normal mb-3">
+                        「神既在古時藉着眾先知<br>多次多方地曉諭列祖，<br>就在這末世藉着他兒子<br>曉諭我們...」
+                    </p>
+                    <p class="text-xs tracking-widest text-gray-500 uppercase font-bold">— 希伯來書 1:1-2</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-16 border-t border-bible-stone/30">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-8 flex justify-center">
+                <div class="w-16 h-16 rounded-full bg-bible-dark border border-bible-gold/30 flex items-center justify-center text-bible-gold text-2xl">
+                    <i class="fas fa-cross"></i>
+                </div>
+            </div>
+            <h3 class="font-serif text-xl md:text-2xl mb-6 text-gray-200">你們查考聖經，因你們以為內中有永生；<br>給我作見證的就是這經。</h3>
+            <p class="text-bible-stone text-sm tracking-widest uppercase">約翰福音 5:39</p>
+            <div class="mt-12 pt-8 border-t border-gray-900 text-gray-600 text-sm flex flex-col md:flex-row justify-center items-center gap-4">
+                <p>Jesus is coming soon.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top -->
+    <button id="scrollToTop" class="fixed bottom-6 right-6 bg-bible-gold text-bible-dark w-12 h-12 rounded-full shadow-lg items-center justify-center hidden hover:bg-white hover:text-bible-gold transition-all duration-300 z-40 transform hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- External Data Source -->
+    <script src="fulfillment_datas.js"></script>
+
+    <script>
+        // --- 1. Mobile Menu Logic ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            const isOpen = !mobileMenu.classList.contains('translate-x-full');
+            if (isOpen) {
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('open'); // Trigger animation
+                document.body.style.overflow = 'auto'; // Enable scroll
+            } else {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Disable scroll
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+        
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // --- 2. Navbar Scroll Effect ---
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.classList.add('bg-bible-dark/95');
+                navbar.classList.remove('bg-transparent');
+            } else {
+                navbar.classList.remove('shadow-lg');
+                // Keep background on mobile view context, mainly for desktop hero transparency
+                // But here we set initial to dark/95 so we just toggle shadow mainly
+            }
+        });
+
+        // --- 3. Intersection Observer for Fade In Animation ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
+
+        // --- 4. Book Rendering Logic ---
+        const grid = document.getElementById('books-grid');
+        const btns = document.querySelectorAll('.category-btn');
+
+        function renderBooks(filter) {
+            // Error handling if JS not loaded
+            if (typeof books === 'undefined') {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-50 rounded-lg border border-red-100">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-red-700 font-bold">無法讀取書籍資料</p>
+                        <p class="text-sm text-red-500 mt-1">請確認 books.js 檔案位於相同目錄下</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            const filteredBooks = filter === 'all' ? books : books.filter(b => {
+                return b.category === filter;
+            });
+
+            if (filteredBooks.length === 0) {
+                 grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">沒有找到相關書籍</div>';
+                 return;
+            }
+
+            filteredBooks.forEach((book, index) => {
+                const card = document.createElement('div');
+                card.className = 'book-card bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden flex flex-col h-full opacity-0 transform translate-y-8';
+                
+                // Add staggered animation delay
+                card.style.animation = `fadeInCard 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${index * 0.05}s`;
+                
+                let iconClass = 'fa-scroll';
+                let categoryLabel = '';
+                let categoryColor = 'text-gray-400';
+                
+                if(book.category === 'law') { iconClass = 'fa-gavel'; categoryLabel = '律法書'; categoryColor = 'text-blue-800 bg-blue-50'; }
+                if(book.category === 'history') { iconClass = 'fa-landmark'; categoryLabel = '歷史書'; categoryColor = 'text-orange-800 bg-orange-50'; }
+                if(book.category === 'poetry') { iconClass = 'fa-music'; categoryLabel = '詩歌智慧'; categoryColor = 'text-purple-800 bg-purple-50'; }
+                if(book.category === 'major_prophets') { iconClass = 'fa-bullhorn'; categoryLabel = '大先知書'; categoryColor = 'text-red-900 bg-red-100'; }
+                if(book.category === 'minor_prophets') { iconClass = 'fa-bullhorn'; categoryLabel = '小先知書'; categoryColor = 'text-rose-600 bg-rose-50'; }
+
+                // COMPACT CARD DESIGN WITH TAG THEME
+                card.innerHTML = `
+                    <div class="p-5 flex-grow flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-xl font-bold font-serif text-bible-dark leading-tight">${book.name}</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                     <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${categoryColor}">${categoryLabel}</span>
+                                     <span class="text-xs text-gray-400 font-serif font-medium">${book.ref}</span>
+                                </div>
+                            </div>
+                            <i class="fas ${iconClass} text-bible-gold/30 text-lg mt-1"></i>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-bible-cream border border-bible-gold/20 text-bible-red text-xs font-bold shadow-sm">
+                                <i class="fas fa-tag text-[10px] opacity-60"></i>
+                                ${book.theme}
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 text-sm leading-relaxed text-justify">
+                            ${book.desc}
+                        </p>
+                    </div>
+                    <div class="h-1 w-full bg-gradient-to-r from-bible-gold to-white"></div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- 5. Custom Animation for Cards ---
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeInCard {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // --- 6. Event Listeners ---
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active', 'bg-bible-dark', 'text-bible-gold', 'border-bible-dark'));
+                btns.forEach(b => b.classList.add('bg-white', 'text-gray-600', 'border-gray-200'));
+                
+                // Active state styles
+                btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                btn.classList.add('active', 'bg-bible-dark', 'text-bible-gold', 'border-bible-dark');
+                
+                renderBooks(btn.dataset.filter);
+            });
+        });
+
+        const scrollToTopBtn = document.getElementById("scrollToTop");
+        window.onscroll = function() {
+            // Navbar logic repeated here for safety or combine
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg', 'bg-bible-dark/95');
+            }
+            
+            // Scroll to top button logic
+            if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+                scrollToTopBtn.classList.remove("hidden");
+                scrollToTopBtn.classList.add("flex");
+            } else {
+                scrollToTopBtn.classList.remove("flex");
+                scrollToTopBtn.classList.add("hidden");
+            }
+        };
+
+        scrollToTopBtn.addEventListener("click", function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // --- 7. Initialization ---
+        window.addEventListener('load', () => {
+            renderBooks('all');
+            // Force active state on first button
+            const firstBtn = document.querySelector('.category-btn[data-filter="all"]');
+            if(firstBtn) {
+                firstBtn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                firstBtn.classList.add('active', 'bg-bible-dark', 'text-bible-gold', 'border-bible-dark');
+            }
+        });
+
+    </script>
+</body>
+</html>
