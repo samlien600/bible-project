@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經考古：救贖之旅 (幻燈片版)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Leaflet CSS (地圖樣式) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <style>
+        :root {
+            --primary-color: #3e2723;
+            --accent-color: #bf360c;
+            --archaeology-color: #558b2f;
+            --bg-color: #f9f7f2;
+            --text-color: #4e342e;
+            --card-bg: #ffffff;
+            --shadow-soft: 0 10px 30px rgba(62, 39, 35, 0.08);
+            --shadow-hover: 0 15px 40px rgba(62, 39, 35, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Noto Serif TC", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 頂部導航列 --- */
+        header {
+            background-color: #ffffff;
+            color: var(--primary-color);
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chapter-indicator {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(62, 39, 35, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .chapter-indicator:hover {
+            background-color: #eee;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chapter-indicator::after {
+            content: 'ℹ';
+            font-size: 0.8rem;
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 5px;
+        }
+
+        /* --- 主內容區 --- */
+        main {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 50px - 60px);
+            max-width: 100%;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        /* 左側：文字資訊 */
+        .info-panel {
+            flex: 3;
+            padding: 25px 30px;
+            overflow-y: auto;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.05);
+            scrollbar-width: thin;
+            scrollbar-color: #d7ccc8 transparent;
+        }
+        
+        .info-panel::-webkit-scrollbar { width: 6px; }
+        .info-panel::-webkit-scrollbar-thumb { background-color: #d7ccc8; border-radius: 3px; }
+
+        /* 地點標題區 */
+        .location-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(62, 39, 35, 0.1);
+            position: relative;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .site-id {
+            color: var(--accent-color);
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0;
+            opacity: 0.8;
+        }
+
+        .site-name-large {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 0;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .site-eng {
+            font-family: 'Lato', sans-serif;
+            color: #8d6e63;
+            font-size: 1.0rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .content-group { margin-bottom: 20px; }
+        
+        .content-label {
+            font-size: 0.8rem;
+            color: var(--archaeology-color);
+            margin-bottom: 6px;
+            display: inline-block;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(85, 139, 47, 0.3);
+            padding-bottom: 2px;
+        }
+
+        .archaeology-text {
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: justify;
+            padding-left: 12px;
+            border-left: 3px solid var(--archaeology-color);
+            background: linear-gradient(to right, rgba(85, 139, 47, 0.05), transparent);
+            padding: 10px 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .site-image-container {
+            margin-top: 5px;
+            width: 100%;
+            height: 220px;
+            background-color: #eceff1;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            cursor: zoom-in; /* 提示可放大 */
+            transition: transform 0.3s ease;
+        }
+        
+        .site-image-container:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        /* 放大鏡提示圖示 */
+        .site-image-container::after {
+            content: '🔍';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.8);
+            padding: 5px;
+            border-radius: 50%;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .site-image-container:hover::after {
+            opacity: 1;
+        }
+
+        .site-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 修改為 contain 以完整顯示圖片 */
+            transition: transform 0.5s ease;
+        }
+        .site-image:hover { transform: scale(1.03); }
+
+        /* 輪播按鈕 */
+        .img-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.3s;
+            display: none; /* 預設隱藏，有多圖時 JS 開啟 */
+        }
+        
+        .img-nav-btn:hover { background: rgba(0, 0, 0, 0.6); }
+        .img-nav-btn.prev { left: 0; border-radius: 0 4px 4px 0; }
+        .img-nav-btn.next { right: 0; border-radius: 4px 0 0 4px; }
+
+        /* 輪播圓點 */
+        .img-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .img-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .img-dot.active { background: white; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
+
+        .img-placeholder {
+            color: #90a4ae;
+            font-size: 0.85rem;
+            padding: 20px;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* 右側：地圖 */
+        .map-panel {
+            flex: 7;
+            position: relative;
+            background-color: #e0e0e0;
+        }
+
+        #map-frame {
+            width: 100%;
+            height: 100%;
+            background-color: #e5e3df; /* Google Map 預設底色 */
+            z-index: 1;
+        }
+
+        /* 右上角地圖按鈕 */
+        .map-external-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #444;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            font-family: 'Lato', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .map-external-btn:hover {
+            background-color: #fff;
+            color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* 地點資訊卡 (Desktop: 右下方, Mobile: 點擊後顯示) */
+        .map-info-card {
+            position: absolute;
+            bottom: 25px; 
+            right: 25px;
+            left: auto;
+            width: 320px;
+            max-width: 85%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-left: 6px solid var(--accent-color);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s;
+        }
+
+        .map-info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.18);
+        }
+
+        /* 卡片關閉按鈕 (僅手機版顯示較有意義，但都加上以防萬一) */
+        .card-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #999;
+            font-size: 1.2rem;
+            line-height: 1;
+            cursor: pointer;
+            display: none; /* 預設隱藏，手機版Active時顯示 */
+        }
+
+        .card-location-name {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-role {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: inline-block;
+            background: rgba(191, 54, 12, 0.1);
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .card-story {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #3e2723;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .card-bible {
+            font-size: 0.85rem;
+            color: #795548;
+            font-style: italic;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .card-bible::before { content: '📖'; margin-right: 8px; }
+
+        .map-error-msg {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center; color: #757575; width: 80%;
+            pointer-events: none; z-index: 1; display: none;
+        }
+
+        /* 地圖標籤樣式 */
+        .map-label {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            font-family: "Noto Serif TC", serif;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            padding: 4px 10px;
+            white-space: nowrap;
+            overflow: visible; 
+            margin-bottom: 0;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+        }
+        
+        .leaflet-tooltip-top:before, 
+        .leaflet-tooltip-bottom:before, 
+        .leaflet-tooltip-left:before, 
+        .leaflet-tooltip-right:before {
+            display: none;
+        }
+
+        .map-label:before {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+
+        .map-label:after {
+            content: "";
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.98) transparent transparent transparent;
+        }
+
+        /* --- Footer --- */
+        footer {
+            height: 60px;
+            background-color: #ffffff;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .control-group { display: flex; align-items: center; gap: 20px; }
+
+        button.nav-btn {
+            padding: 8px 25px; border: none; border-radius: 50px;
+            font-size: 0.95rem; cursor: pointer;
+            transition: all 0.3s; font-weight: 600;
+            display: flex; align-items: center;
+        }
+        button.nav-btn:active { transform: scale(0.96); }
+
+        #btn-prev { background-color: #f5f5f5; color: #616161; }
+        #btn-next { background-color: var(--primary-color); color: white; box-shadow: 0 8px 20px rgba(62, 39, 35, 0.25); }
+        button.nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        #btn-next.conclusion-btn {
+            background-color: #27ae60;
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+        }
+        #btn-next.conclusion-btn:hover {
+            background-color: #219150;
+            transform: translateY(-2px);
+        }
+
+        .progress-indicator {
+            font-size: 0.9rem; color: #8d6e63;
+            min-width: 80px; text-align: center; font-weight: 700;
+        }
+
+        /* --- 章節過場 Modal --- */
+        .chapter-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(62, 39, 35, 0.9);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .chapter-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 40px 50px;
+            width: 800px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-top: 6px solid var(--accent-color);
+        }
+
+        .chapter-modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-chapter-title {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .modal-chapter-intro {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #5d4037;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        .modal-close-btn {
+            padding: 12px 35px;
+            font-size: 1rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(191, 54, 12, 0.4);
+        }
+
+        .modal-close-btn:hover {
+            background-color: #d84315;
+            transform: translateY(-2px);
+        }
+
+        /* --- 圖片燈箱 (Lightbox) 樣式 --- */
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-lightbox.active { opacity: 1; }
+
+        .lightbox-content {
+            margin: auto;
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            object-fit: contain;
+        }
+
+        .image-lightbox.active .lightbox-content { transform: scale(1); }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px; right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 3001;
+        }
+        .lightbox-close:hover { color: #bbb; text-decoration: none; }
+
+        .lightbox-caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: auto;
+            font-size: 1.1rem;
+            font-family: 'Lato', sans-serif;
+        }
+
+        /* 燈箱內導航按鈕 */
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 3rem;
+            padding: 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.3s;
+            z-index: 3002;
+        }
+        .lightbox-nav:hover { color: var(--accent-color); }
+        .lightbox-prev { left: 20px; }
+        .lightbox-next { right: 20px; }
+
+        /* --- RWD 手機版優化 --- */
+        @media (max-width: 1024px) {
+            body { overflow: auto; height: auto; }
+            main { flex-direction: column; height: auto; overflow: visible; padding-bottom: 70px; }
+            .map-panel { height: 45vh; min-height: 250px; order: -1; flex: none; position: sticky; top: 0; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+            .info-panel { order: 1; padding: 25px 20px; overflow: visible; height: auto; background: white; position: relative; z-index: 10; }
+            
+            /* 手機版：預設隱藏資訊卡 */
+            .map-info-card { 
+                display: none; 
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-width: none;
+                padding: 15px 15px 10px 15px;
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 8px;
+            }
+
+            /* 手機版 Active 狀態：顯示 */
+            .map-info-card.active {
+                display: block;
+                animation: slideUp 0.3s ease;
+            }
+            
+            /* 手機版：展開顯示完整資訊 */
+            .map-info-card.expanded .card-story,
+            .map-info-card.expanded .card-bible {
+                display: block;
+                margin-top: 10px;
+                border-top: 1px solid #eee;
+                padding-top: 10px;
+            }
+            
+            .map-info-card.expanded {
+                max-height: 60vh; /* 限制高度，避免遮擋太多 */
+                overflow-y: auto; /* 內容過多時可捲動 */
+            }
+
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            
+            /* 手機版顯示關閉按鈕 */
+            .card-close-btn { display: block; }
+
+            /* 手機版隱藏詳細內容，只留標題與角色 */
+            .map-info-card .card-story, 
+            .map-info-card .card-bible {
+                display: none;
+            }
+            
+            .map-info-card .card-location-name {
+                font-size: 1.1rem;
+                margin-bottom: 2px;
+            }
+            
+            .map-info-card .card-role {
+                margin-bottom: 0;
+                font-size: 0.75rem;
+                padding: 2px 8px;
+            }
+
+            footer { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-top: 1px solid #ddd; }
+            .modal-content { padding: 30px 20px; width: 95%; }
+            .modal-chapter-title { font-size: 1.5rem; }
+            .modal-chapter-intro { font-size: 1rem; }
+            h1 { font-size: 1rem; }
+            header { padding: 0 15px; }
+            .lightbox-close { top: 10px; right: 20px; font-size: 35px; }
+            .lightbox-nav { font-size: 2rem; padding: 10px; }
+        }
+    </style>
+    
+    <!-- 引入 Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+
+<!-- 圖片燈箱 Modal -->
+<div id="image-lightbox" class="image-lightbox">
+    <span class="lightbox-close">&times;</span>
+    <div class="lightbox-nav lightbox-prev" style="display:none;">❮</div>
+    <div class="lightbox-nav lightbox-next" style="display:none;">❯</div>
+    <img class="lightbox-content" id="lightbox-img">
+    <div id="lightbox-caption" class="lightbox-caption"></div>
+</div>
+
+<!-- 章節/結語 Modal -->
+<div id="chapter-modal" class="chapter-modal">
+    <div class="modal-content">
+        <h2 id="modal-chapter-title" class="modal-chapter-title"></h2>
+        <div id="modal-chapter-intro" class="modal-chapter-intro"></div>
+        <button id="modal-close-btn" class="modal-close-btn">繼續旅程</button>
+    </div>
+</div>
+
+<header>
+    <h1>聖經考古救贖之旅</h1>
+    <!-- 章節按鈕 -->
+    <button class="chapter-indicator" id="chapter-display" title="點擊查看章節背景">載入中...</button>
+</header>
+
+<main>
+    <!-- 左側資訊：考古與圖片 -->
+    <div class="info-panel">
+        <div class="location-header">
+            <span class="site-id" id="site-id">#00</span>
+            <span class="site-name-large" id="site-name-left">地點名稱</span>
+            <span class="site-eng" id="site-eng">English Name</span>
+        </div>
+
+        <div class="content-group">
+            <span class="content-label">考古發現與描述</span>
+            <div class="archaeology-text" id="site-archaeology">
+                考古描述...
+            </div>
+            <!-- 考古連結按鈕 -->
+            <a href="#" target="_blank" id="archaeo-link" class="archaeo-link-btn" title="查看更多考古資料" style="margin-top: 15px; display: inline-block; padding: 6px 15px; border: 1px solid var(--archaeology-color); border-radius: 20px; color: var(--archaeology-color); text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.2s;">
+                📚 延伸閱讀：考古資料來源 ↗
+            </a>
+        </div>
+
+        <div class="content-group">
+            <span class="content-label">考古現場影像</span>
+            <!-- 圖片容器 (含輪播按鈕) -->
+            <div class="site-image-container" title="點擊放大圖片">
+                <img id="site-image" class="site-image" src="" alt="考古圖片" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="img-placeholder" style="display:none;">
+                    尚無圖片資料<br>
+                    <small style="opacity:0.6; margin-top:5px; display:block;">(請確認 archeology/ID.jpg 存在)</small>
+                </div>
+                
+                <!-- 輪播控制項 (預設隱藏) -->
+                <button class="img-nav-btn prev" id="img-btn-prev">❮</button>
+                <button class="img-nav-btn next" id="img-btn-next">❯</button>
+                <div class="img-dots" id="img-dots-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側地圖：救贖故事標籤 -->
+    <div class="map-panel">
+        <!-- 右上角開啟地圖按鈕 -->
+        <a href="#" target="_blank" id="btn-google-map" class="map-external-btn" title="在 Google Maps 中開啟">
+            顯示詳細地圖 ↗
+        </a>
+
+        <!-- 地點資訊卡 (手機版預設隱藏，點擊標籤後顯示) -->
+        <div class="map-info-card" title="點擊回到當前地點">
+            <span class="card-close-btn" title="關閉">&times;</span>
+            <div class="card-location-name" id="card-name">地點名稱</div>
+            <span class="card-role" id="card-role">救贖意義</span>
+            <div class="card-story" id="card-desc">
+                救贖故事描述...
+            </div>
+            <div class="card-bible" id="card-bible">
+                經文出處
+            </div>
+        </div>
+
+        <!-- 使用 div 取代 iframe -->
+        <div id="map-frame"></div>
+    </div>
+</main>
+
+<footer>
+    <div class="control-group">
+        <button id="btn-prev" class="nav-btn">⬅ 上一個</button>
+        <span class="progress-indicator" id="progress-text">1 / 30</span>
+        <button id="btn-next" class="nav-btn">下一個 ➡</button>
+    </div>
+</footer>
+
+<!-- 引入您的資料檔 -->
+<script src="archeology_data.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof redemptionPathData === 'undefined' || typeof chapters === 'undefined') {
+            alert("錯誤：找不到 archeology_data.js 資料檔。請確保兩者在同一目錄下。");
+            return;
+        }
+
+        let currentIndex = 0;
+        const totalSlides = redemptionPathData.length;
+        let lastChapter = "";
+        let map; 
+        let markersGroup; 
+
+        // --- 圖片輪播狀態 ---
+        let currentImagePaths = [];
+        let currentImgIndex = 0;
+
+        // DOM 元素
+        const elChapterBtn = document.getElementById('chapter-display');
+        const elGoogleMapBtn = document.getElementById('btn-google-map');
+        const elMapInfoCard = document.querySelector('.map-info-card');
+        const btnCardClose = document.querySelector('.card-close-btn');
+        
+        const elModal = document.getElementById('chapter-modal');
+        const elModalTitle = document.getElementById('modal-chapter-title');
+        const elModalIntro = document.getElementById('modal-chapter-intro');
+        const btnModalClose = document.getElementById('modal-close-btn');
+
+        // Lightbox
+        const elLightbox = document.getElementById('image-lightbox');
+        const elLightboxImg = document.getElementById('lightbox-img');
+        const elLightboxCaption = document.getElementById('lightbox-caption');
+        const btnLightboxClose = document.querySelector('.lightbox-close');
+        const btnLbPrev = document.querySelector('.lightbox-prev');
+        const btnLbNext = document.querySelector('.lightbox-next');
+
+        const elId = document.getElementById('site-id');
+        const elNameLeft = document.getElementById('site-name-left');
+        const elEng = document.getElementById('site-eng');
+        const elArchaeo = document.getElementById('site-archaeology');
+        const elArchaeoLink = document.getElementById('archaeo-link');
+        
+        // 圖片相關 DOM
+        const elImage = document.getElementById('site-image');
+        const elImageContainer = document.querySelector('.site-image-container');
+        const elImgPlaceholder = document.querySelector('.img-placeholder');
+        const btnImgPrev = document.getElementById('img-btn-prev');
+        const btnImgNext = document.getElementById('img-btn-next');
+        const elImgDots = document.getElementById('img-dots-container');
+
+        const elCardName = document.getElementById('card-name');
+        const elCardRole = document.getElementById('card-role');
+        const elCardDesc = document.getElementById('card-desc');
+        const elCardBible = document.getElementById('card-bible');
+        
+        const elProgress = document.getElementById('progress-text');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        // 定義結語
+        const conclusionContent = {
+            title: "結語：歷史中的信仰",
+            intro: "<p>聖經的信仰宣告並非憑空虛構的神話，而是扎根於真實的歷史時空之中。</p><p>透過這些我們所踏查的地理地點、歷史人物與考古發現，我們看見信仰不是建立在空談之上，而是承載於具體可感的歷史敘事裡。</p><p>願這些沉默的石頭向你說話，見證那位在歷史中掌權、也在今日仍然呼喚人的神。</p>",
+            btnText: "關閉"
+        };
+
+        // --- 圖片輪播邏輯 ---
+        function setupImageCarousel(images) {
+            currentImagePaths = images;
+            currentImgIndex = 0;
+            updateImageDisplay();
+        }
+
+        function updateImageDisplay() {
+            if (currentImagePaths.length === 0) {
+                elImage.style.display = 'none';
+                elImgPlaceholder.style.display = 'block';
+                return;
+            }
+
+            elImage.style.display = 'block';
+            elImgPlaceholder.style.display = 'none';
+            elImage.style.opacity = 0;
+            setTimeout(() => {
+                elImage.src = currentImagePaths[currentImgIndex];
+                elImage.style.opacity = 1;
+            }, 150);
+
+            if (currentImagePaths.length > 1) {
+                btnImgPrev.style.display = 'block';
+                btnImgNext.style.display = 'block';
+                renderDots();
+            } else {
+                btnImgPrev.style.display = 'none';
+                btnImgNext.style.display = 'none';
+                elImgDots.innerHTML = '';
+            }
+        }
+
+        function renderDots() {
+            elImgDots.innerHTML = '';
+            currentImagePaths.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `img-dot ${idx === currentImgIndex ? 'active' : ''}`;
+                dot.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    currentImgIndex = idx;
+                    updateImageDisplay();
+                });
+                elImgDots.appendChild(dot);
+            });
+        }
+
+        btnImgPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentImgIndex > 0) { currentImgIndex--; } else { currentImgIndex = currentImagePaths.length - 1; }
+            updateImageDisplay();
+        });
+
+        btnImgNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentImgIndex < currentImagePaths.length - 1) { currentImgIndex++; } else { currentImgIndex = 0; }
+            updateImageDisplay();
+        });
+
+        // --- Lightbox 邏輯 ---
+        function openLightbox() {
+            if (elImage.src && elImage.style.display !== 'none') {
+                elLightbox.style.display = "flex";
+                setTimeout(() => elLightbox.classList.add('active'), 10);
+                updateLightboxImage();
+            }
+        }
+
+        function updateLightboxImage() {
+            elLightboxImg.src = currentImagePaths[currentImgIndex];
+            const data = redemptionPathData[currentIndex];
+            let caption = `${data.name} - ${data.englishName}`;
+            if (currentImagePaths.length > 1) {
+                caption += ` (${currentImgIndex + 1}/${currentImagePaths.length})`;
+                btnLbPrev.style.display = 'block';
+                btnLbNext.style.display = 'block';
+            } else {
+                btnLbPrev.style.display = 'none';
+                btnLbNext.style.display = 'none';
+            }
+            elLightboxCaption.textContent = caption;
+        }
+
+        function closeLightbox() {
+            elLightbox.classList.remove('active');
+            setTimeout(() => elLightbox.style.display = "none", 300);
+        }
+
+        elImageContainer.addEventListener('click', openLightbox);
+        btnLightboxClose.addEventListener('click', closeLightbox);
+        elLightbox.addEventListener('click', (e) => {
+            if (e.target === elLightbox || e.target === elLightboxImg) {
+                closeLightbox();
+            }
+        });
+
+        btnLbPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentImgIndex > 0) { currentImgIndex--; } else { currentImgIndex = currentImagePaths.length - 1; }
+            updateLightboxImage();
+            updateImageDisplay();
+        });
+
+        btnLbNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentImgIndex < currentImagePaths.length - 1) { currentImgIndex++; } else { currentImgIndex = 0; }
+            updateLightboxImage();
+            updateImageDisplay();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (elLightbox.classList.contains('active')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') btnLbPrev.click();
+                if (e.key === 'ArrowRight') btnLbNext.click();
+                return;
+            }
+            if (e.key === 'ArrowRight') btnNext.click();
+            if (e.key === 'ArrowLeft') btnPrev.click();
+        });
+
+        // --- Modal & Card Logic ---
+        const closeModal = () => { elModal.classList.remove('active'); };
+        btnModalClose.addEventListener('click', closeModal);
+        elModal.addEventListener('click', (e) => { if (e.target === elModal) closeModal(); });
+
+        elChapterBtn.addEventListener('click', () => {
+            const data = redemptionPathData[currentIndex];
+            const currentChapterName = data.category;
+            const chapterData = chapters[currentChapterName];
+            if (chapterData) showModal(chapterData.title, chapterData.intro, "繼續旅程");
+        });
+
+        // 資訊卡點擊：飛回中心 (Desktop) 或 展開/收合 (Mobile)
+        elMapInfoCard.addEventListener('click', (e) => {
+            // 如果點到關閉按鈕，不要觸發飛回
+            if (e.target === btnCardClose) return;
+            
+            if (window.innerWidth <= 1024) {
+                // 手機版：切換展開/收合
+                elMapInfoCard.classList.toggle('expanded');
+            } else {
+                // 電腦版：飛回地圖中心
+                const data = redemptionPathData[currentIndex];
+                if (map) map.flyTo([data.location.lat, data.location.lng], 11, { animate: true, duration: 1.0 });
+            }
+        });
+
+        // 資訊卡關閉按鈕 (手機版用)
+        btnCardClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            elMapInfoCard.classList.remove('active');
+            elMapInfoCard.classList.remove('expanded'); // 同時重置展開狀態
+        });
+
+        // 地圖背景點擊：手機版隱藏卡片
+        function onMapClick() {
+            if (window.innerWidth <= 1024) {
+                elMapInfoCard.classList.remove('active');
+                elMapInfoCard.classList.remove('expanded');
+            }
+        }
+
+        function showModal(title, intro, btnText) {
+            elModalTitle.textContent = title;
+            elModalIntro.innerHTML = intro;
+            btnModalClose.textContent = btnText;
+            elModal.classList.add('active');
+        }
+
+        function initMap() {
+            const startCoords = [31.7683, 35.2137]; 
+            map = L.map('map-frame', { zoomControl: false, attributionControl: false }).setView(startCoords, 11);
+            L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=zh-TW', { maxZoom: 20, attribution: 'Google Maps' }).addTo(map);
+            markersGroup = L.layerGroup().addTo(map);
+            
+            // 綁定地圖背景點擊事件
+            map.on('click', onMapClick);
+        }
+
+        initMap();
+        renderSlide(currentIndex);
+
+        btnPrev.addEventListener('click', () => {
+            if (currentIndex > 0) { currentIndex--; renderSlide(currentIndex); }
+        });
+
+        btnNext.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) { currentIndex++; renderSlide(currentIndex); } 
+            else { showModal(conclusionContent.title, conclusionContent.intro, conclusionContent.btnText); }
+        });
+
+        function renderSlide(index) {
+            const data = redemptionPathData[index];
+            const currentChapterName = data.category;
+            const chapterData = chapters[currentChapterName];
+
+            if (currentChapterName !== lastChapter) {
+                if (chapterData) showModal(chapterData.title, chapterData.intro, "繼續旅程");
+                lastChapter = currentChapterName;
+            }
+
+            elChapterBtn.textContent = currentChapterName;
+            elId.textContent = `#${String(data.id).padStart(2, '0')}`;
+            elNameLeft.textContent = data.name;
+            elEng.textContent = data.englishName;
+            elArchaeo.textContent = data.archaeology || "暫無詳細考古資料";
+
+            if (data.archaeoLink) {
+                elArchaeoLink.href = data.archaeoLink;
+                elArchaeoLink.style.display = 'inline-block';
+            } else {
+                elArchaeoLink.style.display = 'none';
+            }
+
+            let imagesToLoad = [];
+            if (data.images && data.images.length > 0) {
+                imagesToLoad = data.images.map(filename => `image/${filename}`);
+            } else {
+                imagesToLoad = [`image/${data.id}.jpg`];
+            }
+            setupImageCarousel(imagesToLoad);
+
+            elCardName.textContent = data.name;
+            elCardRole.textContent = data.role;
+            elCardDesc.textContent = data.description;
+            elCardBible.textContent = `${data.bibleRef}`;
+
+            elProgress.textContent = `${index + 1} / ${totalSlides}`;
+            btnPrev.disabled = index === 0;
+            
+            if (index === totalSlides - 1) {
+                btnNext.textContent = "結語 🏁";
+                btnNext.classList.add('conclusion-btn');
+                btnNext.disabled = false;
+            } else {
+                btnNext.textContent = "下一個 ➡";
+                btnNext.classList.remove('conclusion-btn');
+                btnNext.disabled = false;
+            }
+
+            elGoogleMapBtn.href = `https://www.google.com/maps?q=${data.location.lat},${data.location.lng}`;
+
+            // 換頁時，手機版資訊卡處理
+            if (window.innerWidth <= 1024) {
+                elMapInfoCard.classList.add('active'); // 預設顯示
+                elMapInfoCard.classList.remove('expanded'); // 預設縮小
+            }
+
+            updateMap(index);
+        }
+
+        function updateMap(index) {
+            const data = redemptionPathData[index];
+            const targetCoords = [data.location.lat, data.location.lng];
+
+            if (map) {
+                map.flyTo(targetCoords, 15, { animate: true, duration: 1.5 });
+                markersGroup.clearLayers(); 
+
+                for (let i = 0; i <= index; i++) {
+                    const d = redemptionPathData[i];
+                    const latLng = [d.location.lat, d.location.lng];
+                    const marker = L.marker(latLng).addTo(markersGroup);
+                    
+                    (function(targetIndex) {
+                        marker.on('click', function(e) {
+                            L.DomEvent.stopPropagation(e); // 阻止地圖背景點擊
+                            
+                            // 1. 如果點的不是當前地點 -> 切換地點
+                            if (currentIndex !== targetIndex) {
+                                currentIndex = targetIndex;
+                                renderSlide(targetIndex);
+                            } else {
+                                // 2. 如果點的是當前地點 -> 手機版切換卡片顯示 (如果被關閉了)
+                                if (window.innerWidth <= 1024) {
+                                    elMapInfoCard.classList.add('active'); 
+                                }
+                            }
+                        });
+                    })(i);
+
+                    marker.bindTooltip(`<b>${d.id}. ${d.name}</b>`, {
+                        permanent: true, direction: 'top', className: 'map-label', offset: [-15, -12], interactive: true     
+                    });
+
+                    if (i === index) marker.setZIndexOffset(1000); 
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
