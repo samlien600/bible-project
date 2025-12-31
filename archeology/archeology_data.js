@@ -57,7 +57,7 @@ const redemptionPathData = [
     role: "信心的傳承",
     archaeology: "在 Tell Balata 遺址的神廟入口處，發現了一塊巨大的豎立巨石 (Massebah)。考古學家推測這正是約書亞與百姓立約時所立那塊「大石」，用以見證以色列人承諾離棄外邦神、專心事奉耶和華的歷史時刻。",
     description: "這裡是亞伯拉罕進入應許之地後築的第一座壇，也是雅各買地居住之處。數百年後，約書亞在此召聚全體以色列人，在基利心山與以巴路山之間宣讀律法，並發出挑戰：「至於我和我家，我們必定事奉耶和華。」示劍見證了信心從個人應許轉化為群體盟約的關鍵時刻。",
-    bibleRef: "約書亞記 24:26",
+    bibleRef: "約書亞記 24",
     location: { lat: 32.2136, lng: 35.2811 },
     archaeoLink: "https://opentheword.org/2023/09/20/have-archaeologists-discovered-joshuas-massabah-or-standing-stone/"
   },
@@ -69,7 +69,7 @@ const redemptionPathData = [
     role: "神是拯救者",
     archaeology: "在俯瞰以拉谷的 Khirbet Qeiyafa 堡壘遺址中，發現了兩座城門（符合聖經「沙拉音」雙門之意）以及大衛時期的橄欖核與兵器。這證實了在大衛擊殺歌利亞的時代，此地確實是猶大王國防禦非利士人入侵的重要軍事邊界，為著名的戰役提供了真實的歷史舞台。",
     description: "少年大衛在此面對全副武裝的巨人歌利亞。這場戰役的本質不是武力的對決，而是信仰的宣告：「你來攻擊我，是靠著刀槍和銅戟；我來攻擊你，是靠著萬軍之耶和華的名。」這顆光滑的石子，擊碎了人對軍事力量的迷信，確立了救贖歷史中「爭戰在於耶和華」的真理。",
-    bibleRef: "撒母耳記上 17:45",
+    bibleRef: "撒母耳記上 17",
     location: { lat: 31.6963, lng: 34.9575 },
     archaeoLink: "https://en.wikipedia.org/wiki/Khirbet_Qeiyafa"
   },
@@ -158,7 +158,7 @@ const redemptionPathData = [
     role: "恩典的主權",
     archaeology: "1888年，考古學家開始在耶路撒冷聖安妮教堂附近進行挖掘，發現了畢士大池的遺跡，池邊一側有台階向下延伸，另一側則有五個淺淺的柱廊，這與約翰福音的描述完全吻合。",
     description: "在眾多等待水動的病患中，耶穌走向一位癱瘓了38年、無力爭先的人。耶穌沒有利用池水的傳說，而是單單用祂的話語：「起來，拿你的褥子走吧！」這神蹟表明救恩不是靠人的努力爭取（誰先下水），也不是靠宗教儀式，而是源於神主動的恩典與醫治的大能。",
-    bibleRef: "約翰福音 5:8",
+    bibleRef: "約翰福音 5:1-18",
     location: { lat: 31.7815, lng: 35.2345 },
     archaeoLink: "https://discoverhistoricjesus.com/pool-of-bethesda/"
   },
@@ -171,7 +171,7 @@ const redemptionPathData = [
     images: ["13.jpg", "13_1.jpg"], 
     archaeology: "2025年在大衛城西羅亞池遺址發掘出的巨大水壩體，顯示規模宏大的西羅亞水壩建於西元前805年至795年間，正值聖經中的約阿施王或猶大王亞瑪謝統治時期。",
     description: "耶穌用唾沫和泥抹在瞎子眼睛上，命他去西羅亞池（意為「奉差遣」）洗。瞎子在順服的行動中重見光明。這神蹟發生在住棚節期間，當祭司從此池取水澆奠時，耶穌宣告自己是「世界的光」。瞎子的看見與法利賽人的靈性瞎眼形成強烈對比，揭示了審判與救贖的雙重性。",
-    bibleRef: "約翰福音 9:5",
+    bibleRef: "約翰福音 9",
     location: { lat: 31.7706, lng: 35.2343 },
     archaeoLink: "https://archaeologymag.com/2025/08/ancient-jerusalems-siloam-dam-800-bce/"
   },
@@ -184,7 +184,7 @@ const redemptionPathData = [
     images: ["14.jpg", "14_1.jpg"], 
     archaeology: "在班尼亞斯 (Banias) 的巨大岩壁上，考古學家發現了深邃的洞穴（古稱「陰間之門」）以及供奉潘神 (Pan) 的壁龕。這裡曾是充滿淫亂與偶像崇拜的異教中心。耶穌特意帶門徒來到這個代表「陰間權勢」的地標前，宣告教會的建立，背景意義極為深遠。",
     description: "正是在這偶像林立、被視為陰間門口的地方，耶穌問門徒：「你們說我是誰？」彼得石破天驚地宣告：「你是基督，是永生神的兒子。」耶穌隨即應許建立教會，並宣告「陰間的權柄不能勝過它」。在這黑暗勢力的核心，救主確立了教會得勝的根基。",
-    bibleRef: "馬太福音 16:16",
+    bibleRef: "馬太福音 16:13-20",
     location: { lat: 33.2487, lng: 35.6946 },
     archaeoLink: "https://www.bibleplaces.com/caesarea-philippi-banias/"
   },
@@ -198,7 +198,7 @@ const redemptionPathData = [
     role: "戰勝死亡",
     archaeology: "「拉撒路墓」是一個典型的第一世紀猶太墓穴，入口狹窄且深鑿入岩石，右下角的洞是墓穴的入口，拉撒路從墓穴中出來時，必須從這個洞爬出來，其地理位置與形制，與聖經記載耶穌使拉撒路復活的場景相符。",
     description: "在受難週前夕，耶穌在此行了最大的神蹟——叫死了四天的拉撒路復活。面對死亡的絕望，耶穌宣告：「復活在我，生命也在我。」這不僅是對拉撒路的拯救，更是耶穌對自己即將面臨的死亡與復活的預演。祂主動走近耶路撒冷，準備好面對十字架，因為祂掌握著勝過死亡的權柄。",
-    bibleRef: "約翰福音 11:25",
+    bibleRef: "約翰福音 11",
     location: { lat: 31.7716, lng: 35.2558 },
     archaeoLink: "https://en.wikipedia.org/wiki/Tomb_of_Lazarus"
   },
@@ -210,7 +210,7 @@ const redemptionPathData = [
     role: "王的眼淚",
     archaeology: "橄欖山是一條長約兩英里的山脊，或稱為山麓，有三個山頂。橄欖山東側是曠野（即沙漠），一直延伸到耶利哥和約旦河谷。它因舊約和新約時代生長在那裡的橄欖樹林而得名。",
     description: "耶穌騎驢榮耀入城時，站在橄欖山上眺望耶路撒冷，祂沒有因群眾的歡呼而陶醉，反而為這城哀哭。祂預見了拒絕救主將帶來的毀滅（公元70年聖殿被毀）。神的救贖帶著極深的情感，祂不願一人沉淪，甚至為那些即將將祂釘十字架的人流淚。這是神聖的悲憫。",
-    bibleRef: "路加福音 19:41",
+    bibleRef: "路加福音 19:28-44",
     location: { lat: 31.7779, lng: 35.2456 },
     archaeoLink: "https://www.generationword.com/jerusalem101/12-mount-olives.html"
   },
@@ -222,7 +222,7 @@ const redemptionPathData = [
     role: "苦杯的順服",
     archaeology: "「客西馬尼」意為「榨油坊」。現存橄欖樹根系可能延續古代園區，附近亦發現古代榨油設施遺跡。橄欖被壓榨成油的過程，生動地象徵了耶穌在此處經歷的極度屬靈與心理重壓，如同被榨油機壓榨般流出如血點的汗水。",
     description: "在被賣的那一夜，耶穌如同被放入榨油機般，在極度驚恐與傷痛中禱告，汗如大血點滴下。面對神的忿怒之杯，祂的人性發出掙扎，但最終選擇順服：「不要成就我的意思，只要成就你的意思。」救贖的代價，是在意志上完全的破碎與降服，獨自承擔了世界的罪孽。",
-    bibleRef: "馬太福音 26:39",
+    bibleRef: "馬太福音 26:36-46",
     location: { lat: 31.7793, lng: 35.2397 },
     archaeoLink: "https://en.wikipedia.org/wiki/Gethsemane"
   },
@@ -259,7 +259,7 @@ const redemptionPathData = [
     role: "成了",
     archaeology: "根據近期與過去的考古研究，聖墓教堂所在地原為城牆外的採石場，並在第一世紀被用作墓地（包括岩床與墓穴遺跡）。這樣的地理與墓葬證據與希伯來書「城門外受苦」的描述一致，也符合羅馬時期在城外處刑後就近埋葬的歷史慣例。",
     description: "在這裡，天地的主被掛在木頭上。耶穌在極度的痛苦中喊出「成了！」，殿裡的幔子從上到下裂為兩半。這不是失敗的呼喊，而是勝利的宣告。贖罪的祭物已獻上，神與人之間的阻隔已被除去。十字架從羞辱的刑具，轉變為神愛世人最榮耀的記號。",
-    bibleRef: "約翰福音 19:30",
+    bibleRef: "約翰福音 19:17-30",
     location: { lat: 31.7784, lng: 35.2296 },
     archaeoLink: "https://www.catholicnewsagency.com/news/263377/ancient-quarry-under-holy-sepulcher-yields-new-clues-in-ongoing-excavation"
   },
@@ -272,7 +272,7 @@ const redemptionPathData = [
     images: ["21.jpg", "21_1.jpg"], 
     archaeology: "花園塚提供了一個極佳的視覺場景：一個位於花園中、岩石鑿出的財主式墳墓，門口有滾石槽，且鄰近一個外形酷似骷髏的山丘。儘管其墓穴年代在考古上存在爭議，但此地在空間配置與視覺元素上高度貼近福音書的敘事描述，因此常被用作幫助朝聖者具體想像復活清晨「空墳墓」的場景。",
     description: "安息日過後，婦女們來到墳墓前，卻發現石頭滾開了。天使宣告：「祂不在這裡，照祂所說的，已經復活了。」空墳墓是基督教信仰的基石。死亡的權勢被粉碎，耶穌成為初熟的果子。這不僅是歷史的奇蹟，更是給所有信徒的永恆盼望——死亡不是終點，而是通往永生的門。",
-    bibleRef: "馬太福音 28:6",
+    bibleRef: "馬太福音 28:1-10",
     location: { lat: 31.7839, lng: 35.2302 },
     archaeoLink: "https://www.bibleplaces.com/gardentomb/"
   },
@@ -293,29 +293,29 @@ const redemptionPathData = [
   },
   {
     id: 23,
-    name: "約帕",
-    englishName: "Joppa",
-    category: "第四章：傳揚與終局",
-    role: "打破隔閡",
-    images: ["23.jpg", "23_1.jpg"],
-    archaeology: "在約帕古城的海邊有一處傳統上標示為「硝皮匠西門」的住處，這一地點是基督教傳統上的定位。古代製革業確實因需要大量水且常被猶太社會視為不潔，往往聚集在城市低洼或水邊區域。",
-    description: "彼得住在一個視為不潔的硝皮匠家中，在房頂禱告時看見異象：一塊大布降下，裡面裝滿各樣不潔的動物，神說：「神所潔淨的，你不可當作俗物。」這個異象打破了彼得心中根深蒂固的潔淨禮儀觀念，預備他去接納外邦人哥尼流。救贖不僅是靈魂的拯救，更是文化與偏見的拆毀。",
-    bibleRef: "使徒行傳 11:18",
-    location: { lat: 32.0545, lng: 34.7511 },
-    archaeoLink: "https://en.wikipedia.org/wiki/Simon_the_Tanner_(New_Testament)"
-  },
-  {
-    id: 24,
     name: "凱撒利亞",
     englishName: "Caesarea Maritima",
     category: "第四章：傳揚與終局",
     role: "外邦人的五旬節",
-    images: ["24.jpg", "24_1.jpg", "24_2.jpg"],
+    images: ["23.jpg", "23_1.jpg", "23_2.jpg"],
     archaeology: "這座城市充滿了羅馬式建築：圓形劇場、神廟、皇宮。它是羅馬巡撫的駐地（出土了彼拉多石碑）和羅馬軍隊的總部。這樣的考古背景解釋了為什麼羅馬百夫長哥尼流會居住於此，以及彼得進入此地所代表的「跨越文化與種族界線」的巨大意義。",
     description: "彼得在此違背猶太傳統，進入羅馬百夫長哥尼流的家。當他講道時，聖靈降在一切聽道的外邦人身上，如同五旬節一樣。彼得驚嘆：「神是不偏待人的！」這標誌著救恩歷史的重大轉折——福音正式突破種族藩籬，臨到外邦世界，神救贖的計畫展現出普世的胸懷。",
-    bibleRef: "使徒行傳 10:45",
+    bibleRef: "使徒行傳 10",
     location: { lat: 32.5013, lng: 34.8922 },
     archaeoLink: "https://madainproject.com/caesarea_maritima"
+  },
+  {
+    id: 24,
+    name: "約帕",
+    englishName: "Joppa",
+    category: "第四章：傳揚與終局",
+    role: "打破隔閡",
+    images: ["24.jpg", "24_1.jpg"],
+    archaeology: "在約帕古城的海邊有一處傳統上標示為「硝皮匠西門」的住處，這一地點是基督教傳統上的定位。古代製革業確實因需要大量水且常被猶太社會視為不潔，往往聚集在城市低洼或水邊區域。",
+    description: "彼得住在一個視為不潔的硝皮匠家中，在房頂禱告時看見異象：一塊大布降下，裡面裝滿各樣不潔的動物，神說：「神所潔淨的，你不可當作俗物。」這個異象打破了彼得心中根深蒂固的潔淨禮儀觀念，預備他去接納外邦人哥尼流。救贖不僅是靈魂的拯救，更是文化與偏見的拆毀。",
+    bibleRef: "使徒行傳 11:1-18",
+    location: { lat: 32.0545, lng: 34.7511 },
+    archaeoLink: "https://en.wikipedia.org/wiki/Simon_the_Tanner_(New_Testament)"
   },
   {
     id: 25,
@@ -326,7 +326,7 @@ const redemptionPathData = [
     images: ["25.jpg", "25_1.jpg"],
     archaeology: "亞略巴古（戰神山）是雅典衛城對面的一座岩石山丘，雅典重要的審議與思想辯論機構所在地。站在這裡，可以清楚仰望對面衛城上宏偉的帕德嫩神廟（雅典娜神廟）。這種「滿城偶像」的視覺衝擊，為保羅在此發表的「未識之神」講道提供了最生動的現場背景。",
     description: "面對崇尚智慧的希臘哲學家，保羅沒有引用舊約聖經，而是敏銳地從「未識之神」的祭壇切入，宣告創造天地的主宰不住人手所造的殿。這是一場精彩的跨文化護教。救贖的真理挑戰了人類的驕傲與智慧，宣告神現在吩咐各處的人都要悔改，因為祂已設立耶穌作審判天下的主。",
-    bibleRef: "使徒行傳 17:31",
+    bibleRef: "使徒行傳 17:16-34",
     location: { lat: 37.9724, lng: 23.7232 },
     archaeoLink: "https://en.wikipedia.org/wiki/Areopagus"
   },
@@ -339,7 +339,7 @@ const redemptionPathData = [
     images: ["26.jpg", "26_1.jpg"],
     archaeology: "哥林多保存的 Bema（審判座）遺跡，是古代哥林多公開審理案件的場所，普遍被認為是《使徒行傳》所記保羅被帶到省長迦流面前受審的歷史背景地點。此外，哥林多出土的著名「Erastus inscription」鋪路石，記載一位名為以拉都的市政官自費鋪設道路，與《羅馬書 16:23》所提到的管銀庫以拉都在姓名、身分與社會階層上高度一致，為新約中教會成員橫跨不同社會階層的歷史情境，提供了極具說服力的考古背景。",
     description: "來到這座充斥著商業繁榮與道德敗壞的城市，保羅說自己「又軟弱，又懼怕，又甚戰兢」。但主在異象中鼓勵他：「不要怕，只管講...在這城裡我有許多的百姓。」神的大能是在人的軟弱上顯得完全。哥林多教會的建立，證明了福音能改變最世俗化的人心，將他們洗淨成聖。",
-    bibleRef: "哥林多後書 12:9",
+    bibleRef: "哥林多後書 18:1-17",
     location: { lat: 37.9069, lng: 22.8789 },
     archaeoLink: "https://bibleplaces.com/corinth/"
   },
@@ -378,7 +378,7 @@ const redemptionPathData = [
     images: ["29.jpg", "29_1.jpg"],
     archaeology: "老底嘉的考古研究顯示，該城缺乏天然水源，必須透過長距離引水系統將水輸入城內。來自希拉波立一帶的溫泉水在長途輸送後，抵達老底嘉時已變得不冷不熱，且富含礦物質；考古挖掘出的陶製水管內壁，至今仍可見厚重的鈣化沉澱。",
     description: "耶穌責備老底嘉教會「不冷不熱」，常被理解為呼應當地溫而令人作嘔的水源經驗。面對他們自以為富足（黑羊毛、眼藥、金融），主反而呼召他們向祂得著真正的屬靈富足，提醒教會：物質的滿足若缺乏警醒，反而使人對主失去需要。",
-    bibleRef: "啟示錄 3:20",
+    bibleRef: "啟示錄 3:14-22",
     location: { lat: 37.8347, lng: 29.1097 },
     archaeoLink: "https://bibleplaces.com/laodicea/"
   },
