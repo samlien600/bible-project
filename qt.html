@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日靈修筆記 (本機版) | Daily Devotional</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        /* * Color Palettes Definition 
+         * Using RGB values to allow Tailwind opacity modifiers (e.g., bg-primary-500/20)
+         */
+        :root {
+            /* Common Transitions */
+            --transition-speed: 0.3s;
+
+            /* === 淺色模式預設：奶茶中性色系 (Milk Tea) === */
+            /* Stone -> Sand / Beige / Khaki */
+            --c-stone-50: 253 250 248;  /* Cream */
+            --c-stone-100: 248 244 240;
+            --c-stone-200: 238 230 225;
+            --c-stone-300: 224 210 200; /* Latte Foam */
+            --c-stone-400: 180 160 150;
+            --c-stone-500: 141 110 99;  /* Milk Tea Brown */
+            --c-stone-600: 121 85 72;
+            --c-stone-700: 93 64 55;
+            --c-stone-800: 78 52 46;
+            --c-stone-900: 62 39 35;    /* Coffee Bean */
+            --c-stone-950: 45 25 20;
+
+            /* Primary -> Earthy Pink / Muted Rose / Warm Clay */
+            --c-primary-50: 255 245 245;
+            --c-primary-100: 255 235 235;
+            --c-primary-400: 220 160 150;
+            --c-primary-500: 190 130 120; /* Muted Clay */
+            --c-primary-600: 160 100 90;
+            --c-primary-700: 130 70 60;
+            --c-primary-900: 100 40 30;
+        }
+
+        /* === 深色模式預設：靜夜深色系 (Midnight) === */
+        /* 當 HTML 有 .dark class 時，覆蓋上述變數 */
+        :root.dark {
+            /* Stone -> Slate / Cool Grays (Blue-ish grays for calming effect) */
+            --c-stone-50: 248 250 252;
+            --c-stone-100: 241 245 249;
+            --c-stone-200: 226 232 240;
+            --c-stone-300: 203 213 225;
+            --c-stone-400: 148 163 184;
+            --c-stone-500: 100 116 139;
+            --c-stone-600: 71 85 105;
+            --c-stone-700: 51 65 85;
+            --c-stone-800: 30 41 59;
+            --c-stone-900: 15 23 42;
+            --c-stone-950: 2 6 23;      /* Almost black blue */
+
+            /* Primary -> Deep Moonlight / Royal Blue */
+            --c-primary-50: 240 249 255;
+            --c-primary-100: 224 242 254;
+            --c-primary-400: 56 189 248;
+            --c-primary-500: 14 165 233; /* Sky 500 */
+            --c-primary-600: 2 132 199;
+            --c-primary-700: 3 105 161;
+            --c-primary-900: 12 74 110;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: rgb(var(--c-stone-50));
+            color: rgb(var(--c-stone-700));
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+        
+        /* Dark Mode Body Overrides */
+        .dark body {
+            background-color: rgb(var(--c-stone-950));
+            color: rgb(var(--c-stone-200));
+        }
+        
+        h1, h2, h3, .font-serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* Custom Scrollbar - Minimal */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgb(var(--c-stone-300));
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(var(--c-stone-400));
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgb(var(--c-stone-700));
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: rgb(var(--c-stone-600));
+        }
+
+        /* Tab Animation */
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: rgb(var(--c-primary-600));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .dark .tab-btn::after {
+            background-color: rgb(var(--c-primary-400));
+        }
+
+        .tab-active {
+            color: rgb(var(--c-stone-900));
+            font-weight: 600;
+        }
+        .dark .tab-active {
+            color: rgb(var(--c-stone-100));
+        }
+        .tab-active::after {
+            width: 100%;
+        }
+        
+        .tab-inactive {
+            color: rgb(var(--c-stone-400));
+        }
+        .dark .tab-inactive {
+            color: rgb(var(--c-stone-500));
+        }
+        .tab-inactive:hover {
+            color: rgb(var(--c-stone-600));
+        }
+        .dark .tab-inactive:hover {
+            color: rgb(var(--c-stone-300));
+        }
+
+        /* Input Styling - Refined */
+        .input-wrapper:focus-within {
+            transform: translateY(-1px);
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: rgb(var(--c-stone-600));
+            margin-bottom: 0.75rem;
+            font-size: 0.925rem;
+            letter-spacing: 0.02em;
+        }
+        .dark .input-group label {
+            color: rgb(var(--c-stone-300));
+        }
+
+        .input-group textarea, .input-group input {
+            width: 100%;
+            border: 1px solid transparent;
+            background-color: rgb(var(--c-stone-100));
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: rgb(var(--c-stone-800));
+            transition: all 0.2s ease;
+        }
+        .dark .input-group textarea, .dark .input-group input {
+            background-color: rgb(var(--c-stone-800));
+            color: rgb(var(--c-stone-100));
+        }
+
+        .input-group textarea:focus, .input-group input:focus {
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: rgb(var(--c-stone-200));
+        }
+        .dark .input-group textarea:focus, .dark .input-group input:focus {
+            background-color: rgb(var(--c-stone-900));
+            border-color: rgb(var(--c-stone-700));
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .input-group textarea::placeholder {
+            color: rgb(var(--c-stone-400));
+        }
+        .dark .input-group textarea::placeholder {
+            color: rgb(var(--c-stone-600));
+        }
+
+        /* Glass Header */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(var(--c-stone-200), 0.5);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .dark .glass-header {
+            background: rgba(var(--c-stone-950), 0.85);
+            border-bottom: 1px solid rgba(var(--c-stone-800), 0.5);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, rgb(var(--c-primary-600)) 0%, rgb(var(--c-primary-700)) 100%);
+            color: white;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(var(--c-primary-600), 0.2);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(var(--c-primary-600), 0.3);
+            transform: translateY(-1px);
+        }
+        .dark .btn-primary {
+            background: linear-gradient(135deg, rgb(var(--c-primary-500)) 0%, rgb(var(--c-primary-600)) 100%);
+            box-shadow: 0 4px 12px rgba(var(--c-primary-500), 0.3);
+            color: rgb(var(--c-stone-50)); /* Ensure text contrast in Morning mode */
+        }
+
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid rgb(var(--c-stone-200));
+            color: rgb(var(--c-stone-600));
+            transition: all 0.2s;
+        }
+        .dark .btn-secondary {
+            background-color: rgb(var(--c-stone-900));
+            border-color: rgb(var(--c-stone-700));
+            color: rgb(var(--c-stone-300));
+        }
+        .btn-secondary:hover {
+            border-color: rgb(var(--c-stone-300));
+            background-color: rgb(var(--c-stone-50));
+            color: rgb(var(--c-stone-900));
+        }
+        .dark .btn-secondary:hover {
+            border-color: rgb(var(--c-stone-600));
+            background-color: rgb(var(--c-stone-800));
+            color: #fff;
+        }
+
+        /* Cards */
+        .history-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            border-color: rgb(var(--c-stone-200));
+        }
+        .dark .history-card:hover {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgb(var(--c-stone-700));
+        }
+        
+        .month-header .chevron {
+            transition: transform 0.3s ease;
+        }
+        .month-header.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+
+        /* Detail Expansion */
+        .detail-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        .detail-content.open {
+            grid-template-rows: 1fr;
+        }
+        .detail-inner {
+            overflow: hidden;
+        }
+        .detail-chevron {
+            transition: transform 0.3s ease;
+        }
+        .card-expanded .detail-chevron {
+            transform: rotate(180deg);
+        }
+        .card-expanded .card-title {
+            color: rgb(var(--c-primary-600));
+        }
+        .dark .card-expanded .card-title {
+            color: rgb(var(--c-primary-400));
+        }
+
+        /* Native Date Input Fix for Dark Mode */
+        .dark ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.6;
+        }
+        .dark ::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        // Dynamic Stone Palette
+                        stone: {
+                            50: 'rgb(var(--c-stone-50) / <alpha-value>)',
+                            100: 'rgb(var(--c-stone-100) / <alpha-value>)',
+                            200: 'rgb(var(--c-stone-200) / <alpha-value>)',
+                            300: 'rgb(var(--c-stone-300) / <alpha-value>)',
+                            400: 'rgb(var(--c-stone-400) / <alpha-value>)',
+                            500: 'rgb(var(--c-stone-500) / <alpha-value>)',
+                            600: 'rgb(var(--c-stone-600) / <alpha-value>)',
+                            700: 'rgb(var(--c-stone-700) / <alpha-value>)',
+                            800: 'rgb(var(--c-stone-800) / <alpha-value>)',
+                            900: 'rgb(var(--c-stone-900) / <alpha-value>)',
+                            950: 'rgb(var(--c-stone-950) / <alpha-value>)',
+                        },
+                        // Dynamic Primary Palette
+                        primary: {
+                            50: 'rgb(var(--c-primary-50) / <alpha-value>)',
+                            100: 'rgb(var(--c-primary-100) / <alpha-value>)',
+                            400: 'rgb(var(--c-primary-400) / <alpha-value>)',
+                            500: 'rgb(var(--c-primary-500) / <alpha-value>)',
+                            600: 'rgb(var(--c-primary-600) / <alpha-value>)',
+                            700: 'rgb(var(--c-primary-700) / <alpha-value>)',
+                            900: 'rgb(var(--c-primary-900) / <alpha-value>)',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif TC"', 'serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-primary-100 selection:text-primary-900 dark:selection:bg-primary-900 dark:selection:text-primary-100">
+
+    <!-- Header -->
+    <header class="glass-header sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-sm transition-colors">
+                    <i class="fa-solid fa-book-bible text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-serif font-bold text-stone-900 dark:text-stone-100 tracking-wide leading-none">每日靈修筆記</h1>
+                    <span class="text-[10px] uppercase tracking-widest text-stone-400 dark:text-stone-500 font-medium ml-0.5">Daily Devotional</span>
+                </div>
+            </div>
+            
+            <!-- Data Tools & Theme Toggle -->
+            <div class="flex items-center gap-2 text-sm">
+                
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" onclick="toggleDarkMode()" class="btn-secondary px-3 py-2 rounded-lg flex items-center justify-center transition-all w-10 h-10" title="切換深色模式">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                
+                <div class="w-px h-6 bg-stone-200 dark:bg-stone-700 mx-2"></div>
+                
+                <button onclick="exportData()" class="btn-secondary px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-medium uppercase tracking-wide">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">匯出</span>
+                </button>
+                <button onclick="triggerImport()" class="btn-secondary px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-medium uppercase tracking-wide">
+                    <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">匯入</span>
+                </button>
+                <input type="file" id="file-import" class="hidden" accept=".json" onchange="importData(this)">
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white/50 dark:bg-stone-900/50 border-b border-stone-200 dark:border-stone-800 transition-colors">
+        <div class="max-w-6xl mx-auto px-6 flex gap-10">
+            <button id="tab-write" class="py-4 tab-btn tab-active flex items-center gap-2.5 text-sm" onclick="switchTab('write')">
+                <i class="fa-solid fa-pen-nib"></i> 
+                <span>撰寫靈修</span>
+            </button>
+            <button id="tab-history" class="py-4 tab-btn tab-inactive flex items-center gap-2.5 text-sm" onclick="switchTab('history')">
+                <i class="fa-solid fa-clock-rotate-left"></i> 
+                <span>歷史紀錄</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-8">
+
+        <!-- VIEW: WRITE -->
+        <section id="view-write" class="animate-fade-in">
+            <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-soft p-8 md:p-10 mb-8 border border-white dark:border-stone-800 transition-colors">
+                
+                <!-- Date & Scripture Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 pb-6 border-b border-stone-100 dark:border-stone-800 gap-6">
+                    <div>
+                        <h2 class="text-3xl font-serif font-bold text-stone-900 dark:text-stone-100 mb-2">今天的領受</h2>
+                        <p class="text-stone-500 dark:text-stone-400 font-light">願神的話語成為你腳前的燈，路上的光。</p>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <!-- Scripture Input -->
+                        <div class="bg-stone-50 dark:bg-stone-800 p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 flex items-center transition-colors flex-grow md:flex-grow-0">
+                             <span class="px-3 text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider whitespace-nowrap">經文</span>
+                             <input type="text" id="entry-scripture" class="bg-white dark:bg-stone-900 border-0 rounded shadow-sm py-1.5 px-3 text-stone-700 dark:text-stone-200 font-medium focus:ring-0 text-sm w-full md:w-48 placeholder-stone-300 dark:placeholder-stone-600 transition-colors" placeholder="例如：詩篇 23:1">
+                        </div>
+
+                        <!-- Date Input -->
+                        <div class="bg-stone-50 dark:bg-stone-800 p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 flex items-center transition-colors">
+                            <span class="px-3 text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Date</span>
+                            <input type="date" id="entry-date" class="bg-white dark:bg-stone-900 border-0 rounded shadow-sm py-1.5 px-3 text-stone-700 dark:text-stone-200 font-medium focus:ring-0 text-sm cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <form id="devotional-form">
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 relative">
+                        
+                        <!-- Book Binding Divider (Desktop Only) -->
+                        <div class="hidden lg:block absolute left-1/2 top-4 bottom-4 w-px bg-stone-100 dark:bg-stone-800 -translate-x-1/2"></div>
+
+                        <!-- Left Page: Questions 1-4 -->
+                        <div class="space-y-8">
+                            <!-- Q1 -->
+                            <div class="input-group">
+                                <label for="q1">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">01.</span>請簡單描述這段經文內容
+                                </label>
+                                <textarea id="q1" rows="4" placeholder="請依照每日的讀經進度來靈修，並使用靈修筆記。首先把經文讀一遍，了解經文大概的內容，然後要聆聽上帝像我說話的聲音。"></textarea>
+                            </div>
+
+                            <!-- Q2 -->
+                            <div class="input-group">
+                                <label for="q2">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">02.</span>在這段經文中，我看到了上帝的哪些屬性?
+                                </label>
+                                <textarea id="q2" rows="4" placeholder="仔細思想上帝是怎樣一位上帝。認識上帝的屬性很重要。"></textarea>
+                            </div>
+
+                            <!-- Q3 -->
+                            <div class="input-group">
+                                <label for="q3">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">03.</span>在這段經文中，我領受了哪些真理、教導或教訓?
+                                </label>
+                                <textarea id="q3" rows="4" placeholder="從今天這段經文我領受那些上帝的命令、託付、安慰、勉勵、應許、警戒、責備、要遠離的鑑戒或效法的榜樣等等。"></textarea>
+                            </div>
+
+                            <!-- Q4 -->
+                            <div class="input-group">
+                                <label for="q4">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">04.</span>這段經文提醒我為哪些事情感恩?
+                                </label>
+                                <textarea id="q4" rows="4" placeholder="上帝透過今天的經文提醒我曾經經歷過那些恩典，誠心地獻上感恩。"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Page: Questions 5-8 -->
+                        <div class="space-y-8">
+                            <!-- Q5 -->
+                            <div class="input-group">
+                                <label for="q5">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">05.</span>請安靜的聆聽，神今天要對我說什麼?
+                                </label>
+                                <textarea id="q5" rows="4" placeholder="詢問神在今天的靈修裡，祂要跟我說什麼話？然後有一段安靜、領受的時間。神將藉著聖靈將祂的意念、安慰、造就、勸勉的話，向我顯明。"></textarea>
+                            </div>
+
+                            <!-- Q6 -->
+                            <div class="input-group">
+                                <label for="q6">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">06.</span>今天的QT可以運用在我的生命和生活中的哪些地方?
+                                </label>
+                                <textarea id="q6" rows="4" placeholder="省察自己的生活與生命，將今天領受的應用在自己身上。具體應用會帶來生命的改變。"></textarea>
+                            </div>
+
+                            <!-- Q7 -->
+                            <div class="input-group">
+                                <label for="q7">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">07.</span>我的回應禱告
+                                </label>
+                                <textarea id="q7" rows="4" placeholder="為今天上帝賜給我的領悟、教訓或應用，用禱告來回應。"></textarea>
+                            </div>
+
+                            <!-- Q8 -->
+                            <div class="input-group">
+                                <label for="q8">
+                                    <span class="text-primary-500 dark:text-primary-400 mr-2">08.</span>請給今天的QT記錄定一個題目
+                                </label>
+                                <textarea id="q8" rows="4" placeholder="回想今天靈修的領受、內容，用一句話濃縮作總結。避免將題目訂得太無邊際，也不要將題目訂得太抽象。將是回顧寫過的靈修內容時，一看到題目，就可以知道自己靈修的領受是什麼，成為自己持續的幫助。"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="pt-8 flex items-center justify-end">
+                        <button type="submit" id="btn-save" class="btn-primary py-3 px-10 rounded-xl font-medium flex items-center gap-2.5 shadow-lg shadow-primary-500/20">
+                            <i class="fa-solid fa-floppy-disk"></i> 
+                            <span>儲存筆記</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW: HISTORY -->
+        <section id="view-history" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">靈修歷史</h2>
+                    <p class="text-stone-500 dark:text-stone-400 text-sm mt-1">紀錄神在你生命中的軌跡</p>
+                </div>
+                <div class="text-sm font-medium bg-white dark:bg-stone-900 px-3 py-1 rounded-full border border-stone-200 dark:border-stone-800 text-stone-500 dark:text-stone-400 shadow-sm transition-colors">
+                    Total: <span id="total-count" class="text-stone-900 dark:text-stone-200 font-bold">0</span>
+                </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="bg-white dark:bg-stone-900 rounded-xl shadow-card p-2 mb-8 flex flex-col md:flex-row gap-2 border border-stone-100 dark:border-stone-800 transition-colors">
+                <div class="relative flex-grow w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-400 dark:text-stone-500"></i>
+                    <input type="text" id="search-input" placeholder="搜尋關鍵字 (例如：平安、禱告...)" 
+                           class="w-full pl-11 pr-4 py-3 bg-transparent border-none focus:ring-0 text-stone-700 dark:text-stone-200 placeholder-stone-400 dark:placeholder-stone-600 text-sm font-medium">
+                </div>
+                <div class="h-auto w-px bg-stone-100 dark:bg-stone-800 hidden md:block my-2"></div>
+                <div class="w-full md:w-auto relative">
+                     <i class="fa-solid fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 dark:text-stone-500 text-xs"></i>
+                    <select id="filter-question" class="w-full md:w-56 pl-9 pr-10 py-3 bg-stone-50 dark:bg-stone-800 md:bg-white md:dark:bg-stone-900 border-none rounded-lg focus:ring-0 text-stone-600 dark:text-stone-300 text-sm font-medium cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors appearance-none">
+                        <option value="all">顯示完整筆記</option>
+                        <option value="q1">1. 經文內容</option>
+                        <option value="q2">2. 神的屬性</option>
+                        <option value="q3">3. 領受真理</option>
+                        <option value="q4">4. 感恩</option>
+                        <option value="q5">5. 聆聽神</option>
+                        <option value="q6">6. 生活運用</option>
+                        <option value="q7">7. 回應禱告</option>
+                        <option value="q8">8. 今日題目</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-stone-400 dark:text-stone-500 text-xs pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div id="history-container" class="space-y-8">
+                <!-- Entries will be injected here via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-stone-200 dark:border-stone-800 mt-auto py-8 transition-colors">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-stone-400 dark:text-stone-600 text-xs tracking-wider uppercase mb-2">My Quiet Time Journal</p>
+            <p class="text-stone-300 dark:text-stone-700 text-xs">&copy; <span id="year"></span> 靈修筆記本 | 資料儲存於您的瀏覽器中</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-stone-800 dark:bg-stone-100 text-white dark:text-stone-900 px-6 py-4 rounded-xl shadow-lg transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <div class="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 dark:text-green-600">
+            <i class="fa-solid fa-check text-xs"></i>
+        </div>
+        <span id="toast-message" class="font-medium text-sm">操作成功</span>
+    </div>
+
+    <script>
+        // --- Constants & Config ---
+        const STORAGE_KEY = 'devotional_journal_data_v1';
+        
+        const QUESTION_LABELS = {
+            q1: "01. 經文內容",
+            q2: "02. 神的屬性",
+            q3: "03. 領受真理",
+            q4: "04. 感恩事項",
+            q5: "05. 聆聽神說",
+            q6: "06. 生活運用",
+            q7: "07. 回應禱告",
+            q8: "08. 請給今天的QT紀錄定一個題目"
+        };
+        
+        // --- State ---
+        let devotionalsData = [];
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // --- DOM Elements ---
+        const els = {
+            dateInput: document.getElementById('entry-date'),
+            scriptureInput: document.getElementById('entry-scripture'),
+            form: document.getElementById('devotional-form'),
+            inputs: {
+                q1: document.getElementById('q1'),
+                q2: document.getElementById('q2'),
+                q3: document.getElementById('q3'),
+                q4: document.getElementById('q4'),
+                q5: document.getElementById('q5'),
+                q6: document.getElementById('q6'),
+                q7: document.getElementById('q7'),
+                q8: document.getElementById('q8'),
+            },
+            saveBtn: document.getElementById('btn-save'),
+            historyContainer: document.getElementById('history-container'),
+            totalCount: document.getElementById('total-count'),
+            year: document.getElementById('year'),
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toast-message'),
+            fileImport: document.getElementById('file-import'),
+            searchInput: document.getElementById('search-input'),
+            filterSelect: document.getElementById('filter-question'),
+            themeToggle: document.getElementById('theme-toggle'),
+            // styleMenu: removed
+        };
+
+        // --- Initialization ---
+        function init() {
+            els.dateInput.value = todayStr;
+            els.year.textContent = new Date().getFullYear();
+            
+            initTheme(); // Load Theme First
+            loadLocalData();
+            
+            // Listeners
+            els.dateInput.addEventListener('change', (e) => loadEntryForDate(e.target.value));
+            els.form.addEventListener('submit', handleSave);
+            els.searchInput.addEventListener('input', renderHistory);
+            els.filterSelect.addEventListener('change', renderHistory);
+            
+            // Initial Render
+            renderHistory();
+            loadEntryForDate(todayStr);
+        }
+
+        // --- Theme Logic ---
+        function initTheme() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            const htmlEl = document.documentElement;
+            
+            // Set Dark Mode (Default Light Mode if not saved)
+            if (savedDarkMode === 'dark' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                htmlEl.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                htmlEl.classList.remove('dark');
+                updateThemeIcon(false);
+            }
+        }
+
+        function toggleDarkMode() {
+            const htmlEl = document.documentElement;
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                localStorage.setItem('darkMode', 'light');
+                updateThemeIcon(false);
+            } else {
+                htmlEl.classList.add('dark');
+                localStorage.setItem('darkMode', 'dark');
+                updateThemeIcon(true);
+            }
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = els.themeToggle.querySelector('i');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // --- Data Logic (LocalStorage) ---
+        function loadLocalData() {
+            const rawData = localStorage.getItem(STORAGE_KEY);
+            if (rawData) {
+                try {
+                    devotionalsData = JSON.parse(rawData);
+                    if (!Array.isArray(devotionalsData)) devotionalsData = [];
+                    devotionalsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } catch (e) {
+                    console.error("Data parse error", e);
+                    devotionalsData = [];
+                }
+            } else {
+                devotionalsData = [];
+            }
+            els.totalCount.textContent = devotionalsData.length;
+        }
+
+        function saveLocalData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(devotionalsData));
+            els.totalCount.textContent = devotionalsData.length;
+            renderHistory();
+        }
+
+        // --- Form Logic ---
+        function loadEntryForDate(dateStr) {
+            Object.values(els.inputs).forEach(input => input.value = '');
+            els.scriptureInput.value = ''; // Clear scripture
+            
+            const entry = devotionalsData.find(e => e.date === dateStr);
+            if (entry) {
+                for(let key in els.inputs) {
+                    if(entry[key]) els.inputs[key].value = entry[key];
+                }
+                if (entry.scripture) els.scriptureInput.value = entry.scripture;
+            }
+        }
+
+        function handleSave(e) {
+            e.preventDefault();
+            const dateVal = els.dateInput.value;
+            if (!dateVal) { showToast("請選擇日期", "error"); return; }
+
+            const newEntry = {
+                id: dateVal,
+                date: dateVal,
+                scripture: els.scriptureInput.value,
+                updatedAt: new Date().toISOString(),
+                q1: els.inputs.q1.value,
+                q2: els.inputs.q2.value,
+                q3: els.inputs.q3.value,
+                q4: els.inputs.q4.value,
+                q5: els.inputs.q5.value,
+                q6: els.inputs.q6.value,
+                q7: els.inputs.q7.value,
+                q8: els.inputs.q8.value,
+            };
+
+            devotionalsData = devotionalsData.filter(item => item.date !== dateVal);
+            devotionalsData.push(newEntry);
+            devotionalsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            saveLocalData();
+            showToast("靈修筆記已儲存！");
+        }
+
+        window.deleteEntry = (dateId) => {
+            if (!confirm(`確定要刪除 ${dateId} 的靈修紀錄嗎？`)) return;
+            devotionalsData = devotionalsData.filter(item => item.date !== dateId);
+            saveLocalData();
+            if (dateId === els.dateInput.value) loadEntryForDate(dateId);
+            showToast("紀錄已刪除", "error");
+        };
+
+        window.editEntry = (date) => {
+            els.dateInput.value = date;
+            loadEntryForDate(date);
+            switchTab('write');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // --- Render Logic ---
+        function renderHistory() {
+            const query = els.searchInput.value.trim().toLowerCase();
+            const filterQ = els.filterSelect.value;
+            const isSearching = query.length > 0;
+
+            // 1. Filter Data
+            let filteredData = devotionalsData;
+            
+            if (isSearching) {
+                filteredData = devotionalsData.filter(entry => {
+                    // Include scripture in general search
+                    if (filterQ === 'all' && entry.scripture && entry.scripture.toLowerCase().includes(query)) {
+                        return true;
+                    }
+
+                    if (filterQ !== 'all') {
+                        return (entry[filterQ] || '').toLowerCase().includes(query);
+                    } else {
+                        return Object.values(entry).some(val => 
+                            typeof val === 'string' && val.toLowerCase().includes(query)
+                        );
+                    }
+                });
+            }
+
+            if (filteredData.length === 0) {
+                els.historyContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 text-stone-400 dark:text-stone-600 bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 border-dashed transition-colors">
+                        <div class="w-16 h-16 bg-stone-50 dark:bg-stone-800 rounded-full flex items-center justify-center mb-4 transition-colors">
+                            <i class="fa-solid fa-filter-circle-xmark text-2xl opacity-50"></i>
+                        </div>
+                        <p class="font-medium">${isSearching ? '找不到符合的搜尋結果' : '目前沒有紀錄，開始寫下第一篇吧！'}</p>
+                    </div>`;
+                return;
+            }
+
+            // 2. Group by Month
+            const grouped = groupByMonth(filteredData);
+            const sortedMonths = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+            let html = '';
+
+            sortedMonths.forEach((monthKey, index) => {
+                const monthDisplay = formatMonth(monthKey);
+                const isExpanded = isSearching || index === 0;
+                const chevronRotation = isExpanded ? '' : 'rotate-[-90deg]';
+                const contentDisplay = isExpanded ? '' : 'hidden';
+
+                html += `
+                <div class="animate-fade-in group mb-8">
+                    <!-- Month Header -->
+                    <div class="month-header flex items-center gap-3 mb-5 py-2 cursor-pointer select-none" onclick="toggleMonth('month-${monthKey}', this)">
+                        <div class="w-6 h-6 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 chevron ${chevronRotation} transition-colors">
+                             <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                        <h3 class="text-lg font-serif font-bold text-stone-800 dark:text-stone-200 month-title tracking-wide transition-colors">${monthDisplay}</h3>
+                        <div class="h-px bg-stone-200 dark:bg-stone-800 flex-grow opacity-50 transition-colors"></div>
+                        <span class="text-xs font-medium text-stone-400 dark:text-stone-500 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md transition-colors">${grouped[monthKey].length}</span>
+                    </div>
+                    
+                    <!-- Month Content -->
+                    <div id="month-${monthKey}" class="space-y-4 month-content ${contentDisplay}">
+                `;
+
+                grouped[monthKey].forEach(entry => {
+                    if (filterQ === 'all') {
+                        html += renderFullCard(entry);
+                    } else {
+                        html += renderSpecificCard(entry, filterQ);
+                    }
+                });
+
+                html += `</div></div>`; 
+            });
+
+            els.historyContainer.innerHTML = html;
+        }
+
+        // Render Elegant Card
+        function renderFullCard(entry) {
+            const dateObj = new Date(entry.date);
+            const day = dateObj.getDate();
+            const weekDay = dateObj.toLocaleDateString('zh-TW', { weekday: 'short' });
+            
+            // Title logic
+            const mainTitle = entry.q8 && entry.q8.trim() !== '' ? entry.q8 : '（今日未定題目）';
+            const isPlaceholder = !entry.q8 || entry.q8.trim() === '';
+            
+            // Scripture Display logic
+            const scriptureDisplay = entry.scripture 
+                ? `<span class="ml-2 text-xs font-medium text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md border border-stone-200 dark:border-stone-700 inline-block align-middle transform -translate-y-0.5">${entry.scripture}</span>` 
+                : '';
+
+            // Split keys for book layout
+            const leftKeys = ['q1', 'q2', 'q3', 'q4'];
+            const rightKeys = ['q5', 'q6', 'q7', 'q8'];
+
+            return `
+                <div class="history-card bg-white dark:bg-stone-900 rounded-xl p-5 md:p-6 shadow-card relative group/card cursor-pointer transition-colors" id="card-${entry.date}" onclick="toggleDetail('${entry.date}')">
+                    <div class="flex items-center gap-5">
+                        
+                        <!-- Date Badge -->
+                        <div class="flex flex-col items-center justify-center min-w-[3.5rem] h-[3.5rem] bg-stone-50 dark:bg-stone-800 rounded-xl border border-stone-100 dark:border-stone-700 shadow-sm group-hover/card:border-primary-100 dark:group-hover/card:border-primary-900 group-hover/card:bg-primary-50 dark:group-hover/card:bg-primary-900/20 transition-colors">
+                            <span class="text-xs text-stone-400 dark:text-stone-500 font-medium group-hover/card:text-primary-400 uppercase tracking-wider scale-75">${weekDay}</span>
+                            <span class="text-xl font-serif font-bold text-stone-700 dark:text-stone-300 leading-none group-hover/card:text-primary-600 dark:group-hover/card:text-primary-400">${day}</span>
+                        </div>
+                        
+                        <!-- Main Content (Title + Scripture) -->
+                        <div class="flex-grow overflow-hidden">
+                            <h3 class="card-title text-lg font-bold text-stone-800 dark:text-stone-200 transition-colors truncate pr-4 leading-normal">
+                                <span class="${isPlaceholder ? 'text-stone-400 dark:text-stone-600 font-normal italic' : ''}">${mainTitle}</span>
+                                ${scriptureDisplay}
+                            </h3>
+                            <div class="text-xs text-stone-400 dark:text-stone-500 mt-1 font-medium flex items-center gap-2 transition-colors">
+                                <span>點擊展開詳情</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] detail-chevron opacity-50"></i>
+                            </div>
+                        </div>
+
+                        <!-- Actions (Hover visible on desktop) -->
+                        <div class="flex items-center gap-1 z-10" onclick="event.stopPropagation()">
+                             <div class="flex gap-1 md:opacity-0 group-hover/card:opacity-100 transition-opacity mr-2">
+                                <button onclick="editEntry('${entry.date}')" class="text-stone-400 dark:text-stone-500 hover:text-primary-600 dark:hover:text-primary-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors" title="編輯">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="deleteEntry('${entry.date}')" class="text-stone-400 dark:text-stone-500 hover:text-red-500 dark:hover:text-red-400 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="刪除">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Detail -->
+                    <div class="detail-content" id="detail-${entry.date}">
+                         <div class="detail-inner pt-6 mt-2">
+                            <div class="bg-stone-50/80 dark:bg-stone-800/50 rounded-lg p-6 border border-stone-100/50 dark:border-stone-700/50 transition-colors relative">
+                                
+                                <!-- Book Binding Divider (Desktop Only) -->
+                                <div class="hidden lg:block absolute left-1/2 top-6 bottom-6 w-px bg-stone-200 dark:bg-stone-700 -translate-x-1/2 opacity-60"></div>
+
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                                    <!-- Left Page -->
+                                    <div class="space-y-6">
+                                        ${leftKeys.map(key => generateDetailRow(QUESTION_LABELS[key], entry[key])).join('')}
+                                    </div>
+
+                                    <!-- Right Page -->
+                                    <div class="space-y-6">
+                                        ${rightKeys.map(key => generateDetailRow(QUESTION_LABELS[key], entry[key])).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSpecificCard(entry, key) {
+            const content = entry[key] || '<span class="text-stone-300 dark:text-stone-600 italic">無內容</span>';
+            const dateObj = new Date(entry.date);
+            const day = dateObj.getDate();
+            
+            return `
+                <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-100 dark:border-stone-800 p-5 shadow-sm hover:shadow-md transition-all flex gap-4 group/card relative">
+                     <div class="flex flex-col items-center min-w-[3rem] pt-1">
+                        <div class="text-2xl font-serif font-bold text-stone-300 dark:text-stone-700 group-hover/card:text-primary-300 dark:group-hover/card:text-primary-700 transition-colors">${day}</div>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center mb-2">
+                             <div class="text-xs font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded uppercase tracking-wider transition-colors">${QUESTION_LABELS[key]}</div>
+                             <button onclick="editEntry('${entry.date}')" class="text-stone-300 dark:text-stone-600 hover:text-primary-600 dark:hover:text-primary-400 p-1 md:opacity-0 group-hover/card:opacity-100 transition-opacity" title="編輯全文">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </div>
+                        <p class="text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap text-sm transition-colors">${content}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Helpers ---
+        window.toggleMonth = (id, header) => {
+            const content = document.getElementById(id);
+            const chevron = header.querySelector('.chevron');
+            const isHidden = content.classList.contains('hidden');
+            
+            if (isHidden) {
+                content.classList.remove('hidden');
+                header.classList.remove('collapsed');
+            } else {
+                content.classList.add('hidden');
+                header.classList.add('collapsed');
+            }
+        };
+
+        window.toggleDetail = (date) => {
+            const detailEl = document.getElementById(`detail-${date}`);
+            const cardEl = document.getElementById(`card-${date}`);
+            
+            if (detailEl) {
+                const isOpen = detailEl.classList.contains('open');
+                if (isOpen) {
+                    detailEl.classList.remove('open');
+                    if(cardEl) cardEl.classList.remove('card-expanded');
+                } else {
+                    detailEl.classList.add('open');
+                    if(cardEl) cardEl.classList.add('card-expanded');
+                }
+            }
+        };
+
+        window.switchTab = (tabName) => {
+            const writeBtn = document.getElementById('tab-write');
+            const historyBtn = document.getElementById('tab-history');
+            const writeView = document.getElementById('view-write');
+            const historyView = document.getElementById('view-history');
+
+            if (tabName === 'write') {
+                writeBtn.className = writeBtn.className.replace('tab-inactive', 'tab-active');
+                historyBtn.className = historyBtn.className.replace('tab-active', 'tab-inactive');
+                writeView.classList.remove('hidden');
+                historyView.classList.add('hidden');
+            } else {
+                historyBtn.className = historyBtn.className.replace('tab-inactive', 'tab-active');
+                writeBtn.className = writeBtn.className.replace('tab-active', 'tab-inactive');
+                historyView.classList.remove('hidden');
+                writeView.classList.add('hidden');
+                renderHistory(); 
+            }
+        };
+
+        function generateDetailRow(label, text) {
+            if (!text || text.trim() === "") return ''; // Only show filled fields for cleaner look
+            return `
+                <div class="relative pl-4 border-l-2 border-primary-100 dark:border-primary-900 transition-colors">
+                    <h4 class="text-xs font-bold text-primary-500 dark:text-primary-400 mb-1.5 uppercase tracking-wide transition-colors">${label}</h4>
+                    <p class="text-stone-700 dark:text-stone-300 leading-7 text-sm whitespace-pre-wrap transition-colors">${text}</p>
+                </div>
+            `;
+        }
+
+        function groupByMonth(data) {
+            return data.reduce((acc, obj) => {
+                const month = obj.date.substring(0, 7);
+                if (!acc[month]) acc[month] = [];
+                acc[month].push(obj);
+                return acc;
+            }, {});
+        }
+
+        function formatMonth(yyyyMm) {
+            const [y, m] = yyyyMm.split('-');
+            return `${y}年 ${parseInt(m)}月`;
+        }
+
+        // Import/Export Logic
+        window.exportData = () => {
+            if (devotionalsData.length === 0) { showToast("沒有資料可供匯出", "error"); return; }
+            const blob = new Blob([JSON.stringify(devotionalsData, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `devotional_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("備份檔案已下載");
+        };
+
+        window.triggerImport = () => els.fileImport.click();
+        
+        window.importData = (input) => {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        if(confirm(`準備匯入 ${imported.length} 筆資料。這將會覆蓋現有資料。\n確定要繼續嗎？`)) {
+                             devotionalsData = imported;
+                             saveLocalData();
+                             loadEntryForDate(els.dateInput.value);
+                             showToast("資料匯入成功！");
+                        }
+                    } else throw new Error("Format");
+                } catch { showToast("匯入失敗：格式錯誤", "error"); }
+                input.value = ''; 
+            };
+            reader.readAsText(file);
+        };
+
+        function showToast(msg, type = 'success') {
+            els.toastMsg.textContent = msg;
+            const icon = els.toast.querySelector('i');
+            const iconContainer = icon.parentElement;
+            
+            if (type === 'error') {
+                icon.className = 'fa-solid fa-xmark text-xs';
+                iconContainer.className = 'w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 dark:text-red-300';
+            } else {
+                icon.className = 'fa-solid fa-check text-xs';
+                iconContainer.className = 'w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 dark:text-green-300';
+            }
+            
+            els.toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => els.toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
