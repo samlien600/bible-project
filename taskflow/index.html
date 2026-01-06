@@ -805,7 +805,8 @@ function renderPlanning() {
             <div class="flex-1 px-1.5 overflow-y-auto space-y-2 min-h-0 custom-scrollbar" 
                  ondrop="handleDrop(event, '${dateStr}')" 
                  ondragover="handleDragOver(event)">
-                ${dayTasks.map(task => renderTaskCard(task, true)).join('')} <!-- Grid: fixed height -->
+                <!-- Pass index to identify the first task -->
+                ${dayTasks.map((task, index) => renderTaskCard(task, true, index === 0)).join('')} 
                 <!-- Spacer for easy dropping at bottom -->
                 <div class="h-2 w-full"></div>
                 <button onclick="quickAddTask('${dateStr}')" class="w-full py-2 border border-dashed border-slate-300 rounded-xl text-slate-400 hover:border-primary-400 hover:text-primary-500 hover:bg-white/60 transition group text-sm flex items-center justify-center gap-2 mt-auto opacity-60 hover:opacity-100">
@@ -848,24 +849,43 @@ function saveWeeklyReview() {
     if (currentView === 'history') renderHistory();
 }
 
-function renderTaskCard(task, isGrid = false) {
+function renderTaskCard(task, isGrid = false, isFirst = false) {
     const hasContent = task.content && task.content.trim().length > 0;
     const hasOutput = task.output && task.output.trim().length > 0;
     const isDone = task.status === 'done';
 
     // Grid view specific styles: fixed height, flex column layout
-    // Changed h-20 to h-24 to give more vertical space
     const cardClasses = isGrid 
         ? "h-24 flex flex-col justify-between" 
         : "";
     
+    // Priority Styling (First item in Grid & Not Done)
+    const isPriority = isGrid && isFirst && !isDone;
+    
+    const borderClass = isPriority 
+        ? "border-amber-400 ring-1 ring-amber-100 shadow-md shadow-amber-100/50" 
+        : "border-slate-200";
+        
+    const bgClass = isPriority
+        ? "bg-amber-50/30" // Subtle warm background
+        : "bg-white";
+
     // Grid view title: allow 2 lines if needed since we have fixed height
     const titleClasses = isGrid
         ? "line-clamp-2"
         : "truncate";
 
+    // Status Icon Logic: Priority Star or Done Check
+    let statusIcon = '';
+    if (isDone) {
+        statusIcon = '<i class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>';
+    } else if (isPriority) {
+        // Star icon in the same position as check icon
+        statusIcon = '<i class="fa-solid fa-star text-amber-400 text-sm flex-shrink-0 animate-pulse-slow filter drop-shadow-sm" title="優先處理"></i>';
+    }
+
     return `
-        <div class="task-card bg-white p-3 rounded-lg shadow-sm border border-slate-200 cursor-grab hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative select-none ${cardClasses}"
+        <div class="task-card ${bgClass} p-3 rounded-lg shadow-sm ${borderClass} cursor-grab hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative select-none ${cardClasses}"
              draggable="true" 
              data-id="${task.id}"
              ondragstart="handleDragStart(event)"
@@ -875,8 +895,8 @@ function renderTaskCard(task, isGrid = false) {
              <div class="absolute left-0 top-3 bottom-3 w-1 rounded-r-md ${isDone ? 'bg-emerald-400' : 'bg-primary-500'} opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
             <div class="flex items-start justify-between gap-1.5 mb-1.5 w-full">
-                <div class="font-semibold text-sm leading-tight text-slate-700 ${titleClasses} ${isDone ? 'line-through text-slate-400' : ''}" title="${task.title}">${task.title}</div>
-                 ${isDone ? '<i class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>' : ''}
+                <div class="font-semibold text-sm leading-tight ${isPriority ? 'text-slate-800' : 'text-slate-700'} ${titleClasses} ${isDone ? 'line-through text-slate-400' : ''}" title="${task.title}">${task.title}</div>
+                 ${statusIcon}
             </div>
 
             <div class="flex flex-wrap gap-1.5 items-center">
