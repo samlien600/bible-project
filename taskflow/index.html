@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - 任務管家</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans TC & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', '"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        zinc: {
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            300: '#d4d4d8',
+                            400: '#a1a1aa',
+                            500: '#71717a',
+                            600: '#52525b',
+                            700: '#3f3f46',
+                            800: '#27272a',
+                            900: '#18181b',
+                            950: '#09090b',
+                        },
+                        // 藍色：計畫、執行 (Plan & Execute)
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe', 
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6', // True Blue
+                            600: '#2563eb',
+                            700: '#1d4ed8', 
+                            900: '#1e3a8a',
+                        },
+                        // 靛藍：回顧、反思、決策 (Review & Reflect) - 取代原本的紫色
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        // 綠色：完成、正向結果 (Done & Result) - 使用 Emerald 色系
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 隱藏滾動條但保留功能 */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 自訂滾動條樣式 (更細緻) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
+        /* 拖拉時的樣式 */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.98) rotate(1deg);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            cursor: grabbing !important;
+            z-index: 50;
+        }
+        
+        /* 拖曳經過的區域樣式 - 使用藍色 (計畫/執行) */
+        .drag-over {
+            background-color: rgba(59, 130, 246, 0.1); /* primary-500 with opacity */
+            border: 2px dashed #60a5fa; /* primary-400 */
+            border-radius: 0.75rem;
+        }
+        
+        /* 平滑過渡 */
+        .task-card, .btn-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Modal 動畫 */
+        .modal { transition: opacity 0.2s ease-out; }
+        .modal-content { transition: transform 0.2s ease-out; }
+        
+        body.modal-active { overflow: hidden; }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Range Slider */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px; width: 14px;
+            border-radius: 50%;
+            background: #3b82f6; /* Blue for interaction */
+            cursor: pointer;
+            margin-top: -5px;
+            box-shadow: 0 0 0 2px white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #e4e4e7;
+            border-radius: 2px;
+        }
+
+        /* Accordion transition */
+        .accordion-content {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .accordion-open .accordion-content {
+            max-height: 2000px; /* Arbitrary large height */
+            opacity: 1;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .accordion-open .accordion-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-800 text-base h-screen flex flex-col overflow-hidden selection:bg-primary-100 selection:text-primary-900 transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-20 border-b border-zinc-200/60 shadow-sm flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-14 items-center">
+                <div class="flex items-center gap-3">
+                    <!-- LOGO 使用藍色漸層 (計畫/執行) -->
+                    <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-primary-500/20">
+                        <i class="fa-solid fa-layer-group text-sm"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-zinc-800 tracking-tight">TaskFlow</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <nav class="flex space-x-1 bg-zinc-100/50 p-1.5 rounded-full border border-zinc-200/50" id="nav-container">
+                        <!-- Navigation generated by JS -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-container" class="flex-1 overflow-hidden relative w-full max-w-7xl mx-auto p-2 sm:p-4">
+        
+        <!-- View: Planning (Week + Backlog + Review) -->
+        <div id="view-planning" class="view-section h-full hidden animate-fade-in flex gap-4">
+            
+            <!-- Left Sidebar -->
+            <div class="w-56 flex-shrink-0 flex flex-col gap-4 h-full pb-2">
+                
+                <!-- Backlog Section (Top Half) -->
+                <div class="flex-1 flex flex-col bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden min-h-0">
+                    <div class="p-3 border-b border-zinc-100 bg-zinc-50/50 rounded-t-2xl flex justify-between items-center flex-shrink-0">
+                        <h2 class="text-base font-bold text-zinc-700 flex items-center gap-2">
+                            <i class="fa-solid fa-inbox text-zinc-400"></i> 待辦清單
+                        </h2>
+                        <span class="text-xs bg-zinc-200 text-zinc-600 px-2 py-0.5 rounded-full" id="backlog-count">0</span>
+                    </div>
+                    <div class="flex-1 p-2 overflow-y-auto space-y-2 bg-zinc-50/30" 
+                         id="backlog-list"
+                         ondrop="handleDrop(event, '')" 
+                         ondragover="handleDragOver(event)">
+                        <!-- Backlog items generated by JS -->
+                    </div>
+                    <div class="p-2 border-t border-zinc-100 flex-shrink-0">
+                        <button onclick="quickAddTask('')" class="w-full py-2 border border-dashed border-zinc-300 rounded-xl text-zinc-500 hover:border-primary-400 hover:text-primary-600 hover:bg-white transition group text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> 新增待辦
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Weekly Review Section (Bottom Half) -->
+                <!-- 改為靛藍色 (Indigo) -->
+                <div class="h-[40%] flex flex-col bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+                    <div class="p-3 border-b border-zinc-100 bg-indigo-50 flex justify-between items-center flex-shrink-0">
+                        <h2 class="text-base font-bold text-indigo-600 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib"></i> 週復盤
+                        </h2>
+                        <button onclick="saveWeeklyReview()" class="text-xs bg-white text-indigo-600 border border-indigo-200 px-2.5 py-1 rounded-lg hover:bg-indigo-50 transition shadow-sm font-medium">儲存</button>
+                    </div>
+                    <div class="flex-1 p-0 relative bg-white">
+                        <textarea id="weekly-review-input" class="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-sm text-zinc-600 placeholder-zinc-300 p-3 leading-relaxed" placeholder="寫下本週的反思、成就或下週重點..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week Grid Section (Right Main) -->
+            <div class="flex-1 flex flex-col h-full min-w-0">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            每週任務
+                            <span class="text-xs font-normal px-2 py-1 bg-slate-100 rounded-full text-slate-600" id="planning-week-range">Loading...</span>
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center bg-white rounded-lg shadow-sm border border-slate-200 p-0.5">
+                            <button onclick="changeWeek(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-50 rounded text-slate-500 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <div class="w-px h-4 bg-slate-200 mx-1"></div>
+                            <button onclick="changeWeek(1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-50 rounded text-slate-500 transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                        <button onclick="jumpToToday()" class="text-sm bg-white border border-slate-200 text-slate-600 hover:text-primary-600 hover:border-primary-200 px-4 py-1.5 rounded-lg font-medium transition shadow-sm">
+                            回到今天
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Week Grid -->
+                <div class="flex-1 overflow-x-auto overflow-y-hidden pb-2">
+                    <div class="grid grid-cols-7 grid-rows-1 gap-2 h-full w-full min-w-[800px]" id="week-grid">
+                        <!-- Columns generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: History -->
+        <div id="view-history" class="view-section h-full flex flex-col hidden animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-bold text-slate-800">歷史回顧</h2>
+                    <div id="calendar-controls" class="flex items-center bg-white rounded-lg shadow-sm border border-slate-200 p-0.5">
+                         <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-50 rounded text-slate-500 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                         <span id="history-month-display" class="px-3 font-medium text-sm text-slate-700 min-w-[100px] text-center">Loading...</span>
+                         <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-50 rounded text-slate-500 transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                         <div class="w-px h-4 bg-slate-200 mx-1"></div>
+                         <button onclick="jumpToThisMonth()" class="px-3 text-xs font-medium text-slate-600 hover:text-primary-600 transition">回到本月</button>
+                    </div>
+                </div>
+                
+                <!-- View Toggle & Filters -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div id="history-filters" class="hidden flex gap-2 flex-1 sm:flex-initial">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="filter-keyword" placeholder="搜尋..." class="pl-8 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 w-32 sm:w-48 transition shadow-sm text-slate-800" oninput="renderHistory()">
+                        </div>
+                        <select id="filter-status" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 text-slate-600 shadow-sm cursor-pointer" onchange="renderHistory()">
+                            <option value="all">所有狀態</option>
+                            <option value="todo">進行中</option>
+                            <option value="done">已完成</option>
+                        </select>
+                    </div>
+                    <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                        <button onclick="setHistoryMode('calendar')" id="btn-mode-calendar" class="px-3 py-1 rounded-md text-sm font-medium transition flex items-center gap-2" title="月曆視圖">
+                            <i class="fa-regular fa-calendar"></i>
+                        </button>
+                        <button onclick="setHistoryMode('list')" id="btn-mode-list" class="px-3 py-1 rounded-md text-sm font-medium transition flex items-center gap-2" title="清單視圖">
+                            <i class="fa-solid fa-list-ul"></i>
+                        </button>
+                        <button onclick="setHistoryMode('graph')" id="btn-mode-graph" class="px-3 py-1 rounded-md text-sm font-medium transition flex items-center gap-2" title="圖譜視圖">
+                            <i class="fa-solid fa-circle-nodes"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-1 bg-white/60 backdrop-blur-sm rounded-xl shadow-sm border border-white/50 ring-1 ring-slate-200 p-1 flex flex-col overflow-hidden relative transition-colors duration-200">
+                
+                <!-- Calendar Mode -->
+                <div id="history-view-calendar" class="flex flex-col h-full rounded-lg overflow-hidden bg-white">
+                    <!-- Calendar Header -->
+                    <div class="grid grid-cols-7 py-1.5 text-center text-slate-400 font-bold text-xs tracking-wider border-b border-slate-200 bg-slate-50/50 flex-shrink-0">
+                        <!-- Updated to start from Monday -->
+                        <div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div><div>SUN</div>
+                    </div>
+                    <!-- Calendar Grid -->
+                    <!-- Removed gap-px and bg-slate-200 to remove spacing, using borders instead -->
+                    <div id="calendar-grid" class="grid grid-cols-7 flex-1 bg-white overflow-y-auto">
+                        <!-- Days generated by JS -->
+                    </div>
+                </div>
+
+                <!-- List Mode -->
+                <div id="history-view-list" class="hidden flex flex-col h-full overflow-hidden bg-transparent">
+                    <div class="overflow-y-auto pr-2 space-y-4 p-4" id="history-list-container">
+                        <!-- List Items generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Graph Mode -->
+                <div id="history-view-graph" class="hidden flex flex-col h-full overflow-hidden bg-white rounded-lg relative">
+                    <!-- Graph Controls Overlay -->
+                    <div class="absolute top-2 left-2 z-10 flex gap-2">
+                        <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-500 shadow-sm pointer-events-none flex items-center">
+                            <i class="fa-solid fa-filter mr-2 text-primary-500"></i> <span id="graph-filter-label">當月資料</span>
+                        </div>
+                        <button onclick="toggleGraphSettings()" class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 shadow-sm hover:bg-slate-50 transition flex items-center hover:text-primary-600">
+                            <i class="fa-solid fa-sliders mr-1.5"></i> 調整參數
+                        </button>
+                    </div>
+
+                    <!-- Graph Settings Panel -->
+                    <div id="graph-settings" class="hidden absolute top-12 left-2 z-20 bg-white/95 backdrop-blur p-4 rounded-xl border border-slate-200 shadow-xl w-64 animate-fade-in">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-500 mb-1.5">
+                                    <span>排斥力 (鬆散度)</span>
+                                    <span id="val-repulsion" class="text-primary-600">3000</span>
+                                </label>
+                                <input type="range" min="500" max="8000" step="100" value="3000" oninput="updateGraphParam('repulsion', this.value)" class="w-full">
+                            </div>
+                            <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-500 mb-1.5">
+                                    <span>連線長度</span>
+                                    <span id="val-springLength" class="text-primary-600">250</span>
+                                </label>
+                                <input type="range" min="50" max="600" step="10" value="250" oninput="updateGraphParam('springLength', this.value)" class="w-full">
+                            </div>
+                             <div>
+                                <label class="flex justify-between text-xs font-bold text-slate-500 mb-1.5">
+                                    <span>連線強度 (彈性)</span>
+                                    <span id="val-springStrength" class="text-primary-600">0.04</span>
+                                </label>
+                                <input type="range" min="0.01" max="0.2" step="0.01" value="0.04" oninput="updateGraphParam('springStrength', this.value)" class="w-full">
+                            </div>
+                        </div>
+                        <div class="mt-3 text-[10px] text-slate-400 text-center border-t border-slate-100 pt-2">
+                            拖曳移動節點 · 滾輪縮放
+                        </div>
+                    </div>
+
+                    <canvas id="graph-canvas" class="w-full h-full cursor-move block"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View: Settings -->
+        <div id="view-settings" class="view-section h-full flex flex-col hidden max-w-2xl mx-auto w-full animate-fade-in">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">資料管理</h2>
+            
+            <!-- Simplified Settings Layout -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                
+                <!-- Export -->
+                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition duration-300">
+                            <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-700 text-sm">匯出備份</div>
+                            <div class="text-xs text-slate-400 mt-0.5">下載 JSON 格式檔案</div>
+                        </div>
+                    </div>
+                    <button onclick="exportData()" class="text-sm bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition font-medium">
+                        下載
+                    </button>
+                </div>
+
+                <!-- Import -->
+                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition duration-300">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-700 text-sm">還原資料</div>
+                            <div class="text-xs text-slate-400 mt-0.5">從 JSON 檔案復原</div>
+                        </div>
+                    </div>
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="handleFileImport(event)">
+                    <button onclick="triggerImport()" class="text-sm bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition font-medium">
+                        選擇檔案
+                    </button>
+                </div>
+
+                <!-- Clear -->
+                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center text-rose-500 group-hover:scale-110 transition duration-300">
+                            <i class="fa-solid fa-trash-can text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-700 text-sm">清空資料</div>
+                            <div class="text-xs text-slate-400 mt-0.5">刪除所有任務 (不可復原)</div>
+                        </div>
+                    </div>
+                    <button onclick="clearData()" class="text-sm bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition font-medium">
+                        清空
+                    </button>
+                </div>
+            </div>
+            
+             <div class="mt-auto py-8 text-center">
+                <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Stored locally on your device</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Edit Modal (Compact) -->
+    <div id="task-modal" class="modal fixed inset-0 z-50 flex items-center justify-center pointer-events-none opacity-0">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Content -->
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 z-10 transform scale-95 flex flex-col border border-white/20" id="modal-content">
+            <div class="p-5 overflow-y-auto scrollbar-hide max-h-[90vh]">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex-1 mr-4">
+                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Task Title</label>
+                        <input type="text" id="modal-title" class="text-xl font-bold w-full border-b border-transparent hover:border-slate-200 focus:border-primary-500 focus:outline-none bg-transparent transition pb-1 text-slate-800 placeholder-slate-300" placeholder="輸入任務標題">
+                    </div>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                
+                <!-- Controls Row -->
+                <div class="flex gap-3 mb-4">
+                    <div class="bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 flex-1">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">日期</label>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-regular fa-calendar text-slate-400"></i>
+                            <input type="date" id="modal-date" class="bg-transparent text-sm font-medium text-slate-700 focus:outline-none w-full">
+                        </div>
+                    </div>
+                    <!-- Status Section - Add ID for toggling -->
+                    <div id="modal-status-section" class="bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 cursor-pointer hover:bg-slate-100 transition group flex-1" onclick="toggleModalStatus()">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">狀態</label>
+                        <div class="flex items-center gap-2">
+                            <i id="modal-status-icon" class="fa-regular fa-square transition-transform group-hover:scale-110"></i>
+                            <span id="modal-status-text" class="text-sm font-medium">未完成</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review Content Area (Shown only for reviews) -->
+                <!-- 使用靛藍色 (Indigo) -->
+                <div id="modal-review-section" class="hidden">
+                     <label class="flex items-center text-xs font-bold text-indigo-500 uppercase tracking-wider mb-2 gap-2">
+                        <i class="fa-solid fa-pen-nib"></i> 復盤內容
+                    </label>
+                    <textarea id="modal-review-text" class="w-full h-48 p-3 bg-indigo-50 border border-indigo-100 rounded-lg resize-none focus:bg-white focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 focus:outline-none transition text-sm text-slate-700 leading-relaxed placeholder-slate-400" placeholder="撰寫週復盤內容..."></textarea>
+                </div>
+
+                <!-- Task Fields (Hidden for reviews) -->
+                <div id="modal-task-fields">
+                    <!-- Link Controls -->
+                    <div class="mb-4" id="modal-links-section">
+                        <label class="flex items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 gap-2">
+                            <i class="fa-solid fa-link"></i> 關聯任務
+                        </label>
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                            <div id="modal-links-list" class="flex flex-wrap gap-2 mb-2">
+                                <!-- Link Chips -->
+                            </div>
+                            <div class="flex gap-2">
+                                <input list="task-list-options" id="modal-link-input" class="flex-1 bg-white border border-slate-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500" placeholder="搜尋並新增關聯...">
+                                <datalist id="task-list-options">
+                                    <!-- Options generated by JS -->
+                                </datalist>
+                                <button onclick="addLinkFromInput()" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 px-3 py-1 rounded text-sm transition">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Areas -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="flex items-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 gap-2">
+                                <i class="fa-solid fa-align-left"></i> 詳細內容
+                            </label>
+                            <textarea id="modal-content-text" class="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-lg resize-none focus:bg-white focus:ring-2 focus:ring-primary-100 focus:border-primary-400 focus:outline-none transition text-sm text-slate-700 leading-relaxed placeholder-slate-400" placeholder="添加詳細描述..."></textarea>
+                        </div>
+
+                        <div id="modal-output-section">
+                            <label class="flex items-center text-xs font-bold text-primary-600 uppercase tracking-wider mb-1 gap-2">
+                                <i class="fa-solid fa-gift"></i> 產出成果
+                            </label>
+                            <textarea id="modal-output-text" class="w-full h-28 p-3 bg-primary-50/50 border border-primary-100 rounded-lg resize-none focus:bg-white focus:ring-2 focus:ring-primary-100 focus:border-primary-400 focus:outline-none transition text-sm text-slate-700 leading-relaxed placeholder-primary-300/70" placeholder="紀錄這項任務的具體產出..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-between pt-4 mt-4 border-t border-slate-100">
+                    <button onclick="deleteCurrentTask()" class="text-rose-500 hover:bg-rose-50 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 group">
+                        <i class="fa-regular fa-trash-can group-hover:scale-110 transition-transform"></i> 刪除
+                    </button>
+                    <button onclick="saveModalTask()" class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 font-medium transition shadow-lg shadow-primary-500/30 transform active:scale-95 text-sm">
+                        儲存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Tooltip (For Reviews) - Updated to Light Indigo theme -->
+    <div id="global-tooltip" class="fixed z-[9999] hidden w-72 bg-indigo-50 text-indigo-900 text-xs rounded-lg p-3 shadow-xl border border-indigo-200 pointer-events-none transition-opacity duration-200 opacity-0"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800/90 backdrop-blur-md text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-32 transition-all duration-300 flex items-center gap-4 z-50 border border-white/10">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-check text-emerald-400 text-sm"></i>
+        </div>
+        <span id="toast-msg" class="text-base font-medium tracking-wide">操作成功</span>
+    </div>
+
+<script>
+/**
+ * Data Structure
+ * Task: { 
+ * id: string, 
+ * title: string, 
+ * content: string, 
+ * output: string,
+ * date: string(YYYY-MM-DD), 
+ * status: 'todo'|'done',
+ * order: number,
+ * links: string[] // Array of linked task IDs
+ * type: 'task' | 'review' // Default 'task'
+ * }
+ */
+
+// State
+let tasks = [];
+let currentView = 'planning';
+let refDate = new Date(); // Reference date for calendar/week views
+let currentEditingId = null;
+let currentEditingLinks = []; // Temp storage for links in modal
+let historyMode = 'calendar'; // 'calendar' | 'list' | 'graph'
+let graphAnimationId = null; // To cancel graph loop
+
+// Graph Configuration
+let graphConfig = {
+    repulsion: 3000,
+    springLength: 250,
+    springStrength: 0.04,
+    damping: 0.8
+};
+
+// Constants
+const STORAGE_KEY = 'taskflow_data_v1';
+const VIEWS = [
+    { id: 'planning', label: '每週任務', icon: 'fa-table-columns' },
+    { id: 'history', label: '歷史回顧', icon: 'fa-calendar-days' },
+    { id: 'settings', label: '設定', icon: 'fa-sliders' }
+];
+
+// --- Initialization ---
+
+function init() {
+    loadTasks();
+    renderNav();
+    switchView('planning');
+    
+    // Global Event Listeners
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+    
+    // Window Resize for Graph
+    window.addEventListener('resize', () => {
+        if (currentView === 'history' && historyMode === 'graph') {
+            initGraph();
+        }
+    });
+}
+
+function loadTasks() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+        try {
+            tasks = JSON.parse(raw);
+            // Ensure compatibility
+            tasks.forEach((t, i) => {
+                if(typeof t.order === 'undefined') t.order = i;
+                if(!t.links) t.links = [];
+                if(!t.type) t.type = 'task';
+            });
+        } catch (e) {
+            console.error('Data load error', e);
+            tasks = [];
+        }
+    }
+}
+
+function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+// --- Navigation & Routing ---
+
+function renderNav() {
+    const container = document.getElementById('nav-container');
+    container.innerHTML = VIEWS.map(view => `
+        <button onclick="switchView('${view.id}')" 
+            class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 relative ${currentView === view.id ? 'bg-white text-primary-600 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/50'}"
+            data-view="${view.id}">
+            <i class="fa-solid ${view.icon} text-xs"></i>
+            <span class="hidden sm:inline">${view.label}</span>
+        </button>
+    `).join('');
+}
+
+function switchView(viewId) {
+    currentView = viewId;
+    
+    // Update Nav UI
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isStart = btn.dataset.view === viewId;
+        if (isStart) {
+            btn.className = 'nav-btn px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 relative bg-white text-primary-600 shadow-sm ring-1 ring-black/5';
+        } else {
+            btn.className = 'nav-btn px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 relative text-slate-500 hover:text-slate-900 hover:bg-slate-200/50';
+        }
+    });
+
+    // Hide all views, show current
+    document.querySelectorAll('.view-section').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('animate-fade-in');
+    });
+    
+    const targetView = document.getElementById(`view-${viewId}`);
+    targetView.classList.remove('hidden');
+    // Simple fade in reset
+    void targetView.offsetWidth; 
+    targetView.classList.add('animate-fade-in');
+
+    // Trigger specific render logic
+    if (viewId === 'planning') renderPlanning();
+    if (viewId === 'history') renderHistory();
+    if (viewId === 'settings') {
+        const importFile = document.getElementById('import-file');
+        if (importFile) importFile.value = '';
+    }
+}
+
+// --- Utilities ---
+
+function formatDate(date) {
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
+}
+
+function getDayName(dayIndex) {
+    const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+    return days[dayIndex];
+}
+
+function uuid() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-msg');
+    const iconContainer = toast.querySelector('div');
+    const icon = iconContainer.querySelector('i');
+    
+    toastMsg.textContent = msg;
+    if (type === 'error') {
+        iconContainer.className = 'w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center';
+        icon.className = 'fa-solid fa-exclamation text-rose-400 text-sm';
+    } else {
+        iconContainer.className = 'w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center';
+        icon.className = 'fa-solid fa-check text-emerald-400 text-sm';
+    }
+
+    toast.classList.remove('translate-y-32');
+    setTimeout(() => {
+        toast.classList.add('translate-y-32');
+    }, 3000);
+}
+
+// --- Planning View Logic (Drag & Drop Sorting) ---
+
+function changeWeek(offset) {
+    refDate.setDate(refDate.getDate() + (offset * 7));
+    renderPlanning();
+}
+
+function jumpToToday() {
+    refDate = new Date();
+    if (currentView === 'planning') renderPlanning();
+    if (currentView === 'history') renderHistory();
+}
+
+function getWeekDays(date) {
+    const curr = new Date(date); 
+    const dayOfWeek = curr.getDay(); 
+    const diff = curr.getDate() - dayOfWeek + (dayOfWeek == 0 ? -6 : 1); 
+    const monday = new Date(curr.setDate(diff));
+    
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+        const next = new Date(monday);
+        next.setDate(monday.getDate() + i);
+        week.push(formatDate(next));
+    }
+    return week;
+}
+
+function renderPlanning() {
+    const weekDays = getWeekDays(refDate);
+    const grid = document.getElementById('week-grid');
+    const rangeDisplay = document.getElementById('planning-week-range');
+    const backlogCountDisplay = document.getElementById('backlog-count');
+    
+    // Display Range
+    const startStr = weekDays[0].split('-').slice(1).join('/');
+    const endStr = weekDays[6].split('-').slice(1).join('/');
+    rangeDisplay.textContent = `${startStr} - ${endStr}`;
+
+    grid.innerHTML = '';
+    
+    // Render Backlog
+    const backlogList = document.getElementById('backlog-list');
+    // Filter non-review tasks
+    const backlogTasks = tasks
+        .filter(t => !t.date && t.type !== 'review')
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+    backlogCountDisplay.textContent = backlogTasks.length;
+    backlogList.innerHTML = '';
+    
+    backlogTasks.forEach(task => {
+        backlogList.innerHTML += renderTaskCard(task);
+    });
+    // Add spacer to backlog
+    backlogList.innerHTML += '<div class="h-8 w-full"></div>';
+
+    // Render Weekly Review
+    const reviewSunday = weekDays[6];
+    const weeklyReview = tasks.find(t => t.type === 'review' && t.date === reviewSunday);
+    const reviewInput = document.getElementById('weekly-review-input');
+    if(weeklyReview) {
+        reviewInput.value = weeklyReview.content;
+    } else {
+        reviewInput.value = '';
+    }
+
+    // Render Week Grid
+    weekDays.forEach((dateStr, index) => {
+        const isToday = dateStr === formatDate(new Date());
+        
+        // Filter tasks (exclude reviews)
+        const dayTasks = tasks
+            .filter(t => t.date === dateStr && t.type !== 'review')
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        const dateObj = new Date(dateStr);
+        
+        const col = document.createElement('div');
+        col.className = `flex flex-col h-full rounded-2xl border transition-all duration-300 ${isToday ? 'bg-primary-50/50 border-primary-200/60 shadow-inner' : 'bg-slate-50/50 border-transparent hover:border-slate-200/60'}`;
+        
+        col.innerHTML = `
+            <div class="p-2 text-center border-b border-transparent rounded-t-2xl mb-1 flex-shrink-0">
+                <div class="text-sm font-bold tracking-wider ${isToday ? 'text-primary-500' : 'text-slate-400'} uppercase mb-1">${getDayName(dateObj.getDay())}</div>
+                <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-lg font-bold ${isToday ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30' : 'text-slate-700'}">${dateObj.getDate()}</div>
+            </div>
+            <div class="flex-1 px-1.5 overflow-y-auto space-y-2 min-h-0 custom-scrollbar" 
+                 ondrop="handleDrop(event, '${dateStr}')" 
+                 ondragover="handleDragOver(event)">
+                ${dayTasks.map(task => renderTaskCard(task)).join('')}
+                <!-- Spacer for easy dropping at bottom -->
+                <div class="h-8 w-full"></div>
+            </div>
+            <div class="p-2 pt-0 flex-shrink-0">
+                <button onclick="quickAddTask('${dateStr}')" class="w-full py-2 border border-dashed border-slate-300 rounded-xl text-slate-400 hover:border-primary-400 hover:text-primary-500 hover:bg-white/60 transition group text-sm flex items-center justify-center gap-2 opacity-60 hover:opacity-100">
+                    <i class="fa-solid fa-plus transition-transform group-hover:scale-110"></i>
+                </button>
+            </div>
+        `;
+        grid.appendChild(col);
+    });
+}
+
+function saveWeeklyReview() {
+    const weekDays = getWeekDays(refDate);
+    const reviewSunday = weekDays[6];
+    const content = document.getElementById('weekly-review-input').value;
+    
+    // Find existing or create new
+    let reviewTask = tasks.find(t => t.type === 'review' && t.date === reviewSunday);
+    
+    if (reviewTask) {
+        reviewTask.content = content;
+    } else {
+        reviewTask = {
+            id: uuid(),
+            title: `週復盤 ${reviewSunday}`,
+            content: content,
+            output: "",
+            date: reviewSunday,
+            status: 'done', // Reviews are auto-done
+            type: 'review',
+            links: [],
+            createdAt: Date.now()
+        };
+        tasks.push(reviewTask);
+    }
+    
+    saveTasks();
+    showToast('週復盤已儲存');
+    // Refresh history if active
+    if (currentView === 'history') renderHistory();
+}
+
+function renderTaskCard(task) {
+    const hasContent = task.content && task.content.trim().length > 0;
+    const hasOutput = task.output && task.output.trim().length > 0;
+    const isDone = task.status === 'done';
+
+    return `
+        <div class="task-card bg-white p-3 rounded-lg shadow-sm border border-slate-200 cursor-grab hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative select-none"
+             draggable="true" 
+             data-id="${task.id}"
+             ondragstart="handleDragStart(event)"
+             onclick="openModal('${task.id}')">
+             
+             <!-- Status Indicator Bar -->
+             <div class="absolute left-0 top-3 bottom-3 w-1 rounded-r-md ${isDone ? 'bg-emerald-400' : 'bg-primary-500'} opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+            <div class="flex items-start justify-between gap-1.5 mb-1.5">
+                <div class="font-semibold text-sm leading-tight text-slate-700 truncate ${isDone ? 'line-through text-slate-400' : ''}">${task.title}</div>
+                 ${isDone ? '<i class="fa-solid fa-circle-check text-emerald-400 text-sm flex-shrink-0"></i>' : ''}
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 items-center">
+                ${hasContent ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-align-left text-[9px]"></i></div>` : ''}
+                ${hasOutput ? `<div class="text-[10px] px-1.5 py-0.5 bg-primary-50 rounded text-primary-600 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-gift text-[9px]"></i></div>` : ''}
+                ${task.links && task.links.length > 0 ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-link text-[9px]"></i> ${task.links.length}</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// --- Enhanced Drag & Drop Logic (Sortable) ---
+
+function handleDragStart(e) {
+    e.dataTransfer.setData("text/plain", e.target.dataset.id);
+    e.target.classList.add('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    const container = e.currentTarget;
+    container.classList.add('drag-over');
+
+    const dragging = document.querySelector('.dragging');
+    if (!dragging) return;
+
+    const afterElement = getDragAfterElement(container, e.clientY);
+    
+    if (afterElement == null) {
+        const btn = container.querySelector('button');
+        if(btn) {
+            container.insertBefore(dragging, btn.previousElementSibling); 
+        } else {
+            container.appendChild(dragging);
+        }
+    } else {
+        container.insertBefore(dragging, afterElement);
+    }
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task-card:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function handleDrop(e, dateStr) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    
+    const draggingId = e.dataTransfer.getData("text/plain");
+    const container = e.currentTarget;
+    
+    const taskCards = [...container.querySelectorAll('.task-card')];
+    const newOrderIds = taskCards.map(card => card.dataset.id);
+    
+    let needsSave = false;
+    
+    const draggedTask = tasks.find(t => t.id === draggingId);
+    if(draggedTask) {
+        if(draggedTask.date !== dateStr) {
+             draggedTask.date = dateStr; 
+             needsSave = true;
+        }
+    }
+
+    newOrderIds.forEach((id, index) => {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            if (task.date !== dateStr || task.order !== index) {
+                task.date = dateStr;
+                task.order = index;
+                needsSave = true;
+            }
+        }
+    });
+
+    if (needsSave) {
+        saveTasks();
+        showToast('排序已更新');
+    }
+    
+    const draggables = document.querySelectorAll('.dragging');
+    draggables.forEach(d => d.classList.remove('dragging'));
+    
+    renderPlanning();
+}
+
+function quickAddTask(dateStr) {
+    // Directly create a new task and open modal
+    // If dateStr is empty, it means backlog
+    
+    const relevantTasks = tasks.filter(t => t.date === dateStr);
+    const maxOrder = relevantTasks.reduce((max, t) => Math.max(max, t.order || 0), -1);
+
+    const newTask = {
+        id: uuid(),
+        title: "新任務", // Placeholder title
+        content: "",
+        output: "",
+        date: dateStr, // Will be "" for backlog
+        status: 'todo',
+        order: maxOrder + 1, 
+        links: [],
+        createdAt: Date.now()
+    };
+    tasks.push(newTask);
+    saveTasks();
+    renderPlanning();
+    openModal(newTask.id); // Open modal immediately
+}
+
+// --- History View Logic (Calendar & List & Graph) ---
+
+function setHistoryMode(mode) {
+    historyMode = mode;
+    renderHistory();
+}
+
+function jumpToThisMonth() {
+    refDate = new Date();
+    renderHistory();
+}
+
+function changeMonth(offset) {
+    refDate.setMonth(refDate.getMonth() + offset);
+    renderHistory();
+}
+
+function renderHistory() {
+    const year = refDate.getFullYear();
+    const month = refDate.getMonth();
+    document.getElementById('history-month-display').textContent = `${year}年 ${month + 1}月`;
+
+    // UI Toggle State
+    const btnCal = document.getElementById('btn-mode-calendar');
+    const btnList = document.getElementById('btn-mode-list');
+    const btnGraph = document.getElementById('btn-mode-graph');
+    
+    const viewCal = document.getElementById('history-view-calendar');
+    const viewList = document.getElementById('history-view-list');
+    const viewGraph = document.getElementById('history-view-graph');
+    
+    const filters = document.getElementById('history-filters');
+    const calControls = document.getElementById('calendar-controls');
+
+    // Reset UI
+    [btnCal, btnList, btnGraph].forEach(btn => btn.className = "px-3 py-1 rounded-md text-sm font-medium transition flex items-center gap-2 text-slate-500 hover:text-slate-700");
+    [viewCal, viewList, viewGraph].forEach(view => view.classList.add('hidden'));
+    
+    if (historyMode === 'calendar') {
+        btnCal.className = "px-3 py-1 rounded-md text-sm font-medium transition shadow-sm bg-white text-slate-800 ring-1 ring-slate-200 flex items-center gap-2";
+        viewCal.classList.remove('hidden');
+        filters.classList.remove('hidden');
+        calControls.classList.remove('invisible');
+        renderHistoryCalendar(year, month);
+    } else if (historyMode === 'list') {
+        btnList.className = "px-3 py-1 rounded-md text-sm font-medium transition shadow-sm bg-white text-slate-800 ring-1 ring-slate-200 flex items-center gap-2";
+        viewList.classList.remove('hidden');
+        filters.classList.remove('hidden');
+        calControls.classList.remove('invisible');
+        renderHistoryList(year, month);
+    } else if (historyMode === 'graph') {
+        btnGraph.className = "px-3 py-1 rounded-md text-sm font-medium transition shadow-sm bg-white text-slate-800 ring-1 ring-slate-200 flex items-center gap-2";
+        viewGraph.classList.remove('hidden');
+        filters.classList.remove('hidden'); // Now showing filters for graph view
+        calControls.classList.add('invisible'); // Hide controls for graph as it shows global data usually
+        setTimeout(initGraph, 100); 
+    }
+}
+
+function renderHistoryCalendar(year, month) {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    // Adjusted to start on Monday (0=Mon, 6=Sun)
+    const startDayIndex = (firstDay.getDay() + 6) % 7; 
+    const totalDays = lastDay.getDate();
+    
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = '';
+
+    // Removed individual borders from empty cells to rely on grid gap
+    for (let i = 0; i < startDayIndex; i++) {
+        grid.innerHTML += `<div class="bg-slate-50/30 h-28 border-b border-r border-slate-200"></div>`;
+    }
+    
+    // Get filters
+    const keyword = document.getElementById('filter-keyword').value.toLowerCase();
+    const statusFilter = document.getElementById('filter-status').value;
+
+    for (let d = 1; d <= totalDays; d++) {
+        const currentStr = formatDate(new Date(year, month, d));
+        const isToday = currentStr === formatDate(new Date());
+        
+        // Find review task first to handle it separately
+        const reviewTask = tasks.find(t => t.date === currentStr && t.type === 'review');
+
+        let dayTasks = tasks
+            .filter(t => t.date === currentStr && t.type !== 'review') // Exclude review from main list
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+         // Apply filters to calendar view items
+        if (keyword) {
+            dayTasks = dayTasks.filter(t => 
+                t.title.toLowerCase().includes(keyword) || 
+                (t.content && t.content.toLowerCase().includes(keyword)) ||
+                (t.output && t.output.toLowerCase().includes(keyword))
+            );
+        }
+
+        if (statusFilter !== 'all') {
+            dayTasks = dayTasks.filter(t => t.status === statusFilter);
+        }
+
+        const doneCount = dayTasks.filter(t => t.status === 'done').length;
+        
+        const cell = document.createElement('div');
+        // Compact height h-28 (112px)
+        // Added hover:z-20 to ensure popups from this cell are on top of next cells
+        // Removed border-b border-r border-slate-100 to ensure consistent grid lines via gap-px
+        cell.className = `bg-white h-28 p-1.5 flex flex-col hover:bg-slate-50 transition cursor-pointer group relative hover:z-20 border-b border-r border-slate-200 ${isToday ? 'bg-primary-50/10' : ''}`;
+        
+        let visibleDotsHtml = '';
+        const maxLines = 3;
+        
+        if (dayTasks.length > 0) {
+            let showCount = dayTasks.length;
+            let hasMore = false;
+
+            if (dayTasks.length > maxLines) {
+                showCount = maxLines - 1; 
+                hasMore = true;
+            }
+
+            visibleDotsHtml = dayTasks.slice(0, showCount).map(t => {
+                const normalBg = 'bg-primary-50 text-primary-700 border border-primary-100/50';
+                
+                const finalClass = (t.status === 'done' ? 'bg-slate-100 text-slate-400 line-through' : normalBg);
+
+                return `
+                <div onclick="openModal('${t.id}'); event.stopPropagation()" class="text-xs truncate px-1.5 py-0.5 rounded mb-0.5 cursor-pointer hover:scale-[1.02] transition-transform flex justify-between items-center flex-shrink-0 ${finalClass}">
+                    <span class="truncate font-medium leading-tight">${t.title}</span>
+                    ${t.output ? '<i class="fa-solid fa-gift text-[10px] ml-1 opacity-70"></i>' : ''}
+                </div>
+            `}).join('');
+            
+            if (hasMore) {
+                visibleDotsHtml += `<div class="text-[10px] text-slate-400 pl-1 font-medium leading-tight mt-0.5">+${dayTasks.length - showCount} 更多</div>`;
+            }
+        }
+
+        let popoverHtml = '';
+        if (dayTasks.length > maxLines) {
+             const allTasksHtml = dayTasks.map(t => `
+                <div onclick="openModal('${t.id}'); event.stopPropagation()" class="text-xs truncate px-2 py-1.5 rounded-md mb-1 cursor-pointer hover:bg-slate-50 border border-transparent hover:border-slate-100 transition flex justify-between items-center ${t.status === 'done' ? 'text-slate-400 line-through' : 'text-slate-700'}">
+                    <span class="truncate font-medium">${t.title}</span>
+                    <span class="flex items-center gap-1">
+                        ${t.links && t.links.length > 0 ? '<i class="fa-solid fa-link text-[9px] text-slate-400"></i>' : ''}
+                        ${t.output ? '<i class="fa-solid fa-gift text-[10px] text-primary-400"></i>' : ''}
+                        ${t.status === 'done' ? '<i class="fa-solid fa-check text-emerald-400 text-[10px]"></i>' : ''}
+                    </span>
+                </div>
+            `).join('');
+
+            popoverHtml = `
+                <div class="hidden group-hover:block absolute left-0 top-0 z-50 w-[180%] min-w-[200px] bg-white border border-slate-200 shadow-xl rounded-lg p-2 max-h-64 overflow-y-auto">
+                    <div class="text-xs font-bold text-slate-400 mb-2 px-1 border-b border-slate-100 pb-1">
+                        ${d} 日 - ${dayTasks.length} 任務
+                    </div>
+                    <div class="space-y-0.5">
+                        ${allTasksHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Review Badge Logic - Updated for Global Tooltip to prevent clipping
+        const reviewBadge = reviewTask ? `
+            <div onclick="openModal('${reviewTask.id}'); event.stopPropagation()" 
+                 onmouseenter="showReviewTooltip(event, '${reviewTask.id}')"
+                 onmouseleave="hideTooltip()"
+                  class="ml-auto w-5 h-5 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition cursor-pointer relative">
+                <i class="fa-solid fa-pen-nib text-[10px]"></i>
+            </div>
+        ` : '';
+
+        cell.innerHTML = `
+            ${popoverHtml}
+            <div class="flex justify-between items-center mb-1 relative z-0">
+                <div class="flex items-center gap-2 w-full">
+                    <span class="text-sm font-semibold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30' : 'text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700 transition'}">${d}</span>
+                    ${reviewBadge}
+                </div>
+                ${doneCount > 0 && doneCount === dayTasks.length ? '<div class="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center ml-1 flex-shrink-0"><i class="fa-solid fa-check text-emerald-500 text-[10px]"></i></div>' : ''}
+            </div>
+            <div class="flex-1 overflow-hidden relative z-0 flex flex-col justify-start gap-0.5">
+                ${visibleDotsHtml}
+            </div>
+        `;
+        grid.appendChild(cell);
+    }
+}
+
+// --- Tooltip Functions ---
+
+function showReviewTooltip(e, taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const tooltip = document.getElementById('global-tooltip');
+    
+    // Content - Using Indigo Theme for Text
+    tooltip.innerHTML = `
+        <div class="font-bold text-indigo-600 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-pen-nib text-[10px]"></i> 週復盤
+        </div>
+        <div class="whitespace-pre-wrap leading-relaxed opacity-90 text-slate-700">${(task.content || '無內容').substring(0, 200)}${task.content && task.content.length > 200 ? '...' : ''}</div>
+    `;
+    
+    tooltip.classList.remove('hidden');
+    // Force layout update
+    void tooltip.offsetWidth; 
+    tooltip.classList.remove('opacity-0');
+
+    // Positioning
+    const targetRect = e.currentTarget.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+
+    // Default: Top + Center
+    let top = targetRect.top - tooltipRect.height - 10;
+    let left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+
+    // Boundary Checks - Flip to bottom if clipping top
+    if (top < 10) {
+        top = targetRect.bottom + 10;
+    }
+    
+    // Keep horizontally within screen
+    if (left < 10) left = 10;
+    if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipRect.width - 10;
+    }
+
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+}
+
+function hideTooltip() {
+    const tooltip = document.getElementById('global-tooltip');
+    tooltip.classList.add('opacity-0');
+    setTimeout(() => {
+        tooltip.classList.add('hidden');
+    }, 200);
+}
+
+function renderHistoryList(year, month) {
+    const container = document.getElementById('history-list-container');
+    const keyword = document.getElementById('filter-keyword').value.toLowerCase();
+    const statusFilter = document.getElementById('filter-status').value;
+
+    const startStr = formatDate(new Date(year, month, 1));
+    const endStr = formatDate(new Date(year, month + 1, 0));
+    
+    // Group by week
+    const weeksMap = new Map();
+
+    // Loop through days in month to build weeks structure
+    let currDate = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+
+    // Adjust to start from the first day of the first week (could be prev month)
+    const firstWeekStart = new Date(currDate);
+    // Modified to start on Monday
+    const day = firstWeekStart.getDay(); 
+    const diff = firstWeekStart.getDate() - day + (day == 0 ? -6 : 1); 
+    firstWeekStart.setDate(diff);
+
+    
+    // Iterate weeks until end of month
+    let iterDate = new Date(firstWeekStart);
+    // Keep adding weeks until we are past the last day of the month
+    while (iterDate <= lastDayOfMonth) {
+        // Find week range string
+        const weekStart = new Date(iterDate);
+        const weekEnd = new Date(iterDate);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        const weekRangeStr = `${formatDate(weekStart)} ~ ${formatDate(weekEnd)}`;
+        
+        // Only add if it overlaps with current month
+        if (weekEnd >= new Date(year, month, 1)) {
+             if (!weeksMap.has(weekRangeStr)) {
+                weeksMap.set(weekRangeStr, {
+                    start: weekStart,
+                    end: weekEnd,
+                    tasks: [],
+                    review: null
+                });
+            }
+        }
+        
+        // Move to next week
+        iterDate.setDate(iterDate.getDate() + 7);
+    }
+
+    // Populate tasks into weeks
+    let filteredTasks = tasks.filter(t => t.date >= formatDate(firstWeekStart) && t.date <= formatDate(iterDate)); 
+    
+    // Apply filters
+    if (keyword) {
+        filteredTasks = filteredTasks.filter(t => 
+            t.title.toLowerCase().includes(keyword) || 
+            (t.content && t.content.toLowerCase().includes(keyword)) ||
+            (t.output && t.output.toLowerCase().includes(keyword))
+        );
+    }
+
+    if (statusFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(t => t.status === statusFilter);
+    }
+
+    // Assign to weeks
+    filteredTasks.forEach(t => {
+        // Find which week this task belongs to
+        for (let [range, weekData] of weeksMap) {
+            if (t.date >= formatDate(weekData.start) && t.date <= formatDate(weekData.end)) {
+                if (t.type === 'review') {
+                    weekData.review = t;
+                } else {
+                    weekData.tasks.push(t);
+                }
+                break;
+            }
+        }
+    });
+
+    container.innerHTML = '';
+    
+    // Render
+    let weekCounter = 1;
+    for (let [range, weekData] of weeksMap) {
+        
+        const hasTasks = weekData.tasks.length > 0;
+        const reviewContent = weekData.review ? (weekData.review.content || "未填寫內容") : "本週無復盤";
+        // Use unique ID for accordion
+        const weekId = `week-${formatDate(weekData.start)}`;
+        
+        const tasksHtml = weekData.tasks.sort((a,b) => new Date(a.date)-new Date(b.date)).map(t => {
+            const isReview = t.type === 'review';
+            return `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all cursor-pointer flex flex-col gap-2 group relative overflow-hidden mb-2" onclick="openModal('${t.id}')">
+                <div class="absolute left-0 top-0 bottom-0 w-1 ${t.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}"></div>
+                <div class="pl-3 flex flex-col gap-1.5">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-0.5 w-full">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <span>${t.date}</span>
+                                </div>
+                                ${t.status === 'done' ? '<i class="fa-solid fa-check text-emerald-500 text-sm"></i>' : ''}
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-base leading-tight ${t.status === 'done' ? 'line-through text-slate-400 decoration-slate-300' : ''}">${t.title}</h3>
+                        </div>
+                    </div>
+                    ${(t.content || t.output) ? `
+                    <div class="border-t border-slate-50 pt-2 mt-1 flex flex-col gap-2">
+                        ${t.content ? `
+                        <div class="flex gap-2 items-start">
+                            <i class="fa-solid fa-align-left text-slate-400 text-xs mt-1 flex-shrink-0"></i>
+                            <p class="text-sm text-slate-600 line-clamp-1">${t.content}</p>
+                        </div>` : ''}
+                        ${t.output ? `
+                        <div class="flex gap-2 items-start">
+                            <i class="fa-solid fa-gift text-primary-500 text-xs mt-1 flex-shrink-0"></i>
+                            <p class="text-sm text-primary-700 line-clamp-1">${t.output}</p>
+                        </div>` : ''}
+                    </div>` : ''}
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        const html = `
+            <div class="mb-4 week-group">
+                <div class="week-header bg-white rounded-xl p-4 shadow-sm border border-slate-200 cursor-pointer flex flex-col gap-2 transition hover:border-primary-400" onclick="toggleWeek('${weekId}')">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-primary-50 text-primary-600 px-3 py-1 rounded-lg text-sm font-bold font-mono">
+                                第 ${weekCounter} 週
+                            </div>
+                            <span class="text-xs text-slate-500 font-medium">${weekData.tasks.length} 個任務</span>
+                        </div>
+                        <i id="icon-${weekId}" class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                    </div>
+                    ${weekData.review ? `
+                    <div class="mt-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100" onclick="event.stopPropagation(); openModal('${weekData.review.id}')">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-pen-nib text-indigo-500 text-xs"></i>
+                            <span class="text-xs font-bold text-indigo-700">本週復盤</span>
+                        </div>
+                        <p class="text-sm text-slate-600 line-clamp-2">${reviewContent}</p>
+                    </div>
+                    ` : ''}
+                </div>
+                <div id="${weekId}" class="accordion-content">
+                    <div class="pt-3 pl-2 space-y-2 border-l-2 border-slate-100 ml-4">
+                        ${tasksHtml || '<div class="text-sm text-slate-400 italic p-2">本週無符合條件的任務</div>'}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+        weekCounter++;
+    }
+}
+
+function toggleWeek(id) {
+    const el = document.getElementById(id);
+    const icon = document.getElementById(`icon-${id}`);
+    const parent = el.parentElement;
+    
+    if (parent.classList.contains('accordion-open')) {
+        parent.classList.remove('accordion-open');
+    } else {
+        parent.classList.add('accordion-open');
+    }
+}
+
+// --- Graph View Settings Functions ---
+
+function toggleGraphSettings() {
+    const settingsPanel = document.getElementById('graph-settings');
+    settingsPanel.classList.toggle('hidden');
+}
+
+function updateGraphParam(key, value) {
+    graphConfig[key] = parseFloat(value);
+    document.getElementById(`val-${key}`).textContent = value;
+}
+
+// --- Graph View Logic (Force-Directed) ---
+
+function initGraph() {
+    const canvas = document.getElementById('graph-canvas');
+    const container = document.getElementById('history-view-graph');
+    if (!canvas || !container) return;
+
+    if (graphAnimationId) cancelAnimationFrame(graphAnimationId);
+
+    // Set canvas size
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Get filters
+    const keyword = document.getElementById('filter-keyword').value.toLowerCase();
+    const statusFilter = document.getElementById('filter-status').value;
+
+    // Apply filters to ALL tasks
+    // Filter out reviews for graph view
+    let filteredTasks = tasks.filter(t => t.type !== 'review');
+
+    if (keyword) {
+        filteredTasks = filteredTasks.filter(t => 
+            t.title.toLowerCase().includes(keyword) || 
+            (t.content && t.content.toLowerCase().includes(keyword)) ||
+            (t.output && t.output.toLowerCase().includes(keyword))
+        );
+    }
+
+    if (statusFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(t => t.status === statusFilter);
+    }
+
+    // Update filter label
+    const label = document.getElementById('graph-filter-label');
+    if (label) {
+        label.textContent = `顯示 ${filteredTasks.length} 筆資料`;
+    }
+
+    const nodes = filteredTasks.map(t => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: 0,
+        vy: 0
+    }));
+
+    const links = [];
+    // Only link if both source and target are in current filtered view
+    filteredTasks.forEach(t => {
+        if(t.links) {
+            t.links.forEach(targetId => {
+                const sourceNode = nodes.find(n => n.id === t.id);
+                const targetNode = nodes.find(n => n.id === targetId);
+                if(sourceNode && targetNode) {
+                    if(!links.find(l => (l.source === sourceNode && l.target === targetNode) || (l.source === targetNode && l.target === sourceNode))) {
+                        links.push({ source: sourceNode, target: targetNode });
+                    }
+                }
+            });
+        }
+    });
+
+    // Interaction State
+    let isDragging = false;
+    let draggedNode = null;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let cameraOffset = { x: 0, y: 0 };
+    let zoomLevel = 1;
+
+    // Parameters - use dynamic config
+    // centerStrength: 0.01
+
+    function simulate() {
+        // Repulsion
+        for (let i = 0; i < nodes.length; i++) {
+            const nodeA = nodes[i];
+            for (let j = i + 1; j < nodes.length; j++) {
+                const nodeB = nodes[j];
+                const dx = nodeA.x - nodeB.x;
+                const dy = nodeA.y - nodeB.y;
+                const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                const force = graphConfig.repulsion / (dist * dist);
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+                
+                nodeA.vx += fx;
+                nodeA.vy += fy;
+                nodeB.vx -= fx;
+                nodeB.vy -= fy;
+            }
+        }
+
+        // Spring
+        links.forEach(link => {
+            const dx = link.target.x - link.source.x;
+            const dy = link.target.y - link.source.y;
+            const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+            const force = (dist - graphConfig.springLength) * graphConfig.springStrength;
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+
+            link.source.vx += fx;
+            link.source.vy += fy;
+            link.target.vx -= fx;
+            link.target.vy -= fy;
+        });
+
+        // Center Gravity & Update
+        nodes.forEach(node => {
+            if (node === draggedNode) return; 
+            
+            const dx = (width / 2) - node.x;
+            const dy = (height / 2) - node.y;
+            node.vx += dx * 0.01;
+            node.vy += dy * 0.01;
+
+            node.vx *= graphConfig.damping;
+            node.vy *= graphConfig.damping;
+            node.x += node.vx;
+            node.y += node.vy;
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        
+        ctx.translate(width/2, height/2);
+        ctx.scale(zoomLevel, zoomLevel);
+        ctx.translate(-width/2 + cameraOffset.x, -height/2 + cameraOffset.y);
+
+        // Links
+        const isDark = document.documentElement.classList.contains('dark');
+        ctx.strokeStyle = isDark ? '#475569' : '#cbd5e1'; // slate-600 : slate-300
+        ctx.lineWidth = 1;
+        links.forEach(link => {
+            ctx.beginPath();
+            ctx.moveTo(link.source.x, link.source.y);
+            ctx.lineTo(link.target.x, link.target.y);
+            ctx.stroke();
+        });
+
+        // Nodes
+        nodes.forEach(node => {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 10, 0, Math.PI * 2);
+            // Change colors here: Done = Green, Todo = Blue (Previously Purple)
+            ctx.fillStyle = node.status === 'done' ? '#10b981' : '#3b82f6';
+            ctx.fill();
+            ctx.strokeStyle = isDark ? '#1e293b' : '#fff'; // slate-800 : white
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = isDark ? '#cbd5e1' : '#475569'; // slate-300 : slate-600
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(node.title.length > 8 ? node.title.substring(0,8)+'..' : node.title, node.x, node.y + 24);
+        });
+
+        ctx.restore();
+    }
+
+    function loop() {
+        if(currentView !== 'history' || historyMode !== 'graph') return;
+        simulate();
+        draw();
+        graphAnimationId = requestAnimationFrame(loop);
+    }
+
+    // Handlers
+    canvas.onmousedown = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left - width/2) / zoomLevel + width/2 - cameraOffset.x;
+        const my = (e.clientY - rect.top - height/2) / zoomLevel + height/2 - cameraOffset.y;
+
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+
+        draggedNode = nodes.find(n => {
+            const dx = n.x - mx;
+            const dy = n.y - my;
+            return dx*dx + dy*dy < 144; // Radius squared + margin
+        });
+
+        if (draggedNode) {
+            isDragging = true;
+        }
+    };
+
+    canvas.onmousemove = (e) => {
+        if (isDragging && draggedNode) {
+            const rect = canvas.getBoundingClientRect();
+            draggedNode.x = (e.clientX - rect.left - width/2) / zoomLevel + width/2 - cameraOffset.x;
+            draggedNode.y = (e.clientY - rect.top - height/2) / zoomLevel + height/2 - cameraOffset.y;
+            draggedNode.vx = 0;
+            draggedNode.vy = 0;
+        }
+    };
+
+    canvas.onmouseup = () => {
+        isDragging = false;
+        draggedNode = null;
+    };
+    
+    canvas.onclick = (e) => {
+        const dist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+        if (dist > 5) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left - width/2) / zoomLevel + width/2 - cameraOffset.x;
+        const my = (e.clientY - rect.top - height/2) / zoomLevel + height/2 - cameraOffset.y;
+        
+        const clickedNode = nodes.find(n => {
+            const dx = n.x - mx;
+            const dy = n.y - my;
+            return dx*dx + dy*dy < 144;
+        });
+        
+        if (clickedNode) {
+            openModal(clickedNode.id);
+        }
+    };
+
+    canvas.onwheel = (e) => {
+        e.preventDefault();
+        // Faster zoom sensitivity
+        zoomLevel += e.deltaY * -0.003;
+        zoomLevel = Math.min(Math.max(0.2, zoomLevel), 5);
+    };
+
+    loop();
+}
+
+// --- Import/Export Logic ---
+
+function exportData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "taskflow_backup_" + formatDate(new Date()) + ".json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    showToast('檔案已開始下載');
+}
+
+function triggerImport() {
+    document.getElementById('import-file').click();
+}
+
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed)) {
+                if(confirm(`確定要匯入並覆蓋現有資料嗎？\n檔案：${file.name}\n任務數量：${parsed.length}`)) {
+                    tasks = parsed;
+                    saveTasks();
+                    showToast('資料匯入成功');
+                    switchView('planning');
+                }
+            } else {
+                alert('檔案格式錯誤：內容必須是任務陣列 (Array)');
+            }
+        } catch (ex) {
+            alert('無法解析 JSON 檔案，請確認檔案是否正確。');
+        }
+        event.target.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function clearData() {
+    if(confirm('警告：您確定要刪除所有任務資料嗎？此操作無法復原！')) {
+        if(confirm('再次確認：這將清空所有資料，是否繼續？')) {
+            tasks = [];
+            saveTasks();
+            renderPlanning(); // Ensure views are updated if user switches back
+            if (currentView === 'history') {
+                 if(historyMode === 'graph') initGraph();
+                 else renderHistory();
+            }
+            showToast('所有資料已清空');
+        }
+    }
+}
+
+// --- Modal Logic ---
+
+function openModal(taskId) {
+    currentEditingId = taskId;
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const isReview = task.type === 'review';
+
+    document.getElementById('modal-title').value = task.title;
+    document.getElementById('modal-date').value = task.date;
+    
+    // UI elements
+    const dateInput = document.getElementById('modal-date');
+    const titleInput = document.getElementById('modal-title');
+    const statusSection = document.getElementById('modal-status-section');
+    
+    if (isReview) {
+        // Review specific: Disable date and title
+        dateInput.disabled = true;
+        dateInput.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        titleInput.readOnly = true;
+        titleInput.classList.add('opacity-70', 'cursor-not-allowed');
+        
+        // Lock status section visually instead of hiding it
+        statusSection.classList.remove('hidden');
+        statusSection.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+    } else {
+        // Normal Task
+        dateInput.disabled = false;
+        dateInput.classList.remove('opacity-50', 'cursor-not-allowed');
+        
+        titleInput.readOnly = false;
+        titleInput.classList.remove('opacity-70', 'cursor-not-allowed');
+        
+        // Reset status section
+        statusSection.classList.remove('hidden', 'opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+        statusSection.classList.add('cursor-pointer');
+    }
+    
+    // Toggle UI sections based on type
+    const taskFields = document.getElementById('modal-task-fields');
+    const reviewSection = document.getElementById('modal-review-section');
+    
+    if (isReview) {
+        taskFields.classList.add('hidden');
+        reviewSection.classList.remove('hidden');
+        document.getElementById('modal-review-text').value = task.content || '';
+    } else {
+        taskFields.classList.remove('hidden');
+        reviewSection.classList.add('hidden');
+        document.getElementById('modal-content-text').value = task.content || '';
+        document.getElementById('modal-output-text').value = task.output || '';
+        currentEditingLinks = [...(task.links || [])];
+        renderModalLinks();
+        updateModalDatalist();
+    }
+    
+    updateModalStatusUI(task.status);
+    
+    const modal = document.getElementById('task-modal');
+    const modalContent = document.getElementById('modal-content');
+    
+    modal.classList.remove('pointer-events-none', 'opacity-0');
+    modalContent.classList.remove('scale-95');
+    modalContent.classList.add('scale-100');
+    document.body.classList.add('modal-active');
+}
+
+function renderModalLinks() {
+    const container = document.getElementById('modal-links-list');
+    container.innerHTML = '';
+    currentEditingLinks.forEach(linkId => {
+        const linkedTask = tasks.find(t => t.id === linkId);
+        if(linkedTask) {
+            const chip = document.createElement('div');
+            chip.className = 'flex items-center gap-1 bg-zinc-100 text-zinc-600 px-2 py-1 rounded-full text-xs border border-zinc-200';
+            chip.innerHTML = `
+                <span>${linkedTask.title}</span>
+                <button onclick="removeLink('${linkId}')" class="hover:text-red-500 ml-1"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(chip);
+        }
+    });
+}
+
+function updateModalDatalist() {
+    const datalist = document.getElementById('task-list-options');
+    datalist.innerHTML = '';
+    tasks.forEach(t => {
+        if(t.id !== currentEditingId && !currentEditingLinks.includes(t.id) && t.type !== 'review') {
+            const option = document.createElement('option');
+            option.value = t.title;
+            option.dataset.id = t.id; 
+            datalist.appendChild(option);
+        }
+    });
+}
+
+function addLinkFromInput() {
+    const input = document.getElementById('modal-link-input');
+    const val = input.value;
+    if(!val) return;
+
+    const targetTask = tasks.find(t => t.title === val && t.id !== currentEditingId);
+    if(targetTask && !currentEditingLinks.includes(targetTask.id)) {
+        currentEditingLinks.push(targetTask.id);
+        renderModalLinks();
+        input.value = '';
+        updateModalDatalist();
+    }
+}
+
+window.removeLink = function(linkId) {
+    currentEditingLinks = currentEditingLinks.filter(id => id !== linkId);
+    renderModalLinks();
+    updateModalDatalist();
+}
+
+function updateModalStatusUI(status) {
+    const icon = document.getElementById('modal-status-icon');
+    const text = document.getElementById('modal-status-text');
+    const container = icon.parentElement.parentElement;
+    
+    if (status === 'done') {
+        icon.className = 'fa-solid fa-square-check text-emerald-500 text-xl';
+        text.textContent = '已完成';
+        text.className = 'text-sm font-bold text-emerald-600';
+        container.className = 'bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 transition group flex-1';
+        // Note: cursor and hover styles are managed by the parent container classes in HTML usually, 
+        // but here we override container class.
+        // If locked, openModal handles the cursor-not-allowed
+    } else {
+        icon.className = 'fa-regular fa-square text-zinc-400 text-xl';
+        text.textContent = '未完成';
+        text.className = 'text-sm font-medium text-zinc-500';
+        container.className = 'bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-100 transition group flex-1';
+    }
+}
+
+function toggleModalStatus() {
+    const task = tasks.find(t => t.id === currentEditingId);
+    // Disable toggling for review tasks
+    if(task && task.type === 'review') return;
+    
+    if(task) {
+        task.status = task.status === 'done' ? 'todo' : 'done';
+        updateModalStatusUI(task.status);
+    }
+}
+
+function saveModalTask() {
+    const task = tasks.find(t => t.id === currentEditingId);
+    if (task) {
+        // Only update title if not review
+        if (task.type !== 'review') {
+            task.title = document.getElementById('modal-title').value;
+        }
+        task.date = document.getElementById('modal-date').value;
+        
+        if (task.type === 'review') {
+            task.content = document.getElementById('modal-review-text').value;
+        } else {
+            task.content = document.getElementById('modal-content-text').value;
+            task.output = document.getElementById('modal-output-text').value;
+            task.links = currentEditingLinks;
+        }
+        
+        saveTasks();
+        closeModal();
+        
+        if (currentView === 'planning') renderPlanning();
+        if (currentView === 'history') {
+            if(historyMode === 'graph') initGraph();
+            else renderHistory();
+        }
+        
+        showToast('儲存成功');
+    }
+}
+
+function deleteCurrentTask() {
+    if(confirm('確定要刪除此任務嗎？')) {
+        tasks = tasks.filter(t => t.id !== currentEditingId);
+        tasks.forEach(t => {
+            if(t.links) t.links = t.links.filter(id => id !== currentEditingId);
+        });
+        
+        saveTasks();
+        closeModal();
+        if (currentView === 'planning') renderPlanning();
+        if (currentView === 'history') renderHistory();
+        showToast('任務已刪除', 'error');
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('task-modal');
+    const modalContent = document.getElementById('modal-content');
+    
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+    modal.classList.add('opacity-0');
+    
+    setTimeout(() => {
+        modal.classList.add('pointer-events-none');
+        document.body.classList.remove('modal-active');
+        currentEditingId = null;
+    }, 200);
+}
+
+// Start
+window.onload = init;
+
+</script>
+</body>
+</html>
