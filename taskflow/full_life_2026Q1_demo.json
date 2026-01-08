@@ -6,6 +6,7 @@
     "output": "草稿 v1",
     "date": "",
     "status": "todo",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task",
@@ -18,6 +19,7 @@
     "output": "",
     "date": "",
     "status": "todo",
+    "category": "family",
     "order": 1,
     "links": [],
     "type": "task",
@@ -30,6 +32,7 @@
     "output": "",
     "date": "",
     "status": "todo",
+    "category": "faith",
     "order": 2,
     "links": [],
     "type": "task",
@@ -42,6 +45,7 @@
     "output": "",
     "date": "",
     "status": "todo",
+    "category": "life",
     "order": 3,
     "links": [],
     "type": "task",
@@ -54,6 +58,7 @@
     "output": "家庭年度金句：至於我和我家，我們必定事奉耶和華。",
     "date": "2026-01-01",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -65,6 +70,7 @@
     "output": "會議記錄已發送",
     "date": "2026-01-02",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -76,6 +82,7 @@
     "output": "",
     "date": "2026-01-03",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -87,6 +94,7 @@
     "output": "",
     "date": "2026-01-03",
     "status": "done",
+    "category": "life",
     "order": 1,
     "links": [],
     "type": "task"
@@ -98,6 +106,7 @@
     "output": "奉獻：建堂基金",
     "date": "2026-01-04",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -109,6 +118,7 @@
     "output": "行動：下週三前完成 PRD 初稿。",
     "date": "2026-01-04",
     "status": "done",
+    "category": "life",
     "order": 1,
     "links": [],
     "type": "review"
@@ -120,6 +130,7 @@
     "output": "",
     "date": "2026-01-05",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-01-02"],
     "type": "task"
@@ -131,6 +142,7 @@
     "output": "",
     "date": "2026-01-05",
     "status": "done",
+    "category": "work",
     "order": 1,
     "links": [],
     "type": "task"
@@ -142,6 +154,7 @@
     "output": "",
     "date": "2026-01-05",
     "status": "done",
+    "category": "work",
     "order": 2,
     "links": ["task-2026-01-05"],
     "type": "task"
@@ -153,6 +166,7 @@
     "output": "",
     "date": "2026-01-05",
     "status": "done",
+    "category": "family",
     "order": 3,
     "links": [],
     "type": "task"
@@ -164,6 +178,7 @@
     "output": "決議使用《標竿人生》",
     "date": "2026-01-06",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -175,6 +190,7 @@
     "output": "",
     "date": "2026-01-07",
     "status": "done",
+    "category": "life",
     "order": 0,
     "links": [],
     "type": "task"
@@ -186,6 +202,7 @@
     "output": "",
     "date": "2026-01-08",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -197,6 +214,7 @@
     "output": "收集了 5 個修改意見",
     "date": "2026-01-09",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-01-05"],
     "type": "task"
@@ -208,6 +226,7 @@
     "output": "",
     "date": "2026-01-10",
     "status": "done",
+    "category": "life",
     "order": 0,
     "links": [],
     "type": "task"
@@ -219,6 +238,7 @@
     "output": "",
     "date": "2026-01-11",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -230,6 +250,7 @@
     "output": "",
     "date": "2026-01-11",
     "status": "done",
+    "category": "life",
     "order": 1,
     "links": [],
     "type": "review"
@@ -241,6 +262,7 @@
     "output": "順利拿下合約！",
     "date": "2026-01-14",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -252,6 +274,7 @@
     "output": "抽中三獎：空氣清淨機",
     "date": "2026-01-16",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -263,6 +286,7 @@
     "output": "",
     "date": "2026-01-18",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "review"
@@ -274,6 +298,7 @@
     "output": "",
     "date": "2026-01-20",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -285,6 +310,7 @@
     "output": "",
     "date": "2026-01-20",
     "status": "done",
+    "category": "life",
     "order": 1,
     "links": [],
     "type": "task"
@@ -296,6 +322,7 @@
     "output": "",
     "date": "2026-01-20",
     "status": "done",
+    "category": "life",
     "order": 2,
     "links": [],
     "type": "task"
@@ -307,6 +334,7 @@
     "output": "",
     "date": "2026-01-20",
     "status": "done",
+    "category": "work",
     "order": 3,
     "links": [],
     "type": "task"
@@ -318,6 +346,7 @@
     "output": "",
     "date": "2026-01-25",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -329,6 +358,7 @@
     "output": "",
     "date": "2026-01-25",
     "status": "done",
+    "category": "life",
     "order": 1,
     "links": [],
     "type": "review"
@@ -340,6 +370,7 @@
     "output": "",
     "date": "2026-02-01",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -351,6 +382,7 @@
     "output": "",
     "date": "2026-02-02",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -362,6 +394,7 @@
     "output": "",
     "date": "2026-02-10",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -373,6 +406,7 @@
     "output": "",
     "date": "2026-02-12",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -384,6 +418,7 @@
     "output": "老婆很開心",
     "date": "2026-02-14",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -395,6 +430,7 @@
     "output": "計畫：每個月安排一次 Date Night。",
     "date": "2026-02-15",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "review"
@@ -406,6 +442,7 @@
     "output": "",
     "date": "2026-02-16",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -417,6 +454,7 @@
     "output": "",
     "date": "2026-02-16",
     "status": "done",
+    "category": "family",
     "order": 1,
     "links": [],
     "type": "task"
@@ -428,6 +466,7 @@
     "output": "",
     "date": "2026-02-16",
     "status": "done",
+    "category": "family",
     "order": 2,
     "links": [],
     "type": "task"
@@ -439,6 +478,7 @@
     "output": "",
     "date": "2026-02-16",
     "status": "done",
+    "category": "life",
     "order": 3,
     "links": [],
     "type": "task"
@@ -450,6 +490,7 @@
     "output": "",
     "date": "2026-02-17",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -461,6 +502,7 @@
     "output": "",
     "date": "2026-02-20",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -472,6 +514,7 @@
     "output": "",
     "date": "2026-02-21",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -483,6 +526,7 @@
     "output": "",
     "date": "2026-02-22",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "review"
@@ -494,6 +538,7 @@
     "output": "",
     "date": "2026-02-25",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -505,6 +550,7 @@
     "output": "",
     "date": "2026-03-02",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -516,6 +562,7 @@
     "output": "報告順利，爭取到增加一位實習生。",
     "date": "2026-03-04",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-02-12"],
     "type": "task"
@@ -527,6 +574,7 @@
     "output": "進了一球！全家去吃火鍋慶祝。",
     "date": "2026-03-07",
     "status": "done",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -538,6 +586,7 @@
     "output": "",
     "date": "2026-03-08",
     "status": "done",
+    "category": "life",
     "order": 0,
     "links": [],
     "type": "review"
@@ -549,6 +598,7 @@
     "output": "更換機油、輪胎。",
     "date": "2026-03-10",
     "status": "done",
+    "category": "life",
     "order": 0,
     "links": [],
     "type": "task"
@@ -560,6 +610,7 @@
     "output": "",
     "date": "2026-03-12",
     "status": "done",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-03-04"],
     "type": "task"
@@ -571,6 +622,7 @@
     "output": "決定加強兒童主日學師資培訓。",
     "date": "2026-03-14",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -582,6 +634,7 @@
     "output": "",
     "date": "2026-03-15",
     "status": "done",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "review"
@@ -593,6 +646,7 @@
     "output": "發現 3 個 Critical Bug，需加班修復。",
     "date": "2026-03-18",
     "status": "todo",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-03-04"],
     "type": "task"
@@ -604,6 +658,7 @@
     "output": "",
     "date": "2026-03-20",
     "status": "todo",
+    "category": "family",
     "order": 0,
     "links": [],
     "type": "task"
@@ -615,6 +670,7 @@
     "output": "",
     "date": "2026-03-21",
     "status": "todo",
+    "category": "family",
     "order": 0,
     "links": ["task-2026-03-20"],
     "type": "task"
@@ -626,6 +682,7 @@
     "output": "",
     "date": "2026-03-22",
     "status": "todo",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -637,6 +694,7 @@
     "output": "",
     "date": "2026-03-22",
     "status": "todo",
+    "category": "family",
     "order": 1,
     "links": [],
     "type": "review"
@@ -648,6 +706,7 @@
     "output": "",
     "date": "2026-03-25",
     "status": "todo",
+    "category": "work",
     "order": 0,
     "links": ["task-2026-03-18"],
     "type": "task"
@@ -659,6 +718,7 @@
     "output": "",
     "date": "2026-03-25",
     "status": "todo",
+    "category": "work",
     "order": 1,
     "links": ["task-2026-03-25"],
     "type": "task"
@@ -670,6 +730,7 @@
     "output": "",
     "date": "2026-03-25",
     "status": "todo",
+    "category": "work",
     "order": 2,
     "links": ["task-2026-03-25"],
     "type": "task"
@@ -681,6 +742,7 @@
     "output": "",
     "date": "2026-03-25",
     "status": "todo",
+    "category": "work",
     "order": 3,
     "links": [],
     "type": "task"
@@ -692,6 +754,7 @@
     "output": "",
     "date": "2026-03-27",
     "status": "todo",
+    "category": "work",
     "order": 0,
     "links": [],
     "type": "task"
@@ -703,6 +766,7 @@
     "output": "",
     "date": "2026-03-28",
     "status": "todo",
+    "category": "faith",
     "order": 0,
     "links": [],
     "type": "task"
@@ -714,6 +778,7 @@
     "output": "評分：85分",
     "date": "2026-03-29",
     "status": "todo",
+    "category": "life",
     "order": 0,
     "links": [],
     "type": "review"

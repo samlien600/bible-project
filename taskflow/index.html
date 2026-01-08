@@ -10,14 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Noto Sans TC & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-3DFR7N5MT2');
-    </script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -71,6 +64,9 @@
                             500: '#10b981',
                             600: '#059669',
                         }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -279,9 +275,18 @@
                     <div id="history-filters" class="hidden flex gap-2 flex-1 sm:flex-initial">
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
-                            <input type="text" id="filter-keyword" placeholder="搜尋..." class="pl-8 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 w-32 sm:w-48 transition shadow-sm text-slate-800" oninput="renderHistory()">
+                            <input type="text" id="filter-keyword" placeholder="搜尋..." class="pl-8 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 w-24 sm:w-40 transition shadow-sm text-slate-800" oninput="renderHistory()">
                         </div>
-                        <select id="filter-status" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 text-slate-600 shadow-sm cursor-pointer" onchange="renderHistory()">
+                        <!-- 類別篩選 -->
+                        <select id="filter-category" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 text-slate-600 shadow-sm cursor-pointer w-24" onchange="renderHistory()">
+                            <option value="all">所有類型</option>
+                            <option value="faith">信仰</option>
+                            <option value="family">家庭</option>
+                            <option value="work">工作</option>
+                            <option value="life">生活</option>
+                        </select>
+                        <!-- 狀態篩選 -->
+                        <select id="filter-status" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 text-slate-600 shadow-sm cursor-pointer w-24" onchange="renderHistory()">
                             <option value="all">所有狀態</option>
                             <option value="todo">進行中</option>
                             <option value="done">已完成</option>
@@ -461,6 +466,21 @@
                             <input type="date" id="modal-date" class="bg-transparent text-sm font-medium text-slate-700 focus:outline-none w-full">
                         </div>
                     </div>
+                    
+                    <!-- New Category Select -->
+                    <div class="bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 flex-1">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">類型</label>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-tag text-slate-400"></i>
+                            <select id="modal-category" class="bg-transparent text-sm font-medium text-slate-700 focus:outline-none w-full cursor-pointer appearance-none">
+                                <option value="faith">信仰</option>
+                                <option value="family">家庭</option>
+                                <option value="work">工作</option>
+                                <option value="life">生活</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Status Section - Add ID for toggling -->
                     <div id="modal-status-section" class="bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 cursor-pointer hover:bg-slate-100 transition group flex-1" onclick="toggleModalStatus()">
                         <label class="block text-xs font-semibold text-slate-400 mb-1">狀態</label>
@@ -555,11 +575,20 @@
  * output: string,
  * date: string(YYYY-MM-DD), 
  * status: 'todo'|'done',
+ * category: 'faith'|'family'|'work'|'life', // New field
  * order: number,
  * links: string[] // Array of linked task IDs
  * type: 'task' | 'review' // Default 'task'
  * }
  */
+
+// Category Definitions
+const CATEGORIES = {
+    'faith': { label: '信仰', icon: 'fa-book-open', colorClass: 'text-amber-600 bg-amber-50' },
+    'family': { label: '家庭', icon: 'fa-house', colorClass: 'text-emerald-600 bg-emerald-50' },
+    'work': { label: '工作', icon: 'fa-briefcase', colorClass: 'text-blue-600 bg-blue-50' },
+    'life': { label: '生活', icon: 'fa-mug-hot', colorClass: 'text-slate-600 bg-slate-50' }
+};
 
 // State
 let tasks = [];
@@ -616,6 +645,7 @@ function loadTasks() {
                 if(typeof t.order === 'undefined') t.order = i;
                 if(!t.links) t.links = [];
                 if(!t.type) t.type = 'task';
+                if(!t.category) t.category = 'life'; // Default category
             });
         } catch (e) {
             console.error('Data load error', e);
@@ -853,8 +883,11 @@ function renderTaskCard(task, isGrid = false, isFirst = false) {
     const hasContent = task.content && task.content.trim().length > 0;
     const hasOutput = task.output && task.output.trim().length > 0;
     const isDone = task.status === 'done';
+    const category = task.category || 'life';
+    const catConfig = CATEGORIES[category] || CATEGORIES['life'];
 
     // Grid view specific styles: fixed height, flex column layout
+    // 強制單行後，高度可以改回 h-24，看起來更緊湊
     const cardClasses = isGrid 
         ? "h-24 flex flex-col justify-between" 
         : "";
@@ -869,6 +902,9 @@ function renderTaskCard(task, isGrid = false, isFirst = false) {
     const bgClass = isPriority
         ? "bg-amber-50/30" // Subtle warm background
         : "bg-white";
+
+    // Padding: Use slightly tighter padding for grid view to maximize space
+    const paddingClass = isGrid ? "p-2.5" : "p-3";
 
     // Grid view title: allow 2 lines if needed since we have fixed height
     const titleClasses = isGrid
@@ -885,7 +921,7 @@ function renderTaskCard(task, isGrid = false, isFirst = false) {
     }
 
     return `
-        <div class="task-card ${bgClass} p-3 rounded-lg shadow-sm ${borderClass} cursor-grab hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative select-none ${cardClasses}"
+        <div class="task-card ${bgClass} ${paddingClass} rounded-lg shadow-sm ${borderClass} cursor-grab hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group relative select-none overflow-hidden ${cardClasses}"
              draggable="true" 
              data-id="${task.id}"
              ondragstart="handleDragStart(event)"
@@ -894,15 +930,20 @@ function renderTaskCard(task, isGrid = false, isFirst = false) {
              <!-- Status Indicator Bar -->
              <div class="absolute left-0 top-3 bottom-3 w-1 rounded-r-md ${isDone ? 'bg-emerald-400' : 'bg-primary-500'} opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-            <div class="flex items-start justify-between gap-1.5 mb-1.5 w-full">
+            <div class="flex items-start justify-between gap-1.5 mb-1 w-full">
                 <div class="font-semibold text-sm leading-tight ${isPriority ? 'text-slate-800' : 'text-slate-700'} ${titleClasses} ${isDone ? 'line-through text-slate-400' : ''}" title="${task.title}">${task.title}</div>
                  ${statusIcon}
             </div>
 
-            <div class="flex flex-wrap gap-1.5 items-center">
-                ${hasContent ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-align-left text-[9px]"></i></div>` : ''}
-                ${hasOutput ? `<div class="text-[10px] px-1.5 py-0.5 bg-primary-50 rounded text-primary-600 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-gift text-[9px]"></i></div>` : ''}
-                ${task.links && task.links.length > 0 ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap"><i class="fa-solid fa-link text-[9px]"></i> ${task.links.length}</div>` : ''}
+            <!-- 修正：使用 flex-nowrap 強制單行，overflow-hidden 隱藏溢出，gap-1 縮小間距 -->
+            <div class="flex flex-nowrap gap-1 items-center w-full overflow-hidden">
+                <!-- Category Badge -->
+                <div class="text-[10px] px-1.5 py-0.5 rounded font-medium flex items-center gap-1 whitespace-nowrap ${catConfig.colorClass} opacity-90 flex-shrink-0" title="${catConfig.label}">
+                    <i class="fa-solid ${catConfig.icon} text-[9px]"></i> ${isGrid ? '' : catConfig.label}
+                </div>
+                ${hasContent ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-align-left text-[9px]"></i></div>` : ''}
+                ${hasOutput ? `<div class="text-[10px] px-1.5 py-0.5 bg-primary-50 rounded text-primary-600 font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-gift text-[9px]"></i></div>` : ''}
+                ${task.links && task.links.length > 0 ? `<div class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0"><i class="fa-solid fa-link text-[9px]"></i> ${task.links.length}</div>` : ''}
             </div>
         </div>
     `;
@@ -1008,6 +1049,7 @@ function quickAddTask(dateStr) {
         output: "",
         date: dateStr, // Will be "" for backlog
         status: 'todo',
+        category: 'life', // Default category
         order: maxOrder + 1, 
         links: [],
         createdAt: Date.now()
@@ -1095,6 +1137,7 @@ function renderHistoryCalendar(year, month) {
     // Get filters
     const keyword = document.getElementById('filter-keyword').value.toLowerCase();
     const statusFilter = document.getElementById('filter-status').value;
+    const categoryFilter = document.getElementById('filter-category').value;
 
     for (let d = 1; d <= totalDays; d++) {
         const currentStr = formatDate(new Date(year, month, d));
@@ -1120,6 +1163,10 @@ function renderHistoryCalendar(year, month) {
             dayTasks = dayTasks.filter(t => t.status === statusFilter);
         }
 
+        if (categoryFilter !== 'all') {
+            dayTasks = dayTasks.filter(t => t.category === categoryFilter);
+        }
+
         const doneCount = dayTasks.filter(t => t.status === 'done').length;
         
         const cell = document.createElement('div');
@@ -1142,11 +1189,13 @@ function renderHistoryCalendar(year, month) {
 
             visibleDotsHtml = dayTasks.slice(0, showCount).map(t => {
                 const normalBg = 'bg-primary-50 text-primary-700 border border-primary-100/50';
+                const cat = CATEGORIES[t.category || 'life'];
                 
-                const finalClass = (t.status === 'done' ? 'bg-slate-100 text-slate-400 line-through' : normalBg);
+                // Use category color or done style
+                const colorClass = (t.status === 'done' ? 'bg-slate-100 text-slate-400 line-through' : cat.colorClass + ' border border-transparent');
 
                 return `
-                <div onclick="openModal('${t.id}'); event.stopPropagation()" class="text-xs truncate px-1.5 py-0.5 rounded mb-0.5 cursor-pointer hover:scale-[1.02] transition-transform flex justify-between items-center flex-shrink-0 ${finalClass}">
+                <div onclick="openModal('${t.id}'); event.stopPropagation()" class="text-xs truncate px-1.5 py-0.5 rounded mb-0.5 cursor-pointer hover:scale-[1.02] transition-transform flex justify-between items-center flex-shrink-0 ${colorClass}">
                     <span class="truncate font-medium leading-tight">${t.title}</span>
                     ${t.output ? '<i class="fa-solid fa-gift text-[10px] ml-1 opacity-70"></i>' : ''}
                 </div>
@@ -1265,6 +1314,7 @@ function renderHistoryList(year, month) {
     const container = document.getElementById('history-list-container');
     const keyword = document.getElementById('filter-keyword').value.toLowerCase();
     const statusFilter = document.getElementById('filter-status').value;
+    const categoryFilter = document.getElementById('filter-category').value;
 
     const startStr = formatDate(new Date(year, month, 1));
     const endStr = formatDate(new Date(year, month + 1, 0));
@@ -1326,6 +1376,10 @@ function renderHistoryList(year, month) {
         filteredTasks = filteredTasks.filter(t => t.status === statusFilter);
     }
 
+    if (categoryFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(t => t.category === categoryFilter);
+    }
+
     // Assign to weeks
     filteredTasks.forEach(t => {
         // Find which week this task belongs to
@@ -1359,6 +1413,7 @@ function renderHistoryList(year, month) {
         
         const tasksHtml = weekData.tasks.sort((a,b) => new Date(a.date)-new Date(b.date)).map(t => {
             const isReview = t.type === 'review';
+            const cat = CATEGORIES[t.category || 'life'];
             return `
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all cursor-pointer flex flex-col gap-2 group relative overflow-hidden mb-2" onclick="openModal('${t.id}')">
                 <div class="absolute left-0 top-0 bottom-0 w-1 ${t.status === 'done' ? 'bg-emerald-400' : 'bg-amber-400'}"></div>
@@ -1369,6 +1424,8 @@ function renderHistoryList(year, month) {
                                 <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
                                     <i class="fa-regular fa-calendar"></i>
                                     <span>${t.date}</span>
+                                    <!-- Category Label -->
+                                    <span class="ml-2 ${cat.colorClass} px-1.5 py-0.5 rounded text-[10px]"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</span>
                                 </div>
                                 ${t.status === 'done' ? '<i class="fa-solid fa-check text-emerald-500 text-sm"></i>' : ''}
                             </div>
@@ -1474,6 +1531,7 @@ function initGraph() {
     // Get filters
     const keyword = document.getElementById('filter-keyword').value.toLowerCase();
     const statusFilter = document.getElementById('filter-status').value;
+    const categoryFilter = document.getElementById('filter-category').value;
 
     // Apply filters to ALL tasks
     // Filter out reviews for graph view
@@ -1489,6 +1547,10 @@ function initGraph() {
 
     if (statusFilter !== 'all') {
         filteredTasks = filteredTasks.filter(t => t.status === statusFilter);
+    }
+
+    if (categoryFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(t => t.category === categoryFilter);
     }
 
     // Update filter label
@@ -1769,6 +1831,7 @@ function openModal(taskId) {
     const dateInput = document.getElementById('modal-date');
     const titleInput = document.getElementById('modal-title');
     const statusSection = document.getElementById('modal-status-section');
+    const categorySelect = document.getElementById('modal-category');
     
     if (isReview) {
         // Review specific: Disable date and title
@@ -1781,6 +1844,11 @@ function openModal(taskId) {
         // Lock status section visually instead of hiding it
         statusSection.classList.remove('hidden');
         statusSection.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+
+        // Disable Category Select for Review (or hide it?) Let's disable
+        categorySelect.disabled = true;
+        categorySelect.parentElement.parentElement.classList.add('opacity-50', 'cursor-not-allowed');
+
     } else {
         // Normal Task
         dateInput.disabled = false;
@@ -1792,6 +1860,10 @@ function openModal(taskId) {
         // Reset status section
         statusSection.classList.remove('hidden', 'opacity-60', 'cursor-not-allowed', 'pointer-events-none');
         statusSection.classList.add('cursor-pointer');
+
+        // Enable Category Select
+        categorySelect.disabled = false;
+        categorySelect.parentElement.parentElement.classList.remove('opacity-50', 'cursor-not-allowed');
     }
     
     // Toggle UI sections based on type
@@ -1812,6 +1884,11 @@ function openModal(taskId) {
         updateModalDatalist();
     }
     
+    // Set Category Value
+    if (categorySelect) {
+        categorySelect.value = task.category || 'life';
+    }
+
     updateModalStatusUI(task.status);
     
     const modal = document.getElementById('task-modal');
@@ -1911,6 +1988,9 @@ function saveModalTask() {
         // Only update title if not review
         if (task.type !== 'review') {
             task.title = document.getElementById('modal-title').value;
+            // Update Category
+            const catSelect = document.getElementById('modal-category');
+            if(catSelect) task.category = catSelect.value;
         }
         task.date = document.getElementById('modal-date').value;
         
