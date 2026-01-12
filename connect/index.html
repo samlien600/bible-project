@@ -102,7 +102,7 @@
             <div class="mb-4 text-amber-700 opacity-50">
                 <i class="fas fa-book-open text-xl md:text-2xl"></i>
             </div>
-            <p class="text-stone-600 font-serif-tc text-xs md:text-sm mb-2">© 2026 串聯新舊約靈修計畫</p>
+            <p class="text-stone-600 font-serif-tc text-xs md:text-sm mb-2">© 2025 串聯新舊約靈修計畫</p>
             <p class="text-stone-400 text-[10px] md:text-xs font-display tracking-widest">Connecting the Testaments</p>
         </div>
     </footer>
@@ -120,7 +120,6 @@
 
     <!-- Load Data JS -->
     <script src="bible_data.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -178,7 +177,7 @@
             let html = `
                 <div class="text-center mb-10 md:mb-16 fade-in-up px-2">
                     <span class="text-amber-600 font-display tracking-[0.2em] text-xs md:text-sm font-bold uppercase mb-2 block">Daily Devotional</span>
-                    <h2 class="text-3xl md:text-5xl font-bold text-stone-800 mb-4 md:mb-6 font-serif-tc leading-tight">2026 每日靈修計畫</h2>
+                    <h2 class="text-3xl md:text-5xl font-bold text-stone-800 mb-4 md:mb-6 font-serif-tc leading-tight">2025 每日靈修計畫</h2>
                     <div class="w-16 md:w-24 h-1 bg-amber-500 mx-auto rounded-full mb-4 md:mb-6"></div>
                     <p class="text-stone-500 max-w-2xl mx-auto leading-loose text-base md:text-lg font-light text-justify md:text-center px-2">這不僅是一份讀經表，更是一趟穿越歷史的旅程。看見舊約的預表如何在基督裡得到完美的應驗。</p>
                 </div>
@@ -196,7 +195,7 @@
                         
                         <div class="relative z-10 flex-grow">
                             <div class="flex items-center justify-between mb-4 md:mb-6">
-                                <span class="font-display text-2xl md:text-3xl font-bold text-amber-700/80 border-b-2 border-amber-100 pb-1">${m.id} 月</span>
+                                <span class="font-display text-2xl md:text-3xl font-bold text-amber-700/80 border-b-2 border-amber-100 pb-1">${String(m.id).padStart(2, '0')}</span>
                                 <div class="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center text-stone-400">
                                     <i class="fas fa-arrow-right text-xs"></i>
                                 </div>
@@ -230,15 +229,34 @@
                 </div>
             `;
 
+            // 生成書卷 Tags HTML
+            let booksHtml = '';
+            if (theme.books && theme.books.length > 0) {
+                booksHtml = `
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        ${theme.books.map(book => `
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-amber-50 text-amber-900 border border-amber-100">
+                                <i class="fas fa-bookmark mr-1.5 text-[10px] text-amber-500/70"></i>
+                                ${book}
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
             let html = `
                 <div class="fade-in-up">
                     <div class="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-stone-200 pb-4 md:pb-6">
-                        <div>
+                        <div class="w-full">
                             <button onclick="renderHome()" class="mb-3 md:mb-4 px-3 py-1.5 md:px-4 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 transition text-xs font-medium tracking-wide flex items-center w-fit active:scale-95">
                                 <i class="fas fa-arrow-left mr-2"></i> 返回總覽
                             </button>
-                            <h2 class="text-2xl md:text-4xl font-bold text-stone-800 font-serif-tc mb-1 md:mb-2">${theme.title}</h2>
+                            <div class="flex justify-between items-baseline w-full">
+                                <h2 class="text-2xl md:text-4xl font-bold text-stone-800 font-serif-tc mb-1 md:mb-2">${theme.title}</h2>
+                                <span class="text-5xl font-display font-bold text-stone-100 md:hidden">${String(monthId).padStart(2, '0')}</span>
+                            </div>
                             <p class="text-stone-500 text-sm md:text-base">${theme.desc}</p>
+                            ${booksHtml} <!-- Insert Books Tags Here -->
                         </div>
                         <div class="mt-2 md:mt-0 text-right hidden md:block">
                             <span class="text-5xl font-display font-bold text-stone-100">${String(monthId).padStart(2, '0')}</span>
@@ -270,8 +288,6 @@
                         </div>
                     ` : '';
 
-                    // Layout change for mobile: Always keep flex-row to put date next to content (timeline style)
-                    // Added items-start to align top
                     html += `
                         <div style="animation-delay: ${delay}ms" class="fade-in-up bg-white rounded-xl p-5 md:p-8 shadow-sm border border-stone-100 hover:shadow-md transition-shadow group relative overflow-hidden">
                             <div class="flex flex-row items-start gap-4 md:gap-6">
