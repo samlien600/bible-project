@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Project Exodus - The Journey</title>
+    
+    <!-- Tailwind CSS (Utility classes) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <!-- Custom Fonts & Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDFCF8;
+            color: #4A4740;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            transition: background-color 3s ease, color 3s ease; /* 日夜切換的長過渡動畫 */
+        }
+
+        .font-serif {
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* --- Night Mode Styles --- */
+        body.night-mode {
+            background-color: #0F1014; /* 深邃夜空黑 */
+            color: #B0AAA0; /* 柔和月光灰 */
+        }
+
+        /* 夜間模式下的按鈕樣式調整 */
+        body.night-mode .btn-interact {
+            background-color: #1A1C23;
+            color: #B0AAA0;
+            border-color: #2F333F;
+        }
+        body.night-mode .btn-interact:hover {
+            background-color: #252830;
+            border-color: #4A4F5E;
+        }
+        
+        /* 夜間模式下的卡片樣式調整 */
+        body.night-mode .chapter-card.active {
+            background-color: rgba(26, 28, 35, 0.8);
+            border-color: #2F333F;
+        }
+        body.night-mode .chapter-card.active:hover {
+            background-color: rgba(37, 40, 48, 0.9);
+        }
+        body.night-mode .text-dark { color: #B0AAA0 !important; } /* 強制覆蓋深色文字 */
+        body.night-mode .text-muted { color: #6B7280 !important; }
+
+        /* --- Custom Animations --- */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(15px);
+            filter: blur(8px);
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out, filter 1.2s ease-out;
+            will-change: opacity, transform, filter;
+        }
+        
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .breathing-text {
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        .noise-bg {
+            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
+            opacity: 0.4;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+            transition: opacity 3s ease;
+        }
+        body.night-mode .noise-bg {
+            opacity: 0.15; /* 夜晚減少噪點干擾 */
+            mix-blend-mode: overlay;
+        }
+        
+        .btn-interact {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-interact:active {
+            transform: scale(0.98);
+        }
+
+        /* Menu Card Styles */
+        .chapter-card {
+            transition: all 0.3s ease;
+        }
+        .chapter-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+            background-color: #f3f3f3;
+        }
+        body.night-mode .chapter-card.locked {
+            background-color: #1A1C23;
+            opacity: 0.3;
+        }
+        .chapter-card.active {
+            background-color: white;
+            border-left: 4px solid #4A4740;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+        .chapter-card.active:hover {
+            transform: translateX(4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-[#D6CFC0] selection:text-[#4A4740]">
+
+    <!-- Backgrounds -->
+    <div class="fixed inset-0 noise-bg z-0"></div>
+    <canvas id="bg-canvas" class="fixed inset-0 z-0 pointer-events-none opacity-60"></canvas>
+
+    <!-- App Container -->
+    <div id="app" class="relative z-10 w-full max-w-2xl mx-auto min-h-screen flex flex-col">
+        <!-- Content injected via JS -->
+    </div>
+
+    <script>
+        // --- 特效系統 (Visual Effects System) ---
+        const EFFECTS = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            wind: { x: 0, y: 0 },
+            isNight: false, // 新增：夜間狀態追蹤
+            animationFrame: null,
+
+            init() {
+                this.canvas = document.getElementById('bg-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                const count = window.innerWidth < 768 ? 35 : 70;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push(this.createParticle());
+                }
+                this.animate();
+            },
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+
+            createParticle() {
+                return {
+                    x: Math.random() * this.canvas.width,
+                    y: Math.random() * this.canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    baseSpeedX: Math.random() * 0.4 - 0.2,
+                    baseSpeedY: Math.random() * 0.4 - 0.2,
+                    opacity: Math.random() * 0.4 + 0.1
+                };
+            },
+
+            setWind(level) {
+                // level: 0=Calm, 1=Breeze, 2=Strong Wind
+                const targets = [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 4.5, y: 0.3 }]; // Level 2 speed increased for effect
+                this.wind = targets[level] || { x: 0, y: 0 };
+            },
+
+            setTheme(theme) {
+                this.isNight = theme === 'night';
+                // Toggle CSS class on body
+                if (this.isNight) {
+                    document.body.classList.add('night-mode');
+                } else {
+                    document.body.classList.remove('night-mode');
+                }
+            },
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 動態決定粒子顏色：白天是深沙色，晚上是微光白
+                this.ctx.fillStyle = this.isNight ? 'rgba(200, 200, 210, 0.5)' : '#8C887E';
+                this.ctx.strokeStyle = this.isNight ? 'rgba(200, 200, 210, 0.3)' : 'rgba(140, 136, 126, 0.3)';
+
+                this.particles.forEach(p => {
+                    this.ctx.beginPath();
+                    this.ctx.globalAlpha = p.opacity;
+
+                    // 風速特效邏輯
+                    const totalSpeed = Math.abs(this.wind.x) + Math.abs(this.wind.y);
+                    
+                    if (totalSpeed > 2) {
+                        // 強風模式：畫成線條 (Streaks)
+                        this.ctx.lineWidth = p.size / 2;
+                        this.ctx.moveTo(p.x, p.y);
+                        // 線條長度隨風速與粒子大小變化
+                        this.ctx.lineTo(p.x - this.wind.x * (4 + p.size), p.y - this.wind.y * (4 + p.size));
+                        this.ctx.stroke();
+                    } else {
+                        // 平靜模式：畫成圓點
+                        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+
+                    // Update Position
+                    p.x += p.baseSpeedX + this.wind.x;
+                    p.y += p.baseSpeedY + this.wind.y;
+
+                    // Wrapping
+                    if (p.x < -50) p.x = this.canvas.width + 50;
+                    if (p.x > this.canvas.width + 50) p.x = -50;
+                    if (p.y < -50) p.y = this.canvas.height + 50;
+                    if (p.y > this.canvas.height + 50) p.y = -50;
+                });
+                this.animationFrame = requestAnimationFrame(() => this.animate());
+            }
+        };
+
+        // --- 數據結構 ---
+        
+        const SCENES = {
+            INTRO: 'INTRO',
+            MENU: 'MENU',
+            GAME: 'GAME',
+            ENDING: 'ENDING',
+        };
+
+        const STATS = {
+            CONTROL: 'control',
+            ESCAPE: 'escape',
+            TRUST: 'trust',
+        };
+
+        const CHAPTERS = [
+            { id: 'prologue', title: '序章：被壓迫', desc: '為什麼我覺得這麼累？關於生活中的重擔。', locked: true },
+            { id: 'ch1', title: '第一章：呼召', desc: '有一個聲音說要改變，但我真的準備好了嗎？', locked: true },
+            { id: 'ch2', title: '第二章：失控', desc: '以為事情會變好，結果卻更加混亂...', locked: true },
+            { id: 'ch3', title: '第三章：跨越', desc: '眼前是紅海，後有追兵。跨出去，還是退回去？', locked: true },
+            { id: 'ch4', title: '第四章：曠野', desc: '離開了熟悉的地方，卻還沒到目的地。只有風聲與不安。', locked: false, tag: '體驗版' },
+            { id: 'epilogue', title: '終章：同在', desc: '在漫長的旅程後，我們終於學會如何被陪伴。', locked: true }
+        ];
+
+        const STORY_NODES = {
+            'start': {
+                id: 'start',
+                effectLevel: 0,
+                theme: 'day', // 新增：日夜主題
+                text: [
+                    "你已經走了很久。",
+                    "原本以為只要離開了那個壓迫你的地方，一切都會立刻好轉。",
+                    "但眼前的景象，這幾天來幾乎沒有變過。",
+                    "只有風聲，沙礫，還有無止盡的延伸。",
+                    "預期中的「目的地」，似乎比想像中更遠。"
+                ],
+                choices: [
+                    { text: "我拿出地圖（或是任何紀錄），試圖確認還要走多久。", stat: STATS.CONTROL, nextId: 'node_1' },
+                    { text: "我戴上耳機（或封閉感官），不想看這單調的景色。", stat: STATS.ESCAPE, nextId: 'node_1' },
+                    { text: "我停下腳步，深呼吸，承認自己真的很累。", stat: STATS.TRUST, nextId: 'node_1' }
+                ]
+            },
+            'node_1': {
+                id: 'node_1',
+                effectLevel: 1,
+                theme: 'day',
+                text: [
+                    "隨著太陽升起，焦慮感也開始像氣溫一樣攀升。",
+                    "身邊的人群開始出現騷動。",
+                    "有人抱怨當初不該離開，有人開始爭論該往哪走。",
+                    "甚至有人開始聚集，說要用以前熟悉的方式「打造」一個新的依靠，因為這片空白太令人恐慌了。",
+                    "看著他們，你心裡怎麼想？"
+                ],
+                choices: [
+                    { text: "我覺得他們很愚蠢，這時候更應該保持冷靜與秩序。", stat: STATS.CONTROL, nextId: 'node_2' },
+                    { text: "其實我有點羨慕他們，至少他們找到了事情做，不像現在這麼空虛。", stat: STATS.ESCAPE, nextId: 'node_2' },
+                    { text: "我能理解那種恐慌，因為我也感覺到了同樣的不安。", stat: STATS.TRUST, nextId: 'node_2' }
+                ]
+            },
+            'node_2': {
+                id: 'node_2',
+                effectLevel: 0,
+                theme: 'night', // 夜幕降臨
+                text: [
+                    "夜幕降臨，氣溫驟降。",
+                    "喧囂暫時平息，世界剩下絕對的安靜。",
+                    "沒有路標，沒有明天的保證。",
+                    "在這樣的時刻，你最想念的是什麼？"
+                ],
+                choices: [
+                    { text: "我想念以前那份雖然辛苦，但至少「可以預測」的生活。", stat: STATS.CONTROL, nextId: 'node_3' },
+                    { text: "我想念任何可以讓我大笑、忘記現在在哪裡的東西。", stat: STATS.ESCAPE, nextId: 'node_3' },
+                    { text: "我誰也不想念，只想知道這一切的意義到底是什麼。", stat: STATS.TRUST, nextId: 'node_3' }
+                ]
+            },
+            'node_3': {
+                id: 'node_3',
+                effectLevel: 2, // 強風特效開啟
+                theme: 'night',
+                text: [
+                    "突然，一陣風吹過。",
+                    "並不是那種刺骨的寒風，而是一股奇異的、微暖的氣流。",
+                    "它似乎在邀請你把背包放下，暫時不要思考下一步。",
+                    "但你心裡有個聲音說：『如果我現在停下來，會不會就再也走不動了？』",
+                    "你會怎麼做？"
+                ],
+                choices: [
+                    { text: "我不放鬆，抓緊背包。我必須隨時準備好應對突發狀況。", stat: STATS.CONTROL, nextId: 'node_4' },
+                    { text: "我坐下來，試圖睡去。希望能直接快轉到明天。", stat: STATS.ESCAPE, nextId: 'node_4' },
+                    { text: "我試著放下背包。雖然手還在發抖，但我試著坐進那陣風裡。", stat: STATS.TRUST, nextId: 'node_4' }
+                ]
+            },
+            'node_4': {
+                id: 'node_4',
+                effectLevel: 0,
+                theme: 'night',
+                text: [
+                    "這是旅程中最漫長的一夜。",
+                    "沒有神蹟，沒有煙火，也沒有突然出現的出口。",
+                    "只有你，和你的心跳聲。",
+                    "如果此刻有一個聲音對你說話，你覺得那會是什麼？"
+                ],
+                choices: [
+                    { text: "它會責備我不夠堅強，沒有把事情規劃好。", stat: STATS.CONTROL, nextId: 'end_calculation' },
+                    { text: "它會說這一切都是徒勞，不如早點放棄比較輕鬆。", stat: STATS.ESCAPE, nextId: 'end_calculation' },
+                    { text: "它什麼都沒說，只是靜靜地坐在我旁邊，像是在陪我看星星。", stat: STATS.TRUST, nextId: 'end_calculation' }
+                ]
+            }
+        };
+
+        let currentState = {
+            scene: SCENES.INTRO,
+            currentNodeId: 'start',
+            playerStats: { [STATS.CONTROL]: 0, [STATS.ESCAPE]: 0, [STATS.TRUST]: 0 }
+        };
+
+        // --- 核心邏輯 ---
+
+        function initApp() {
+            EFFECTS.init();
+            renderScene();
+        }
+
+        function goToMenu() {
+            currentState.scene = SCENES.MENU;
+            renderScene();
+        }
+
+        function startChapter(chapterId) {
+            if (chapterId === 'ch4') {
+                currentState.scene = SCENES.GAME;
+                currentState.currentNodeId = 'start';
+                currentState.playerStats = { [STATS.CONTROL]: 0, [STATS.ESCAPE]: 0, [STATS.TRUST]: 0 };
+                renderScene();
+            }
+        }
+
+        function handleChoice(stat, nextId) {
+            currentState.playerStats[stat] += 1;
+            if (nextId === 'end_calculation') {
+                currentState.scene = SCENES.ENDING;
+            } else {
+                currentState.currentNodeId = nextId;
+            }
+            renderScene();
+        }
+
+        function getEndingContent() {
+            const { control, escape, trust } = currentState.playerStats;
+            let dominant = STATS.TRUST;
+            if (control >= escape && control >= trust) dominant = STATS.CONTROL;
+            else if (escape >= control && escape >= trust) dominant = STATS.ESCAPE;
+
+            const contents = {
+                [STATS.CONTROL]: {
+                    reflection: "在這段旅程中，你一直試圖「搞清楚」狀況。這顯示了你的負責與堅韌，但同時，那個必須隨時保持警戒的你，其實已經很累了。",
+                    voice: "「你們要休息，要知道我是神！」<br><span class='text-sm mt-2 block not-italic opacity-80'>— 詩篇 46:10</span>",
+                    action: "【今日練習】\n今晚睡覺前，試著不為明天做任何一個具體的計畫。容許明天早上醒來時，有5分鐘的空白，問自己：「我現在感覺如何？」，而不是「我今天要做什麼？」。"
+                },
+                [STATS.ESCAPE]: {
+                    reflection: "面對這片荒蕪，你本能地尋找掩護與轉移注意力的事物。這不是軟弱，而是你保護自己心靈不受傷害的方式。但有時候，那些轉移注意力的東西，反而讓你更聽不見自己的聲音。",
+                    voice: "「凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。」<br><span class='text-sm mt-2 block not-italic opacity-80'>— 馬太福音 11:28</span>",
+                    action: "【今日練習】\n今天找一個獨處的時刻，關掉手機、音樂和所有螢幕，只給自己10分鐘。如果感到焦慮，不用急著滑手機，試著觀察那個焦慮感，對它說：「我看見你了，沒關係。」"
+                },
+                [STATS.TRUST]: {
+                    reflection: "你選擇了最困難的一條路：誠實地面對不確定性。雖然手在發抖，但你沒有逃跑，也沒有強求答案。這份在未知中停留的勇氣，是你最珍貴的特質。",
+                    voice: "「我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。」<br><span class='text-sm mt-2 block not-italic opacity-80'>— 哥林多後書 12:9</span>",
+                    action: "【今日練習】\n找一張紙，寫下這段時間讓你感到最「無力」的一件事。寫完後，將紙摺起來放在一個盒子裡，象徵這件事暫時不需要你用力解決，你可以先休息。"
+                }
+            };
+            return contents[dominant];
+        }
+
+        // --- 渲染 ---
+
+        function renderScene() {
+            const app = document.getElementById('app');
+            app.innerHTML = ''; 
+            
+            // 每次渲染場景時，重置或繼承主題設定
+            if (currentState.scene === SCENES.GAME) {
+                const node = STORY_NODES[currentState.currentNodeId];
+                if (node.effectLevel !== undefined) EFFECTS.setWind(node.effectLevel);
+                if (node.theme !== undefined) EFFECTS.setTheme(node.theme);
+            } else {
+                EFFECTS.setWind(0);
+                EFFECTS.setTheme('day'); // 其他頁面預設為白天
+            }
+
+            // 1. INTRO PAGE
+            if (currentState.scene === SCENES.INTRO) {
+                app.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-screen p-6 md:p-8 text-center animate-fade-in w-full max-w-2xl mx-auto">
+                        <div class="mb-6 opacity-60">
+                            <i data-lucide="footprints" width="48" height="48" stroke-width="1" class="text-[#6B6559]"></i>
+                        </div>
+                        <h1 class="text-3xl md:text-5xl font-serif tracking-widest mb-6">
+                            THE JOURNEY
+                        </h1>
+                        <div class="w-16 h-1 bg-[#D6CFC0] mb-8"></div>
+                        <div class="bg-white/60 p-6 rounded-lg border border-[#D6CFC0] mb-8 text-left space-y-4 shadow-sm w-full backdrop-blur-sm">
+                            <h3 class="font-bold tracking-widest text-sm uppercase mb-2 text-[#4A4740]">關於此體驗</h3>
+                            <p class="text-sm md:text-base text-[#6B6559] leading-relaxed">
+                                這是一個靈感來自聖經《出埃及記》敘事的沉浸式互動遊戲。
+                            </p>
+                            <p class="text-sm md:text-base text-[#6B6559] leading-relaxed">
+                                這單純是一次關於「選擇」的探索，讓你安全地覺察自己在壓力、等待與未知中的內在反應。沒有對錯，只有你的感受。
+                            </p>
+                        </div>
+                        <button onclick="goToMenu()" class="btn-interact px-8 py-5 rounded-lg text-xl tracking-widest font-medium w-full max-w-xs bg-[#4A4740] text-[#F5F2EA] hover:bg-[#2C2A26] shadow-md transition-all">
+                            進入旅程
+                        </button>
+                    </div>
+                `;
+            } 
+            
+            // 2. MENU PAGE
+            else if (currentState.scene === SCENES.MENU) {
+                const container = document.createElement('div');
+                container.className = "flex flex-col min-h-screen p-6 md:p-12 pt-12 animate-fade-in w-full max-w-2xl mx-auto";
+                
+                container.innerHTML = `
+                    <div class="mb-10 text-center md:text-left">
+                        <h2 class="text-2xl font-serif tracking-widest mb-2">章節選擇</h2>
+                        <p class="text-sm text-gray-500">請選擇你的旅程節點</p>
+                    </div>
+                `;
+
+                const list = document.createElement('div');
+                list.className = "flex flex-col gap-4 pb-12";
+
+                CHAPTERS.forEach((chapter, index) => {
+                    const card = document.createElement('div');
+                    const isLocked = chapter.locked;
+                    
+                    let cardClass = "chapter-card w-full p-5 rounded-lg border border-[#EAE5D9] flex items-center justify-between group select-none";
+                    if (isLocked) {
+                        cardClass += " locked";
+                    } else {
+                        cardClass += " active bg-white/80 backdrop-blur-sm";
+                    }
+                    card.className = cardClass;
+                    
+                    card.innerHTML = `
+                        <div class="flex-1 pr-4">
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="text-sm font-bold ${isLocked ? 'text-gray-400' : 'text-current'} tracking-widest uppercase">
+                                    ${chapter.title}
+                                </span>
+                                ${!isLocked && chapter.tag ? `<span class="bg-[#D6CFC0] text-[#4A4740] text-[10px] px-2 py-0.5 rounded-full font-bold">${chapter.tag}</span>` : ''}
+                            </div>
+                            <p class="text-sm ${isLocked ? 'text-gray-400' : 'text-muted'} leading-relaxed">
+                                ${chapter.desc}
+                            </p>
+                        </div>
+                        <div class="${isLocked ? 'text-gray-300' : 'opacity-0 group-hover:opacity-100 transition-opacity'}">
+                            ${isLocked ? '<i data-lucide="lock" width="20"></i>' : '<i data-lucide="chevron-right" width="24"></i>'}
+                        </div>
+                    `;
+
+                    if (!isLocked) {
+                        card.onclick = () => startChapter(chapter.id);
+                    }
+
+                    list.appendChild(card);
+                });
+
+                container.appendChild(list);
+                app.appendChild(container);
+            }
+
+            // 3. GAMEPLAY
+            else if (currentState.scene === SCENES.GAME) {
+                const node = STORY_NODES[currentState.currentNodeId];
+                
+                // --- 渲染前的類別檢查與應用 ---
+                // 此處不再手動設置風與主題，因為已在函式開頭統一處理
+
+                const container = document.createElement('div');
+                container.className = "flex flex-col flex-grow p-6 md:p-12 pt-12 md:pt-20 max-w-2xl mx-auto w-full";
+                
+                const header = document.createElement('div');
+                header.className = "text-xs font-bold tracking-[0.2em] opacity-60 mb-8 uppercase flex items-center gap-2 cursor-pointer hover:opacity-100 transition-opacity";
+                header.innerHTML = `<i data-lucide="arrow-left" width="14"></i> 回到目錄`;
+                header.onclick = goToMenu; 
+                container.appendChild(header);
+
+                const subTitle = document.createElement('div');
+                subTitle.className = "text-xs font-bold tracking-[0.2em] opacity-60 mb-8 uppercase flex items-center gap-2";
+                subTitle.innerHTML = `<i data-lucide="wind" width="14"></i> 第四章：曠野`;
+                container.appendChild(subTitle);
+
+                const textContainer = document.createElement('div');
+                textContainer.className = "space-y-6 mb-12";
+                container.appendChild(textContainer);
+
+                const choicesContainer = document.createElement('div');
+                choicesContainer.className = "space-y-4 transition-all duration-1000 opacity-0 transform translate-y-4 pointer-events-none";
+                container.appendChild(choicesContainer);
+
+                app.appendChild(container);
+
+                const lineSpeed = 1500;
+                node.text.forEach((line, index) => {
+                    const p = document.createElement('p');
+                    p.className = "text-lg md:text-xl leading-loose fade-in-up"; // 移除 text-[#4A4740] 以繼承 body 顏色
+                    p.innerText = line;
+                    textContainer.appendChild(p);
+                    setTimeout(() => p.classList.add('visible'), index * lineSpeed);
+                });
+
+                node.choices.forEach((choice) => {
+                    const btn = document.createElement('button');
+                    // 按鈕樣式使用通用類 btn-interact 並移除硬編碼顏色，讓 CSS 處理日夜切換
+                    btn.className = "btn-interact w-full px-6 py-4 rounded-lg text-left text-lg leading-relaxed font-medium tracking-wide bg-[#F5F2EA] text-[#4A4740] shadow-sm border border-[#D6CFC0] hover:bg-[#EAE5D9] active:bg-[#D6CFC0] hover:border-gray-400";
+                    btn.innerText = choice.text;
+                    btn.onclick = () => handleChoice(choice.stat, choice.nextId);
+                    choicesContainer.appendChild(btn);
+                });
+
+                setTimeout(() => {
+                    choicesContainer.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                    choicesContainer.classList.add('opacity-100', 'translate-y-0');
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, node.text.length * lineSpeed);
+            }
+
+            // 4. ENDING
+            else if (currentState.scene === SCENES.ENDING) {
+                const content = getEndingContent();
+                app.innerHTML = `
+                    <div class="flex flex-col min-h-screen p-8 md:p-12 pt-16 animate-fade-in max-w-2xl mx-auto w-full">
+                        <div class="text-center mb-12">
+                            <div class="mx-auto mb-4 opacity-60 flex justify-center">
+                                <i data-lucide="feather" width="32" height="32" stroke-width="1"></i>
+                            </div>
+                            <h2 class="text-2xl font-serif tracking-widest">旅程暫歇</h2>
+                        </div>
+                        <div class="space-y-12">
+                            <div class="bg-white/60 backdrop-blur-sm p-8 rounded-xl border border-[#EAE5D9] shadow-sm text-dark">
+                                <h3 class="text-sm font-bold text-gray-500 tracking-widest uppercase mb-4">你的旅程鏡像</h3>
+                                <p class="text-lg leading-relaxed text-[#4A4740]">${content.reflection}</p>
+                            </div>
+                            <div class="px-4 border-l-2 border-[#D6CFC0] py-4 breathing-text origin-left">
+                                <p class="text-xl md:text-2xl font-serif italic opacity-80 leading-relaxed">${content.voice}</p>
+                            </div>
+                            <div class="bg-[#4A4740] text-[#F5F2EA] p-8 rounded-xl shadow-lg transform transition-all active:scale-[0.99] btn-interact">
+                                <h3 class="text-sm font-bold text-[#D6CFC0] tracking-widest uppercase mb-4 flex items-center gap-2">
+                                    <i data-lucide="sun" width="16"></i> 下一步行動
+                                </h3>
+                                <p class="text-lg leading-relaxed whitespace-pre-line">${content.action}</p>
+                            </div>
+                            <div class="mt-8 p-6 bg-[#F5F2EA]/80 backdrop-blur-sm rounded-xl border border-[#EAE5D9] flex flex-col items-center text-center space-y-4 text-dark">
+                                <h3 class="text-sm font-bold text-gray-500 tracking-widest uppercase">延伸探索</h3>
+                                <p class="text-sm text-gray-500 leading-relaxed max-w-xs">如果你想找個人聊聊剛才的感受，<br>或是尋找更多類似的陪伴...</p>
+                                <div class="bg-white p-3 rounded-lg shadow-sm">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/church-connect" alt="Connect QR Code" class="w-32 h-32 opacity-90 mix-blend-multiply" loading="lazy">
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2">掃描 QR Code，延續這份對話</p>
+                            </div>
+                        </div>
+                        <div class="mt-12 pb-12 text-center">
+                            <button onclick="goToMenu()" class="opacity-60 hover:opacity-100 py-3 px-6 rounded text-base transition-colors">
+                                返回章節目錄
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
