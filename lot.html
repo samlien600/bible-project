@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羅得的抉擇｜信仰與世俗的拔河</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&display=swap');
+
+        /* 歷史質感基底設定 */
+        body {
+            font-family: 'Noto Serif TC', serif;
+            transition: background 1.5s ease, color 1.5s ease;
+            /* 羊皮紙質感漸層背景 */
+            background-color: #eee6d8;
+            background-image: radial-gradient(circle at center, #f5f0e6 0%, #e0d5c1 100%);
+            color: #3e2723; /* 深墨褐色 */
+            overflow-x: hidden;
+        }
+
+        /* 主題：暗夜（進入所多瑪） */
+        .theme-dark body {
+            background-color: #272422;
+            background-image: radial-gradient(circle at center, #3a3633 0%, #1c1a18 100%);
+            color: #e6dfd8; /* 柔和的紙白色 */
+        }
+
+        /* 主題：毀滅（神降下審判） */
+        .theme-doom body {
+            background-color: #2b1111;
+            background-image: radial-gradient(circle at center, #421c1c 0%, #1a0808 100%);
+            color: #f3e5f5;
+        }
+
+        .fade-in {
+            animation: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 內心獨白樣式調整 */
+        .thought-bubble {
+            font-style: italic;
+            position: relative;
+            padding: 1.25rem 1.5rem;
+            background: rgba(140, 90, 69, 0.08); /* 微微的赭紅色基底 */
+            border-left: 3px solid #8c5a45;
+            color: #5d4037;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .theme-dark .thought-bubble { 
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #a1887f;
+            color: #d7ccc8; 
+        }
+        .theme-doom .thought-bubble { 
+            background: rgba(0, 0, 0, 0.25);
+            border-left: 3px solid #e57373;
+            color: #ffcdd2; 
+        }
+
+        /* SVG 古地圖標記樣式 */
+        .map-point { transition: all 0.8s ease; }
+        .map-point.active { 
+            fill: #8c2222; /* 深紅色標記 */
+        }
+        .theme-dark .map-point.active { fill: #d4af37; /* 暗夜中的暗金色 */ }
+        .theme-doom .map-point.active { fill: #ef4444; }
+
+        /* 修復地圖文字糊成一團的問題 */
+        .map-text {
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            /* 讓描邊畫在文字背後，並使用圓角轉折避免尖刺 */
+            paint-order: stroke fill;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            stroke-width: 2.5px;
+            
+            fill: #3e2723; /* 預設文字色：深墨褐 */
+            stroke: #e8ddc8; /* 預設背景色描邊 */
+            transition: fill 1s ease, stroke 1s ease;
+        }
+        .map-text.water {
+            fill: #2c3e3c;
+        }
+
+        /* 主題切換時的文字對應調整 */
+        .theme-dark .map-text,
+        .theme-doom .map-text {
+            fill: #e6dfd8; /* 暗黑模式文字變紙白色 */
+            stroke: #332f2c; /* 描邊融入暗色背景 */
+        }
+        .theme-dark .map-text.water,
+        .theme-doom .map-text.water {
+            fill: #8a9c9a;
+        }
+
+        /* 古典按鈕特效 */
+        .historical-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .historical-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+        .historical-btn:hover::before { left: 0; }
+        .historical-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4 md:px-0">
+
+    <!-- 地圖區 -->
+    <div id="real-map-container" class="w-full max-w-3xl bg-[#fdfbf7]/95 dark:bg-[#2a2624]/95 shadow-xl rounded-sm p-5 mb-8 hidden fade-in transition-colors duration-1000 relative border-x-4 border-double border-[#d4c4a8] dark:border-[#4a423e]">
+        <h2 class="text-sm font-bold text-[#8c5a45] dark:text-[#a1887f] mb-3 text-center tracking-[0.2em] border-b border-[#d4c4a8]/50 dark:border-[#4a423e]/50 pb-2">羅得的遷移路線</h2>
+        
+        <!-- 仿古地圖 SVG -->
+        <div class="relative w-full aspect-[4/3] bg-[#e8ddc8] dark:bg-[#332f2c] overflow-hidden border border-[#d4c4a8] dark:border-[#1a1816] shadow-inner" style="background-image: url('data:image/svg+xml,%3Csvg width=\\'20\\' height=\\'20\\' viewBox=\\'0 0 20 20\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'%23d4c4a8\\' fill-opacity=\\'0.2\\' fill-rule=\\'evenodd\\'%3E%3Ccircle cx=\\'3\\' cy=\\'3\\' r=\\'1\\'/%3E%3Ccircle cx=\\'13\\' cy=\\'13\\' r=\\'1\\'/%3E%3C/g%3E%3C/svg%3E');">
+            <svg viewBox="0 0 400 300" class="w-full h-full">
+                <!-- 仿古地形背景：約旦河與死海 -->
+                <path d="M 180 0 Q 200 50 180 120 Q 160 180 200 200" fill="none" stroke="#6d827f" stroke-width="6" opacity="0.6"/>
+                <ellipse cx="200" cy="240" rx="30" ry="50" fill="#6d827f" opacity="0.6"/>
+                <text x="186" y="245" font-size="12" class="map-text water" opacity="0.9">鹽海</text>
+                <text x="160" y="60" font-size="12" class="map-text water" opacity="0.9" transform="rotate(-70 160 60)">約旦河</text>
+
+                <!-- 歷史軌跡線段 (動態顯示) -->
+                <!-- 預設顏色為深墨褐 (#5d4037) -->
+                <line id="path-bethel-plain" x1="140" y1="80" x2="190" y2="150" stroke="#5d4037" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="100" style="transition: stroke-dashoffset 2s ease-in-out;"/>
+                <line id="path-plain-sodom" x1="190" y1="150" x2="220" y2="220" stroke="#5d4037" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="100" style="transition: stroke-dashoffset 2s ease-in-out;"/>
+                <line id="path-sodom-zoar" x1="220" y1="220" x2="245" y2="260" stroke="#5d4037" stroke-width="2" stroke-dasharray="60" stroke-dashoffset="60" style="transition: stroke-dashoffset 2s ease-in-out;"/>
+                <line id="path-zoar-cave" x1="245" y1="260" x2="280" y2="210" stroke="#5d4037" stroke-width="2" stroke-dasharray="80" stroke-dashoffset="80" style="transition: stroke-dashoffset 2s ease-in-out;"/>
+
+                <!-- 節點 (移除了內嵌的 stroke 與 fill，改由 CSS 控制) -->
+                <g id="node-bethel" transform="translate(140, 80)">
+                    <circle cx="0" cy="0" r="4" class="map-point" fill="#8c7a6b"/>
+                    <text x="-18" y="-12" font-size="14" class="map-text">伯特利</text>
+                </g>
+                <g id="node-plain" transform="translate(190, 150)">
+                    <circle cx="0" cy="0" r="4" class="map-point" fill="#8c7a6b"/>
+                    <text x="12" y="-5" font-size="14" class="map-text">平原</text>
+                </g>
+                <g id="node-sodom" transform="translate(220, 220)">
+                    <circle cx="0" cy="0" r="4" class="map-point" fill="#8c7a6b"/>
+                    <text x="-48" y="5" font-size="14" class="map-text">所多瑪</text>
+                </g>
+                <g id="node-zoar" transform="translate(245, 260)">
+                    <circle cx="0" cy="0" r="4" class="map-point" fill="#8c7a6b"/>
+                    <text x="12" y="12" font-size="14" class="map-text">瑣珥</text>
+                </g>
+                <g id="node-cave" transform="translate(280, 210)">
+                    <circle cx="0" cy="0" r="4" class="map-point" fill="#8c7a6b"/>
+                    <text x="10" y="-8" font-size="14" class="map-text">山洞</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 故事內容區 -->
+    <div id="story-container" class="w-full max-w-3xl bg-[#fdfbf7] dark:bg-[#2a2624] shadow-2xl p-8 md:p-12 border-x-4 border-double border-[#d4c4a8] dark:border-[#4a423e] transition-colors duration-1000">
+        <!-- 動態渲染區 -->
+    </div>
+
+    <script>
+        // 遊戲狀態
+        let state = {
+            theme: 'default', // default, dark, doom
+            visitedLocations: []
+        };
+
+        // 劇本數據 (純聖經主線)
+        const storyNodes = {
+            "prologue": {
+                title: "前言：跨越千年的警告",
+                text: `
+                    <div class="text-center py-10 my-4 border-y-2 border-[#8c5a45] dark:border-[#a1887f]">
+                        <p class="text-3xl md:text-5xl font-bold text-[#8c2222] dark:text-[#e57373] tracking-widest mb-6 leading-relaxed">
+                            「你們要回想<br class="md:hidden">羅得的妻子。」
+                        </p>
+                        <p class="text-xl text-[#5d4037] dark:text-[#d7ccc8] font-semibold tracking-widest">
+                            —— 路加福音 17:32
+                        </p>
+                    </div>
+                    <p class="leading-loose mt-8 text-lg">
+                        耶穌曾用這句簡短而有力的警告，提醒世人不要貪戀將亡的世界。<br><br>
+                        羅得的失敗並非一夕之間造成的。現在，讓我們回到幾千年前的約旦河平原，走進羅得的內心世界，經歷他那一步步走向深淵的抉擇...
+                    </p>
+                `,
+                action: { text: "翻開歷史的書卷", next: "start" }
+            },
+            "start": {
+                title: "序章：蒙福與分歧",
+                location: "bethel",
+                text: "你是羅得。多年來，你跟隨著你的叔叔亞伯蘭（後改名亞伯拉罕）離開了吾珥，經歷了神的帶領。因為神的賜福，你們的牛群、羊群極多，甚至這片土地已經容不下你們兩家同居了。你的牧人和亞伯蘭的牧人常常發生爭吵。",
+                thought: "這片土地實在太擁擠了，我的牧人連給羊群找水喝都要跟叔叔的人爭搶。這樣下去不是辦法，但我也不好意思開口，不知道叔叔會怎麼決定...",
+                action: { text: "這天，亞伯蘭主動找你談話...", next: "separation" }
+            },
+            "separation": {
+                title: "第一章：十字路口的選擇",
+                location: "bethel",
+                text: "亞伯蘭為了平息紛爭，對你說：「你我不可相爭... 遍地不都在你眼前嗎？請你離開我：你向左，我就向右；你向右，我就向左。」<br><br>你舉目觀看，看見約旦河的全平原，直到瑣珥，都是滋潤的。那地如同耶和華的園子。然而，那裡的所多瑪人在耶和華面前罪大惡極。",
+                thought: "這片平原水草豐美，這正是我擴張產業的好機會！至於那裡的罪惡...只要我保守自己的心，不和他們同流合污就好了。為家人追求更好的生活，有什麼錯呢？",
+                action: { 
+                    text: "選擇約旦河的全平原，往東遷移 (創 13:11)", 
+                    next: "moving_tent",
+                    reflection: "【深度反思：貪戀世俗與舒適——眼目的情慾】<br><br>你用「追求更好的生活」合理化了自己的貪婪。當亞伯蘭憑信心讓出選擇權，將未來交託給神時，你卻憑「眼見」做決定。你看重了物質的豐盛（「如同耶和華的園子」），卻刻意忽略了當地屬靈環境的極度敗壞。這正是約翰一書 2:16 所警告的「眼目的情慾」。你為了現實利益，主動脫離了亞伯蘭的屬靈遮蓋，邁出了墮落的第一步。"
+                }
+            },
+            "moving_tent": {
+                title: "第二章：漸漸挪移帳棚",
+                location: "plain",
+                text: "你選擇了平原，與亞伯蘭分開。起初，你只是在平原的城邑之間遊牧。但你發現，平原的資源與生活，深受其中心城市「所多瑪」的影響。",
+                thought: "住在野外風吹日曬，太辛苦了。所多瑪城牆堅固、市場繁榮。我只是把帳棚稍微靠近城一點，享受一些生活便利，這不代表我贊同他們的惡行啊。",
+                theme: "dark",
+                action: { 
+                    text: "漸漸挪移帳棚，直到所多瑪 (創 13:12)", 
+                    next: "city_gate",
+                    reflection: "【深度反思：漸進式的妥協——向罪惡靠近】<br><br>罪惡的吞噬往往不是一步到位的，而是「溫水煮青蛙」。從「在平原的城邑之間遊牧」，到「漸漸挪移帳棚」，再到最終的「搬入城內」，你對罪惡的環境從警戒、習慣，最終變成了麻木。<br><br>你以為自己能「出淤泥而不染」，卻低估了環境對全家人的腐蝕力。正如箴言 4:23 說：「你要保守你心，勝過保守一切」，當你主動向罪惡靠近時，你的心就已經失守了。"
+                }
+            },
+            "city_gate": {
+                title: "第三章：城門口的審判官",
+                location: "sodom",
+                text: "時間飛逝，你不再是那個居無定所的牧羊人。如今，你買了房子，甚至坐在所多瑪的城門口——這代表著你在這座罪惡之城中擁有了一定的地位和發言權。每天，你看見城裡那些淫亂和強暴的事，你那「義人的心」天天感到痛苦。",
+                thought: "我很痛苦，但我能做什麼？我好不容易在這裡取得了一席之地。如果我站出來強烈譴責他們，大家都會翻臉，我會失去一切。我只能在心裡痛苦，表面上還是得明哲保身...",
+                action: { 
+                    text: "坐在所多瑪城門口，與他們混居 (創 19:1)", 
+                    next: "the_warning",
+                    reflection: "【深度反思：信仰與生活脫節——失去鹽味的基督徒】<br><br>你成功融入了所多瑪，甚至成為了城門口的長老（審判官）。你贏得了世俗的地位與財富，卻成為了一個「默默無聲的義人」。為了維持人際關係與既得利益，你對罪惡保持沉默。<br><br>正如耶穌所說：「人若賺得全世界，賠上自己的生命，有甚麼益處呢？」（太16:26）你擁有了影響力，卻不敢發揮屬靈的影響力，最終信仰與生活嚴重脫節。"
+                }
+            },
+            "the_warning": {
+                title: "第四章：大難臨頭的警告",
+                location: "sodom",
+                text: "兩個天使在夜晚來到了所多瑪。城裡的人包圍了你的房子企圖行惡。天使將你拉進屋內，並嚴肅地說：「這城的人罪惡甚重，耶和華差我們來毀滅這地方。你去把你的女婿和家人都帶出去！」",
+                thought: "神真的要毀滅這裡？我一生的心血都在這裡！但我必須去警告我的女婿們，這次關係到性命，他們總該聽我的了吧！",
+                theme: "doom",
+                action: { 
+                    text: "跑去警告女婿，卻被當作戲言 (創 19:14)", 
+                    next: "the_flight",
+                    reflection: "【深度反思：失去見證的悲哀——毫無說服力的信仰】<br><br>這是何等諷刺與悲哀的一幕！當危機真正來臨時，你焦急地想拯救家人，但因為你平時的生活與世人毫無分別，你的警告在女婿們眼中竟成了一場「戲言」。<br><br>一個平時不敬畏神、對罪惡妥協的人，在災難前突然談論神的審判，沒有人會相信。你妥協的代價，就是連拯救自己家人的信用都徹底破產了。"
+                }
+            },
+            "the_flight": {
+                title: "第五章：遲延與討價還價",
+                location: "sodom",
+                text: "天明了，天使催逼你逃命：「不可回頭看，也不可在平原站住，要逃到山上！」<br><br>但是，看著屋裡華麗的陳設、積累的財富，你竟然遲延不走。天使因為神憐恤你，強拉著你們的手，把你們領出城外。",
+                thought: "山上太荒涼了！我這把年紀怎麼受得了那種苦？我習慣了城市生活。瑣珥雖然小，但至少是個城...神啊，通融一下吧！",
+                action: { 
+                    text: "因捨不得而遲延，求神讓他逃往瑣珥 (創 19:16,20)", 
+                    next: "the_salt_pillar",
+                    reflection: "【深度反思：大難臨頭依然捨不得——與神討價還價】<br><br>神差遣天使來施行拯救，你卻還在「遲延」。你捨不得即將化為灰燼的財富與舒適的生活。<br><br>即使天使強拉著你逃命，你依然不肯完全順服神「逃到山上」的命令，反而在危急關頭還要為自己的肉體舒適與神討價還價，硬求去「瑣珥」。這暴露出你內心深處依然不想放棄世俗的安逸，也是對神缺乏絕對信靠的真實寫照。"
+                }
+            },
+            "the_salt_pillar": {
+                title: "第六章：回頭的代價",
+                location: "zoar",
+                text: "神應允了你的請求。當太陽升起，你們終於逃到了瑣珥。就在那一刻，耶和華將硫磺與火從天上降與所多瑪和蛾摩拉。震耳欲聾的轟鳴聲撕裂了清晨的寧靜，平原上煙氣上騰，如同燒窯一般。<br><br>天使曾嚴厲警告：『逃命吧！不可回頭看！』<br><br>然而，在震天的毀滅聲中，你的妻子終究無法放下她留在城裡的一切——她的家、她的財寶、她所習慣的舒適。她違背了神的命令，在你的身後，轉頭望向了那片火海。<br><br>瞬間，她的身體僵住了。神聖的審判與她內心對罪惡之城的眷戀交織，她化作了一根白森森的鹽柱，永遠立在了死海的荒野中，成為了世世代代無言的鑒戒。",
+                thought: "不...我的妻子！為什麼妳要回頭？我們明明已經逃出來了啊！那座城裡到底有什麼值得妳連命都不要？",
+                theme: "doom",
+                action: { 
+                    text: "帶著極度的悲痛與恐懼，繼續逃亡 (創 19:26)", 
+                    next: "ending",
+                    reflection: "【深度反思：回頭的代價——身逃出，心未逃】<br><br>這就是耶穌在路加福音 17:32 沉重警告「你們要回想羅得的妻子」的原因。她雖然腳步跟著天使逃出了所多瑪，但她的心卻緊緊釘在那裡。<br><br>回頭，不僅僅是一個動作，更代表了對罪惡世界的眷戀與對神命令的輕忽。很多時候，我們看似離開了罪惡的環境，但我們的心是否依然在回味、貪戀那些不討神喜悅的事物？心若沒有真正離開，最終仍會被與世界一同審判。"
+                }
+            },
+            "ending": {
+                title: "終章：山洞中的悲劇",
+                location: "cave",
+                text: "失去了妻子，你帶著兩個女兒孤單地留在瑣珥。但看著遠方平原的濃煙，你的內心充滿了極度的恐懼。你覺得這座神答應不毀滅的小城也不安全了。<br><br>你最終逃到了神一開始指示的山上，住在一個陰暗潮濕的山洞裡。沒有了羊群、沒有了僕人、沒有了妻子與女婿，只剩下無盡的恐懼與絕望。",
+                thought: "瑣珥真的安全嗎？神既然毀滅了所多瑪，難保不會連這裡一起毀滅。我不相信這裡！我還是逃到山上躲起來最安全...",
+                action: { 
+                    text: "害怕住在瑣珥，帶著女兒逃往山洞 (創 19:30)", 
+                    next: "reflection_final",
+                    reflection: "【深度反思：失去信心的終局——從妥協到毀滅】<br><br>你起初憑己意求神讓你去瑣珥，現在又因恐懼而不相信神的保守。你的一生都在躲避與妥協中度過。<br><br>這場以「追求更好生活」為起點的旅程，最終卻讓你在陰暗的山洞裡失去了所有的財產、妻子與尊嚴。更悲慘的是，你在所多瑪的妥協深深影響了你的女兒們，導致她們道德扭曲，生下了摩押和亞捫——以色列人世世代代的仇敵。"
+                }
+            },
+            "reflection_final": {
+                title: "【史詩回顧】羅得一生的總結與對比",
+                location: "cave",
+                text: `
+                    <div class="space-y-6 text-left mt-2 text-lg">
+                        <p class="leading-loose font-semibold text-[#5d4037] dark:text-[#d7ccc8]">
+                            彼得後書 2:7-8 提到羅得是「常為惡人淫行憂傷的義人」。他雖然得救了，卻如哥林多前書 3:15 所描述：「雖然得救，乃像從火裏經過的一樣」。
+                        </p>
+                        
+                        <div class="bg-[#f4ebdc]/50 dark:bg-[#38312e]/50 p-6 border border-[#d4c4a8] dark:border-[#4a423e] rounded shadow-sm">
+                            <h3 class="font-bold text-xl mb-4 text-[#8c2222] dark:text-[#e57373] text-center">亞伯蘭與羅得的強烈對比</h3>
+                            <ul class="space-y-4 text-base">
+                                <li class="flex items-start">
+                                    <span class="mr-2 mt-1 text-[#8c5a45]">✦</span>
+                                    <span><strong>起點的選擇：</strong>亞伯蘭憑著<span class="text-[#10b981] font-bold">信心</span>讓出權利，神將迦南全地賜給他；羅得憑著<span class="text-[#8c2222] font-bold">眼見</span>搶占肥沃的平原，卻一步步走向罪惡之城。</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="mr-2 mt-1 text-[#8c5a45]">✦</span>
+                                    <span><strong>人生的追求：</strong>亞伯蘭在帳棚裡築壇，是<span class="text-[#10b981] font-bold">神的朋友</span>；羅得在所多瑪城門口為官，卻成了<span class="text-[#8c2222] font-bold">世界的朋友</span>。</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="mr-2 mt-1 text-[#8c5a45]">✦</span>
+                                    <span><strong>最終的結局：</strong>亞伯蘭成為多國之父，帶來<span class="text-[#10b981] font-bold">永恆的祝福</span>；羅得失去了一切，他的後裔成了神的選民<span class="text-[#8c2222] font-bold">世代的仇敵</span>。</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <p class="leading-loose mt-4">
+                            羅得的一生是一面明鏡，深刻地向我們展示了：**一個沒有與神斷絕關係，卻與世界深深妥協的信徒，最終會付上多麼慘痛的代價。** 他雖然保住了靈魂，卻失去了人生中一切有永恆價值的獎賞。
+                        </p>
+                    </div>
+                `,
+                thought: "",
+                action: { text: "尋求屬靈的解藥 ➔", next: "solutions" }
+            },
+            "solutions": {
+                title: "【屬靈解藥】如何避免步上羅得的後塵？",
+                location: "cave",
+                text: `
+                    <div class="space-y-8 text-left mt-2">
+                        <p class="leading-loose text-lg font-semibold text-[#5d4037] dark:text-[#d7ccc8]">
+                            羅得的失敗並非偶然，是由一連串微小的妥協累積而成。聖經留下這段歷史，正是為了成為我們的鑒戒。面對生活中的試探，我們當如何以真理來回應？
+                        </p>
+                        
+                        <div class="space-y-8 border-t border-[#d4c4a8] dark:border-[#4a423e] pt-6">
+                            
+                            <!-- 解藥 1 -->
+                            <div class="pl-5 border-l-4 border-[#10b981] dark:border-[#34d399] bg-[#10b981]/5 dark:bg-[#34d399]/5 py-3 pr-4 rounded-r">
+                                <h3 class="text-[#059669] dark:text-[#34d399] text-xl font-bold mb-2 flex items-center">
+                                    <span class="mr-2 text-2xl">I.</span> 對抗貪戀舒適：看重屬靈遮蓋與價值
+                                </h3>
+                                <p class="text-base leading-relaxed mb-3 text-[#3e2723] dark:text-[#d7ccc8]">
+                                    當我們面臨轉職、搬家、升學等人生十字路口時，不能只看見「如同耶和華的園子」般的物質條件（高薪、好學區、便利生活），而忽略了當地的屬靈環境。
+                                </p>
+                                <div class="bg-white/60 dark:bg-black/40 p-3 rounded text-sm text-[#4a423e] dark:text-[#a0aec0]">
+                                    <strong>🗝️ 真理原則：</strong>「你們要先求神的國和他的義，這些東西都要加給你們了。」(太 6:33)<br>
+                                    <strong>🛡️ 實踐解藥：</strong>做決定前，先考量該選擇是否會讓你遠離教會生活？是否會讓你脫離屬靈牧者的遮蓋？讓神的引導優先於物質的考量。
+                                </div>
+                            </div>
+
+                            <!-- 解藥 2 -->
+                            <div class="pl-5 border-l-4 border-[#10b981] dark:border-[#34d399] bg-[#10b981]/5 dark:bg-[#34d399]/5 py-3 pr-4 rounded-r">
+                                <h3 class="text-[#059669] dark:text-[#34d399] text-xl font-bold mb-2 flex items-center">
+                                    <span class="mr-2 text-2xl">II.</span> 對抗漸進妥協：堅守聖潔的界線
+                                </h3>
+                                <p class="text-base leading-relaxed mb-3 text-[#3e2723] dark:text-[#d7ccc8]">
+                                    不要對自己的定力過度自信。罪惡如同引力，當你「漸漸挪移帳棚」靠近試探時，你就已經在被同化了。與世界做朋友，就是與神為敵。
+                                </p>
+                                <div class="bg-white/60 dark:bg-black/40 p-3 rounded text-sm text-[#4a423e] dark:text-[#a0aec0]">
+                                    <strong>🗝️ 真理原則：</strong>「不從惡人的計謀，不站罪人的道路，不坐褻慢人的座位。」(詩 1:1)<br>
+                                    <strong>🛡️ 實踐解藥：</strong>在罪惡的環境面前絕不試探底線。對於網路情色、職場潛規則、不敬虔的關係，策略不是「靠近並保持不犯錯」，而是「你要逃避少年的私慾，同那清心禱告主的人追求公義、信德、仁愛、和平。」(提後 2:22)
+                                </div>
+                            </div>
+
+                            <!-- 解藥 3 -->
+                            <div class="pl-5 border-l-4 border-[#10b981] dark:border-[#34d399] bg-[#10b981]/5 dark:bg-[#34d399]/5 py-3 pr-4 rounded-r">
+                                <h3 class="text-[#059669] dark:text-[#34d399] text-xl font-bold mb-2 flex items-center">
+                                    <span class="mr-2 text-2xl">III.</span> 對抗失去見證：勇敢作光作鹽
+                                </h3>
+                                <p class="text-base leading-relaxed mb-3 text-[#3e2723] dark:text-[#d7ccc8]">
+                                    羅得在所多瑪擁有審判官的地位，卻失去了說話的權柄。如果在平時的言語、金錢觀、道德觀上與世人無異，當你試圖傳福音或警告他人時，只會被當作「戲言」。
+                                </p>
+                                <div class="bg-white/60 dark:bg-black/40 p-3 rounded text-sm text-[#4a423e] dark:text-[#a0aec0]">
+                                    <strong>🗝️ 真理原則：</strong>「你們是世上的光。城造在山上是不能隱藏的。」(太 5:14)<br>
+                                    <strong>🛡️ 實踐解藥：</strong>不要為了明哲保身而在職場或朋友圈中隱藏基督徒的身份。當在行事為人上活出信仰的價值觀，用真實的好行為帶出屬靈的影響力。
+                                </div>
+                            </div>
+
+                            <!-- 解藥 4 -->
+                            <div class="pl-5 border-l-4 border-[#10b981] dark:border-[#34d399] bg-[#10b981]/5 dark:bg-[#34d399]/5 py-3 pr-4 rounded-r">
+                                <h3 class="text-[#059669] dark:text-[#34d399] text-xl font-bold mb-2 flex items-center">
+                                    <span class="mr-2 text-2xl">IV.</span> 對抗討價還價：完全委身與順服
+                                </h3>
+                                <p class="text-base leading-relaxed mb-3 text-[#3e2723] dark:text-[#d7ccc8]">
+                                    羅得的妻子因為回頭看而變成鹽柱；羅得因為貪圖肉體舒適，不肯上山而硬求去瑣珥。這都是沒有真正「捨己」的表現。
+                                </p>
+                                <div class="bg-white/60 dark:bg-black/40 p-3 rounded text-sm text-[#4a423e] dark:text-[#a0aec0]">
+                                    <strong>🗝️ 真理原則：</strong>「手扶着犁向後看的，不配進神的國。」(路 9:62)<br>
+                                    <strong>🛡️ 實踐解藥：</strong>我們需要羅馬書 12:1-2 的心志：「將身體獻上，當作活祭」。當神施恩拯救或給予明確指引時，當專心仰賴祂，不眷戀過去，毫不遲疑地順服到底。
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="mt-10 font-bold text-center text-[#8c2222] dark:text-[#e57373] text-2xl tracking-[0.15em] border-t-2 border-[#d4c4a8] dark:border-[#4a423e] pt-8">
+                            「所以，自己以為站得穩的，<br class="md:hidden">須要謹慎，免得跌倒。」<br>
+                            <span class="text-base font-normal tracking-normal text-[#5d4037] dark:text-[#d7ccc8]">—— (林前 10:12)</span>
+                        </p>
+                    </div>
+                `,
+                thought: "",
+                action: { text: "重新閱讀史詩", next: "prologue" }
+            }
+        };
+
+        const storyContainer = document.getElementById('story-container');
+        const mapContainer = document.getElementById('real-map-container');
+
+        function updateMap(locId) {
+            if (!locId) return;
+            
+            if (!state.visitedLocations.includes(locId)) {
+                state.visitedLocations.push(locId);
+            }
+
+            // 重置節點
+            document.querySelectorAll('.map-point').forEach(p => {
+                p.setAttribute('fill', '#8c7a6b');
+                p.setAttribute('r', '4');
+                p.classList.remove('active');
+            });
+
+            // 啟動當前節點 (古地圖高亮)
+            const currentNode = document.querySelector(`#node-${locId} circle`);
+            if (currentNode) {
+                currentNode.classList.add('active');
+                currentNode.setAttribute('r', '7');
+            }
+
+            // 動態繪製歷史路線
+            if (state.visitedLocations.includes('plain')) document.getElementById('path-bethel-plain').style.strokeDashoffset = '0';
+            if (state.visitedLocations.includes('sodom')) document.getElementById('path-plain-sodom').style.strokeDashoffset = '0';
+            if (state.visitedLocations.includes('zoar')) document.getElementById('path-sodom-zoar').style.strokeDashoffset = '0';
+            if (state.visitedLocations.includes('cave')) document.getElementById('path-zoar-cave').style.strokeDashoffset = '0';
+        }
+
+        function updateTheme() {
+            document.body.className = `min-h-screen flex flex-col items-center py-10 px-4 transition-colors duration-1000 ${
+                state.theme === 'dark' ? 'theme-dark' : 
+                state.theme === 'doom' ? 'theme-doom' : ''
+            }`;
+        }
+
+        function renderNode(nodeId) {
+            const node = storyNodes[nodeId];
+            if (!node) return;
+
+            if (nodeId === 'prologue') {
+                state.theme = 'default';
+                state.visitedLocations = [];
+                mapContainer.classList.add('hidden'); // 前言隱藏地圖
+            }
+
+            if (nodeId === 'start') {
+                mapContainer.classList.remove('hidden');
+                
+                // 重置路線
+                document.getElementById('path-bethel-plain').style.strokeDashoffset = '100';
+                document.getElementById('path-plain-sodom').style.strokeDashoffset = '100';
+                document.getElementById('path-sodom-zoar').style.strokeDashoffset = '60';
+                document.getElementById('path-zoar-cave').style.strokeDashoffset = '80';
+            }
+
+            if (node.location) updateMap(node.location);
+            if (node.theme) state.theme = node.theme;
+            updateTheme();
+
+            let html = `<div class="fade-in">`;
+            html += `<h1 class="text-3xl md:text-4xl font-bold mb-6 text-[#5d4037] dark:text-[#e6dfd8] border-b border-[#d4c4a8] dark:border-[#4a423e] pb-4 tracking-wide">${node.title}</h1>`;
+            html += `<div class="text-lg leading-loose mb-8 space-y-5">${node.text}</div>`;
+            
+            if (node.thought) {
+                html += `<div class="thought-bubble mb-10 text-[1.1rem]">「${node.thought}」</div>`;
+            }
+
+            html += `<div class="mt-8 flex flex-col">`;
+            html += `<button onclick="handleAction('${nodeId}')" class="historical-btn w-full text-center border-2 border-[#8c5a45] dark:border-[#a1887f] text-[#5d4037] dark:text-[#e6dfd8] hover:bg-[#8c5a45] hover:text-[#fdfbf7] dark:hover:bg-[#a1887f] dark:hover:text-[#1c1a18] p-4 font-bold tracking-widest text-lg">
+                        ❖ ${node.action.text}
+                     </button>`;
+            html += `</div></div>`;
+
+            storyContainer.innerHTML = html;
+        }
+
+        window.handleAction = function(currentNodeId) {
+            const action = storyNodes[currentNodeId].action;
+            if (action.reflection) {
+                renderReflection(action.reflection, action.next);
+            } else {
+                renderNode(action.next);
+            }
+        };
+
+        function renderReflection(reflectionText, nextNodeId) {
+             let html = `<div class="fade-in flex flex-col items-center justify-center h-full min-h-[40vh] py-4">`;
+             html += `<div class="w-full bg-[#f4ebdc] dark:bg-[#38312e] border-y-4 border-[#8c5a45] dark:border-[#a1887f] p-8 mb-10 shadow-lg relative">
+                        <!-- 角落裝飾 -->
+                        <div class="absolute top-2 left-2 text-[#8c5a45] opacity-50">✦</div>
+                        <div class="absolute top-2 right-2 text-[#8c5a45] opacity-50">✦</div>
+                        <div class="absolute bottom-2 left-2 text-[#8c5a45] opacity-50">✦</div>
+                        <div class="absolute bottom-2 right-2 text-[#8c5a45] opacity-50">✦</div>
+                        
+                        <p class="leading-loose text-lg font-medium text-[#3e2723] dark:text-[#d7ccc8]">${reflectionText}</p>
+                      </div>`;
+             html += `<button onclick="renderNode('${nextNodeId}')" class="historical-btn border-2 border-[#3e2723] dark:border-[#d7ccc8] text-[#3e2723] dark:text-[#d7ccc8] hover:bg-[#3e2723] hover:text-[#fdfbf7] dark:hover:bg-[#d7ccc8] dark:hover:text-[#1c1a18] px-10 py-3 font-bold tracking-[0.2em] text-lg">
+                        翻閱下一章 ➔
+                      </button>`;
+             html += `</div>`;
+             storyContainer.innerHTML = html;
+        }
+
+        // 啟動體驗
+        renderNode('prologue');
+
+    </script>
+</body>
+</html>
