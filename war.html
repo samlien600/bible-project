@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>攻破營壘：謊言技能樹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-3DFR7N5MT2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-3DFR7N5MT2');
+    </script>
+    <style>
+        /* 自訂動畫與特效 */
+        @keyframes pulse-dark {
+            0%, 100% { box-shadow: 0 0 15px 5px rgba(220, 38, 38, 0.4); transform: translate(-50%, -50%) scale(1); }
+            50% { box-shadow: 0 0 25px 10px rgba(220, 38, 38, 0.7); transform: translate(-50%, -50%) scale(1.05); }
+        }
+        @keyframes pulse-light {
+            0%, 100% { box-shadow: 0 0 15px 5px rgba(52, 211, 153, 0.5); transform: translate(-50%, -50%) scale(1); }
+            50% { box-shadow: 0 0 25px 10px rgba(52, 211, 153, 0.8); transform: translate(-50%, -50%) scale(1.05); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+        
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            transition: background-color 2s ease, color 2s ease;
+        }
+
+        .theme-dark {
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            color: #e5e7eb;
+        }
+
+        .theme-light {
+            background: radial-gradient(circle at center, #e0f2fe 0%, #f0fdf4 100%);
+            color: #064e3b;
+        }
+
+        /* 自訂滾動條 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; border-radius: 4px;}
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* 技能樹節點基礎樣式 */
+        .node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 68px; /* 手機版稍微縮小一點點適應手指 */
+            height: 68px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            z-index: 10;
+        }
+        @media (min-width: 768px) {
+            .node { width: 76px; height: 76px; }
+        }
+
+        /* 節點狀態 */
+        .node.locked {
+            background-color: #374151;
+            border: 2px dashed #4b5563;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .node.unlocked {
+            background-color: #7f1d1d;
+            border: 2px solid #ef4444;
+            animation: pulse-dark 2.5s infinite;
+        }
+        .node.conquered {
+            background-color: #10b981;
+            border: 2px solid #34d399;
+            animation: pulse-light 3s infinite;
+        }
+
+        .node-icon { font-size: 20px; margin-bottom: 2px; }
+        @media (min-width: 768px) { .node-icon { font-size: 24px; } }
+        
+        .node-label { font-size: 10px; font-weight: bold; text-align: center; white-space: nowrap; text-shadow: 0px 1px 3px rgba(0,0,0,0.9); color: white;}
+        @media (min-width: 768px) { .node-label { font-size: 11px; } }
+
+        /* 連線 SVG */
+        #svg-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .tree-line {
+            stroke-width: 2.5;
+            transition: stroke 1s ease;
+        }
+        @media (min-width: 768px) { .tree-line { stroke-width: 3; } }
+
+        .line-locked { stroke: #374151; stroke-dasharray: 4,4; opacity: 0.5; }
+        .line-unlocked { stroke: #991b1b; opacity: 0.8; }
+        .line-conquered { stroke: #34d399; filter: drop-shadow(0 0 5px #34d399); opacity: 1; }
+
+        .shake-animation { animation: shake 0.5s; }
+        
+        /* 全螢幕覆蓋共用樣式 */
+        .overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* 卡片懸浮動畫 */
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<!-- 使用 100dvh 解決手機瀏覽器上下方選單列問題，overscroll-none 防止手機下拉重整 -->
+<body class="theme-dark h-[100dvh] w-screen overflow-hidden flex flex-col overscroll-none">
+
+    <!-- 標題與進度區 -->
+    <header class="z-20 mt-3 sm:mt-4 px-3 sm:px-4 text-center transition-all duration-1000 flex-shrink-0" id="main-header">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wider mb-1 sm:mb-2">攻破營壘</h1>
+        <p class="text-xs sm:text-sm md:text-base opacity-80" id="subtitle">用真理的聖靈，擊碎謊言的技能樹，成為新造的人。</p>
+        
+        <!-- 進度條 -->
+        <div class="max-w-2xl mx-auto mt-2 sm:mt-4 bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden border border-gray-600">
+            <div id="progress-bar" class="bg-emerald-500 h-full transition-all duration-1000 ease-out relative" style="width: 0%">
+                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+            </div>
+        </div>
+        <div class="text-[10px] sm:text-xs mt-1 text-gray-400 font-mono" id="progress-text">已攻破: 0 / 21</div>
+    </header>
+
+    <!-- 可滾動的畫布區域 -->
+    <div id="scroll-wrapper" class="flex-grow w-full overflow-auto mt-2 sm:mt-4 relative touch-pan-x touch-pan-y cursor-move">
+        <!-- 技能樹容器 (縮小寬度適應手機體驗，但仍保持足夠探索空間) -->
+        <div class="relative mx-auto" id="tree-container" style="width: 1000px; height: 800px;">
+            <svg id="svg-canvas"></svg>
+            <!-- 節點將透過 JS 動態生成 -->
+        </div>
+    </div>
+
+    <!-- 互動彈跳視窗 (Modal) -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex justify-center items-center p-3 sm:p-4">
+        <!-- 調整為 85dvh，防止手機下方空間不夠被截斷 -->
+        <div class="bg-gray-800 border border-red-900 rounded-xl p-4 sm:p-6 w-full max-w-xl shadow-2xl relative flex flex-col max-h-[85dvh]" id="modal-content">
+            <button onclick="closeModal()" class="absolute top-2 right-3 sm:top-3 sm:right-4 text-gray-400 hover:text-white text-3xl z-10">&times;</button>
+            
+            <div class="mb-3 sm:mb-5 flex-shrink-0">
+                <h2 class="text-red-400 font-bold text-lg sm:text-xl mb-2 flex items-center pr-8">
+                    <span class="text-xl sm:text-2xl mr-2" id="modal-icon">🥀</span> 發現營壘謊言
+                </h2>
+                <!-- 謊言內心描述區域 -->
+                <div class="bg-gray-900 rounded-lg border-l-4 border-red-500 shadow-inner max-h-28 sm:max-h-40 overflow-y-auto p-3 sm:p-4 custom-scrollbar">
+                    <p id="modal-lie-text" class="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed tracking-wide italic"></p>
+                </div>
+            </div>
+            
+            <div class="flex-shrink-0">
+                <h3 class="text-emerald-400 font-semibold mb-2 sm:mb-3 text-xs sm:text-sm tracking-wide">請選擇能攻破此營壘的真理經文：</h3>
+            </div>
+
+            <!-- 選項區 -->
+            <div id="modal-options" class="grid grid-cols-1 gap-2 sm:gap-3 overflow-y-auto custom-scrollbar flex-grow pr-1 pb-1">
+                <!-- 選項按鈕由 JS 產生 -->
+            </div>
+            
+            <p id="feedback-msg" class="mt-3 sm:mt-4 text-center font-bold hidden text-base sm:text-lg flex-shrink-0"></p>
+        </div>
+    </div>
+
+    <!-- 第一階段：勝利宣告覆蓋層 -->
+    <div id="victory-overlay" class="overlay fixed inset-0 bg-white/95 z-40 flex flex-col justify-center items-center backdrop-blur-md overflow-y-auto p-4 sm:p-6">
+        <div class="text-center transform scale-90 transition-transform duration-1000 my-auto" id="victory-content">
+            <div class="text-6xl sm:text-8xl mb-4 sm:mb-6 drop-shadow-lg">👑⚔️🌍</div>
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-emerald-700 mb-4 sm:mb-6 drop-shadow-sm">恢復身分，執掌權柄</h1>
+            <p class="text-base sm:text-xl md:text-2xl text-emerald-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
+                「願你的國降臨；願你的旨意行在地上，如同行在天上。」<br>
+                <span class="text-sm sm:text-base text-emerald-500 mt-2 block">(馬太福音 6:10)</span>
+            </p>
+            <p class="text-gray-800 mb-8 sm:mb-10 font-medium text-sm sm:text-lg bg-emerald-50 py-4 px-5 sm:py-5 sm:px-8 rounded-lg inline-block shadow-sm leading-relaxed border border-emerald-200">
+                謊言的營壘已被真理徹底摧毀！<br>
+                神賜給你權柄，是為了讓你恢復起初受造的身分與榮耀的使命。<br>
+                <span class="text-emerald-700 font-bold block mt-2">興起掌權吧！去執行天父的旨意，讓天上的國度透過你降臨在全地。</span>
+            </p>
+            <br>
+            <button onclick="showDailyPractice()" class="px-6 py-3 sm:px-10 sm:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold shadow-xl transition transform hover:scale-105 text-base sm:text-lg animate-pulse w-full sm:w-auto">
+                領受每日的屬靈兵器 ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- 第二階段：每天要做的三件事覆蓋層 -->
+    <div id="daily-practice-overlay" class="overlay fixed inset-0 bg-gray-50 z-50 flex flex-col items-center overflow-y-auto pt-8 pb-16 sm:py-10">
+        <div class="max-w-4xl w-full px-4 sm:px-6 flex flex-col items-center mt-auto mb-auto">
+            
+            <div class="text-center mb-6 sm:mb-10 mt-6">
+                <h2 class="text-2xl sm:text-4xl md:text-5xl font-black text-gray-800 mb-2 sm:mb-4 tracking-wider">🛡️ 每天要做的三件事</h2>
+                <p class="text-sm sm:text-lg text-gray-600 font-medium">將真理化為行動，在日常生活中持續守護你的心。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full mb-8 sm:mb-12">
+                <!-- 任務 1 -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg border border-gray-100 hover-card transition-all duration-300 flex flex-col">
+                    <div class="text-3xl sm:text-4xl mb-3 sm:mb-4 bg-red-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-red-600 mx-auto md:mx-0">🚫</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 border-b-2 border-red-200 pb-2 text-center md:text-left">1. 認出謊言</h3>
+                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed flex-grow text-center md:text-left">
+                        謊言最怕被識破。當負面的意念或情緒襲來時，立刻指認出這是不屬於神的謊言，並且大聲宣告：<br>
+                        <span class="font-bold text-red-600 mt-2 block bg-red-50 p-2 rounded">「奉耶穌的名離開！」</span>
+                    </p>
+                </div>
+
+                <!-- 任務 2 -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg border border-gray-100 hover-card transition-all duration-300 flex flex-col">
+                    <div class="text-3xl sm:text-4xl mb-3 sm:mb-4 bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-blue-600 mx-auto md:mx-0">🗣️</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 border-b-2 border-blue-200 pb-2 text-center md:text-left">2. 宣告真理</h3>
+                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed flex-grow text-center md:text-left">
+                        每天早晨開口大聲對自己宣告這三句話，穩固你的屬靈身分：<br>
+                        <span class="font-bold text-blue-700 mt-2 block space-y-1">
+                            <span class="block bg-blue-50 p-1.5 rounded">「我是神的兒子」</span>
+                            <span class="block bg-blue-50 p-1.5 rounded">「我與基督一同坐在天上」</span>
+                            <span class="block bg-blue-50 p-1.5 rounded">「今天我要活出我的身分」</span>
+                        </span>
+                    </p>
+                </div>
+
+                <!-- 任務 3 -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-lg border border-gray-100 hover-card transition-all duration-300 flex flex-col">
+                    <div class="text-3xl sm:text-4xl mb-3 sm:mb-4 bg-emerald-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-emerald-600 mx-auto md:mx-0">👂</div>
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 border-b-2 border-emerald-200 pb-2 text-center md:text-left">3. 問神並順服</h3>
+                    <p class="text-sm sm:text-base text-gray-600 leading-relaxed flex-grow text-center md:text-left">
+                        找個安靜的時間，單純地來到神面前問祂：<br>
+                        <span class="font-bold text-emerald-700 mt-2 block bg-emerald-50 p-2 rounded mb-2">「父阿，今天祢要我做甚麼？」</span>
+                        安靜地聽，<span class="font-bold text-gray-800">聽到就去做，不要遲疑。</span>這是帶下神國度最直接的方式。
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="px-8 py-3 sm:px-12 sm:py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-full font-bold shadow-xl transition transform hover:scale-105 text-base sm:text-lg w-full sm:w-auto">
+                重新開始旅程
+            </button>
+            <p class="mt-4 sm:mt-6 text-xs sm:text-sm text-gray-400">願神的話語成為你腳前的燈，路上的光。</p>
+        </div>
+    </div>
+
+    <script>
+        // ---------------- 遊戲資料設定 ----------------
+
+        // 真理經文資料庫 (經文版本：和合本新標點神版 CUNP)
+        const truthDB = [
+            { id: 1, text: "「因為我深信無論是死，是生...都不能叫我們與神的愛隔絕；這愛是在我們的主基督耶穌裏的。」(羅8:38-39)" },
+            { id: 2, text: "「凡接待他的，就是信他名的人，他就賜他們權柄作神的兒女。」(約1:12)" },
+            { id: 3, text: "「如今，那些在基督耶穌裏的就不定罪了。」(羅8:1)" },
+            { id: 4, text: "「各人應當察驗自己的行為。這樣，他所誇的就專在自己，不在別人了。」(加6:4)" },
+            { id: 5, text: "「我要稱謝你，因我受造，奇妙可畏；你的作為奇妙，這是我心深知道的。」(詩139:14)" },
+            { id: 6, text: "「我現在是要得人的心呢？還是要得神的心呢？...若仍舊討人的喜歡，我就不是基督的僕人了。」(加1:10)" },
+            { id: 7, text: "「你要專心仰賴耶和華，不可倚靠自己的聰明，在你一切所行的事上都要認定他，他必指引你的路。」(箴3:5-6)" },
+            { id: 8, text: "「你們要將一切的憂慮卸給神，因為他顧念你們。」(彼前5:7)" },
+            { id: 9, text: "「因為神賜給我們，不是膽怯的心，乃是剛強、仁愛、謹守的心。」(提後1:7)" },
+            { id: 10, text: "「我的神必照他榮耀的豐富，在基督耶穌裏，使你們一切所需用的都充足。」(腓4:19)" },
+            { id: 11, text: "「耶和華說：我知道我向你們所懷的意念是賜平安的意念，不是降災禍的意念，要叫你們末後有指望。」(耶29:11)" },
+            { id: 12, text: "「你們得救是本乎恩，也因着信；這並不是出於自己，乃是神所賜的；也不是出於行為，免得有人自誇。」(弗2:8-9)" },
+            { id: 13, text: "「他對我說：『我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。』」(林後12:9)" },
+            { id: 14, text: "「神阻擋驕傲的人，賜恩給謙卑的人。」(雅4:6)" },
+            { id: 15, text: "「凡勞苦擔重擔的人可以到我這裏來，我就使你們得安息。」(太11:28)" },
+            { id: 16, text: "「並要以恩慈相待，存憐憫的心，彼此饒恕，正如神在基督裏饒恕了你們一樣。」(弗4:32)" },
+            { id: 17, text: "「神叫孤獨的有家，使被囚的出來享福。」(詩68:6)" },
+            { id: 18, text: "「我們原是他的工作，在基督耶穌裏造成的，為要叫我們行善，就是神所預備叫我們行的。」(弗2:10)" },
+            { id: 19, text: "「但願使人有盼望的神，因信將諸般的喜樂、平安充滿你們的心，使你們藉着聖靈的能力大有盼望！」(羅15:13)" },
+            { id: 20, text: "「親愛的弟兄，不要自己伸冤，寧可讓步，聽憑主怒；因為經上記着：『主說：伸冤在我，我必報應。』」(羅12:19)" },
+            { id: 21, text: "「神非人，必不致說謊，也非人子，必不致後悔。他說話豈不照着行呢？他發言豈不要成就呢？」(民23:19)" },
+            { id: 22, text: "「我們若認自己的罪，神是信實的，是公義的，必要赦免我們的罪，洗淨我們一切的不義。」(約一1:9)" },
+            { id: 23, text: "「我靠着那加給我力量的，凡事都能做。」(腓4:13)" },
+            { id: 24, text: "「你不要害怕，因為我與你同在；不要驚惶，因為我是你的神。我必堅固你，我必幫助你。」(賽41:10)" },
+            { id: 25, text: "「耶穌說：『我就是道路、真理、生命；若不藉着我，沒有人能到父那裏去。』」(約14:6)" },
+            { id: 26, text: "「耶和華是我的牧者，我必不致缺乏。」(詩23:1)" },
+            { id: 27, text: "「不要效法這個世界，只要心意更新而變化，叫你們察驗何為神的善良、純全、可喜悅的旨意。」(羅12:2)" }
+        ];
+
+        // 技能樹節點定義 (深度描繪內心狀態)
+        const initialNodesConfig = [
+            // Level 0 (Root 樹根)
+            { id: 1, name: "神不愛我", icon: "💔", conqueredIcon: "❤️", 
+              lie: "「我總覺得自己是個例外，是恩典的漏網之魚。每當遭遇挫折，內心深處就有個聲音嘲笑我：『看吧，祂根本不在乎你。』我感覺自己像宇宙中的孤兒，永遠被隔絕在愛與溫暖的門外，我的存在本身就是一個不被期待的錯誤。」", 
+              truthId: 1, x: 50, y: 92, parents: [], state: "unlocked" },
+            
+            // Level 1 (第一層分支)
+            { id: 2, name: "孤兒的靈", icon: "👤", conqueredIcon: "👑", 
+              lie: "「我無法真正信任任何人，包括神。在我的世界裡，沒有『無條件的保護』這種事。我必須時刻保持警戒，靠自己的雙手去爭取、去防禦。即使在人群中，我也感到深深的孤獨，因為我知道，一旦我倒下，沒有人會接住我。」", 
+              truthId: 2, x: 20, y: 80, parents: [1], state: "locked" },
+            { id: 7, name: "掌控慾", icon: "🕹️", conqueredIcon: "🤲", 
+              lie: "「我的內心像一張緊繃的弓，隨時處於備戰狀態。如果事情不照我的計畫發展，我就會感到極度的焦慮和恐慌。我害怕失控帶來的未知與傷害，所以我必須緊緊抓住一切——計畫、關係、甚至是別人的看法，這讓我精疲力竭，卻又無法放手。」", 
+              truthId: 7, x: 50, y: 78, parents: [1], state: "locked" },
+            { id: 12, name: "靠行為稱義", icon: "⚖️", conqueredIcon: "🎁", 
+              lie: "「我像是一個永遠在跑輪上的倉鼠。我深信，只有當我表現得完美、服事得夠多、道德上無懈可擊時，我才『配』得到神的愛和人的肯定。我極度害怕失敗，因為一次的失誤就足以徹底否定我這個人的價值。」", 
+              truthId: 12, x: 80, y: 80, parents: [1], state: "locked" },
+
+            // Level 2 (第二層分支)
+            { id: 3, name: "定罪與羞恥", icon: "🩸", conqueredIcon: "✨", 
+              lie: "「我彷彿穿著一件洗不掉污漬的衣服。過去的失敗與罪疚感如影隨形地控告我，讓我覺得自己骯髒且不配。即使神說已經赦免，我仍覺得那不適用於我這種『無可救藥』的人。我害怕別人看穿我糟糕的本質，所以總是躲藏在面具背後。」", 
+              truthId: 3, x: 12, y: 65, parents: [2], state: "locked" },
+            { id: 4, name: "比較與嫉妒", icon: "👀", conqueredIcon: "🤝", 
+              lie: "「我的眼睛總是盯著別人擁有的祝福。看到別人的成功、幸福，我的心裡不是替他們高興，而是湧起一陣酸楚與不平：『為什麼神對他們那麼好，對我卻如此吝嗇？』我永遠覺得自己是次等的，在無止盡的比較中消耗著生命的喜樂。」", 
+              truthId: 4, x: 30, y: 65, parents: [2, 12], state: "locked" },
+            
+            { id: 8, name: "憂慮與恐懼", icon: "🌪️", conqueredIcon: "🕊️", 
+              lie: "「我的腦海裡隨時都在播放『最壞情況』的災難片。我對未來充滿了無法名狀的恐懼，總覺得災難、疾病或失去隨時會降臨在我或我愛的人身上。這份恐懼像無形的枷鎖，勒住我的呼吸，讓我無法享受當下的平安。」", 
+              truthId: 8, x: 50, y: 62, parents: [7], state: "locked" },
+            
+            { id: 13, name: "完美主義", icon: "📏", conqueredIcon: "🌱", 
+              lie: "「『還不夠好』是我對自己永遠的評價。我為自己設定了無法企及的高標準，只要有一點瑕疵，我就會陷入嚴厲的自我鞭笞。我把價值完全綁定在成就上，對犯錯抱持著零容忍的態度，這讓我的靈魂一直處於緊繃與窒息的狀態。」", 
+              truthId: 13, x: 70, y: 65, parents: [12], state: "locked" },
+            { id: 14, name: "驕傲自義", icon: "🦚", conqueredIcon: "🙇", 
+              lie: "「我在心裡築起了一座名為『優越感』的高塔。我暗自認為自己比那些軟弱、常犯錯的人更好、更有智慧。我不需要別人的幫助，更難以承認自己的盲點。這種自義讓我變得冷漠，也讓我與神、與人的關係築起了一道厚厚的冰牆。」", 
+              truthId: 14, x: 88, y: 65, parents: [12], state: "locked" },
+
+            // Level 3 (第三層分支：行為與心理狀態)
+            { id: 5, name: "自我厭惡", icon: "🪞", conqueredIcon: "😊", 
+              lie: "「每當我照鏡子或審視自己的內心，我只看到滿滿的缺陷。我討厭我的長相、我的個性、我的軟弱。我深信自己是一件瑕疵品，沒有任何值得被愛的地方。這種對自己的深惡痛絕，像慢性毒藥一樣，一點一滴吞噬著我的生命力。」", 
+              truthId: 5, x: 8, y: 48, parents: [3], state: "locked" },
+            { id: 6, name: "過度討好", icon: "🎭", conqueredIcon: "🛡️", 
+              lie: "「我是一個沒有界線、失去自我的人。我極度害怕別人的失望與拒絕，所以我總是在迎合、退讓、戴著面具生活。我把別人的情緒當成自己的責任，只要有人不高興，我就覺得是我的錯。在日復一日的討好中，我已經忘記了真實的自己是誰。」", 
+              truthId: 6, x: 26, y: 50, parents: [4, 13], state: "locked" },
+            
+            { id: 9, name: "恐慌發作", icon: "😱", conqueredIcon: "🦁", 
+              lie: "「危機感像突如其來的海嘯，瞬間將我淹沒。在那些時刻，我覺得天塌下來了，四周全是死路，沒有人能救我，連神都顯得遙不可及。我的心跳加速、無法呼吸，理智完全被極度的恐懼給吞噬，只剩下想逃跑卻無處可逃的絕望。」", 
+              truthId: 9, x: 40, y: 46, parents: [8], state: "locked" },
+            { id: 10, name: "貪婪與匱乏", icon: "💰", conqueredIcon: "🍞", 
+              lie: "「我的心裡有一個填不滿的黑洞。我總覺得資源是有限的，如果不拼命去抓取金錢、地位或別人的注意力，我也會一無所有。看著別人擁有，我就感到深深的匱乏與恐慌。我無法真正慷慨，因為我深怕給出去之後，自己就不夠了。」", 
+              truthId: 10, x: 60, y: 46, parents: [8, 12], state: "locked" },
+            
+            { id: 15, name: "工作耗竭", icon: "🔋", conqueredIcon: "🛌", 
+              lie: "「我像是一台不能停機的機器。我深信『停下來』就等於『無能』與『沒有價值』。我用永無止境的忙碌來麻痺內心的空虛與不安。即便身體與靈魂都在發出求救訊號，我依然不敢休息，深怕一停下來，就會面對那個脆弱無助的自己。」", 
+              truthId: 15, x: 74, y: 50, parents: [13], state: "locked" },
+            { id: 16, name: "不饒恕苦毒", icon: "🐍", conqueredIcon: "💧", 
+              lie: "「那些曾經傷害過我的人，被我牢牢鎖在心裡的審判庭上。我不斷重溫那些受傷的畫面，讓憤怒與怨恨的毒汁在血液裡流淌。我覺得原諒就是放過他們、就是我不公平。我以為我在懲罰他們，卻不知道這份苦毒正在慢慢腐蝕我自己的靈魂。」", 
+              truthId: 16, x: 92, y: 48, parents: [14], state: "locked" },
+
+            // Level 4 (第四層分支：極端結果)
+            { id: 17, name: "封閉孤立", icon: "🧱", conqueredIcon: "🚪", 
+              lie: "「我把自己的心鎖進了一座孤島。過去的傷害讓我深信：『靠近人群就等於給別人機會傷害我。』我切斷了深層的連結，拒絕任何人的關心。雖然嘴上說著『我一個人也很好』，但每到深夜，那種無人理解的刺骨寒冷，卻讓我痛不欲生。」", 
+              truthId: 17, x: 18, y: 30, parents: [5, 6], state: "locked" },
+            { id: 11, name: "宿命絕望", icon: "⛓️", conqueredIcon: "🌅", 
+              lie: "「我像是被困在一個沒有出口的黑暗迷宮中。無論我怎麼努力、怎麼禱告，事情總是不會好轉。我已經放棄了掙扎，認定這就是我逃不掉的、被詛咒的命運。盼望對我來說成了一種奢侈品，甚至是另一種形式的殘忍，因為期待只會帶來更深的失落。」", 
+              truthId: 11, x: 38, y: 28, parents: [9, 5], state: "locked" },
+            { id: 19, name: "憤世嫉俗", icon: "😒", conqueredIcon: "🔥", 
+              lie: "「我戴上了一副充滿濾鏡的冷酷眼鏡看世界。我不相信世界上有純粹的愛、無私的奉獻。我覺得每個人背後都有自私的目的，連教會或信仰也不過是另一種利益交換。我用嘲諷和懷疑把自己包裹起來，以此來防禦可能再次遭遇的背叛與失望。」", 
+              truthId: 19, x: 62, y: 28, parents: [10, 15], state: "locked" },
+            { id: 20, name: "仇恨報復", icon: "🗡️", conqueredIcon: "🕊️", 
+              lie: "「我的心中燃燒著一把名為『討回公道』的烈火。那些傷害過我的人，必須付出同等甚至更慘痛的代價。滿腦子都是如何讓他們痛苦的畫面，這份仇恨成了支撐我活下去的扭曲動力。我不在乎這把火是否會連同我自己一起燒毀，我只要看著他們毀滅。」", 
+              truthId: 20, x: 82, y: 30, parents: [16, 14], state: "locked" },
+
+            // Level 5 (頂層：終極謊言)
+            { id: 18, name: "虛無主義", icon: "🕳️", conqueredIcon: "⭐", 
+              lie: "「我站在生命的懸崖邊，看著底下深不見底的虛無。努力有什麼意義？信仰有什麼意義？一切終將歸於塵土。我感覺不到快樂，也感覺不到悲傷，只剩下無盡的麻木與空洞。活著變成了一種無法理解的荒謬，我只是在倒數著消亡的日子。」", 
+              truthId: 18, x: 28, y: 12, parents: [17, 11], state: "locked" },
+            { id: 21, name: "神是騙子", icon: "😈", conqueredIcon: "✝️", 
+              lie: "「這是我內心最深、最黑暗的絕望。我認定聖經裡的應許全是美麗的謊言，神根本不可信。祂要嘛不存在，要嘛就是一個殘忍的旁觀者，眼睜睜看著世界與我受苦卻無動於衷。我感覺自己被宇宙中最大的權威給徹底背叛與拋棄了。」", 
+              truthId: 21, x: 72, y: 12, parents: [19, 20, 11], state: "locked" }
+        ];
+
+        let nodes = [];
+        let currentActiveNodeId = null;
+        const totalNodes = initialNodesConfig.length;
+
+        // ---------------- 初始化與渲染 ----------------
+
+        function initGame() {
+            nodes = JSON.parse(JSON.stringify(initialNodesConfig));
+            
+            // 隱藏所有覆蓋層
+            document.getElementById('victory-overlay').classList.remove('active');
+            document.getElementById('daily-practice-overlay').classList.remove('active');
+            
+            document.body.className = "theme-dark h-[100dvh] w-screen overflow-hidden flex flex-col overscroll-none";
+            document.getElementById('subtitle').innerText = "用真理的聖靈，擊碎謊言的技能樹，成為新造的人。";
+            document.getElementById('main-header').classList.remove('text-emerald-800');
+            
+            renderTree();
+            updateProgress();
+
+            setTimeout(() => {
+                const wrapper = document.getElementById('scroll-wrapper');
+                // 動態定位到底部樹根區
+                wrapper.scrollTop = wrapper.scrollHeight;
+                wrapper.scrollLeft = (wrapper.scrollWidth - wrapper.clientWidth) / 2;
+            }, 100);
+        }
+
+        function renderTree() {
+            const container = document.getElementById('tree-container');
+            const svg = document.getElementById('svg-canvas');
+            
+            svg.innerHTML = '';
+            document.querySelectorAll('.node').forEach(el => el.remove());
+
+            nodes.forEach(node => {
+                node.parents.forEach(parentId => {
+                    const parent = nodes.find(n => n.id === parentId);
+                    if (parent) {
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", `${parent.x}%`);
+                        line.setAttribute("y1", `${parent.y}%`);
+                        line.setAttribute("x2", `${node.x}%`);
+                        line.setAttribute("y2", `${node.y}%`);
+                        
+                        let lineClass = "tree-line line-locked";
+                        if (parent.state === 'conquered' && node.state !== 'locked') {
+                            lineClass = node.state === 'conquered' ? "tree-line line-conquered" : "tree-line line-unlocked";
+                        }
+                        line.setAttribute("class", lineClass);
+                        line.id = `line-${parent.id}-${node.id}`;
+                        svg.appendChild(line);
+                    }
+                });
+            });
+
+            nodes.forEach(node => {
+                const el = document.createElement('div');
+                el.id = `node-${node.id}`;
+                el.className = `node ${node.state}`;
+                el.style.left = `${node.x}%`;
+                el.style.top = `${node.y}%`;
+                el.onclick = () => handleNodeClick(node.id);
+
+                const icon = node.state === 'conquered' ? node.conqueredIcon : node.icon;
+                
+                el.innerHTML = `
+                    <div class="node-icon">${icon}</div>
+                    <div class="node-label">${node.name}</div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function updateProgress() {
+            const conqueredCount = nodes.filter(n => n.state === 'conquered').length;
+            const percentage = (conqueredCount / totalNodes) * 100;
+            
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `已修復: ${conqueredCount} / ${totalNodes}`;
+        }
+
+        // ---------------- 互動邏輯 ----------------
+
+        function handleNodeClick(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node || node.state === 'locked' || node.state === 'conquered') {
+                return;
+            }
+
+            currentActiveNodeId = nodeId;
+            openModal(node);
+        }
+
+        function openModal(node) {
+            document.getElementById('modal-icon').innerText = node.icon;
+            
+            // 替換謊言文字
+            const lieTextEl = document.getElementById('modal-lie-text');
+            lieTextEl.innerHTML = node.lie;
+            // 每次打開彈窗時，確保滾動條在最上方
+            lieTextEl.parentElement.scrollTop = 0;
+
+            document.getElementById('feedback-msg').classList.add('hidden');
+            
+            const optionsContainer = document.getElementById('modal-options');
+            optionsContainer.innerHTML = '';
+            // 確保選項區也在最上方
+            optionsContainer.scrollTop = 0;
+
+            const correctTruth = truthDB.find(t => t.id === node.truthId);
+            let wrongTruths = truthDB.filter(t => t.id !== node.truthId);
+            wrongTruths = wrongTruths.sort(() => 0.5 - Math.random()).slice(0, 3);
+            
+            let options = [correctTruth, ...wrongTruths].sort(() => 0.5 - Math.random());
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-2.5 sm:p-4 rounded-lg bg-gray-700 hover:bg-gray-600 transition text-gray-200 border border-gray-600 focus:outline-none text-xs sm:text-sm md:text-base leading-snug';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkAnswer(opt.id, node.truthId, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            const modalContent = document.getElementById('modal-content');
+            modalContent.className = 'bg-gray-800 border border-red-900 rounded-xl p-4 sm:p-6 w-full max-w-xl shadow-2xl relative flex flex-col max-h-[85dvh] transition-all duration-300';
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            currentActiveNodeId = null;
+        }
+
+        function checkAnswer(selectedTruthId, correctTruthId, btnElement) {
+            const feedback = document.getElementById('feedback-msg');
+            feedback.classList.remove('hidden');
+
+            const allBtns = document.getElementById('modal-options').querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selectedTruthId === correctTruthId) {
+                btnElement.classList.remove('bg-gray-700', 'border-gray-600', 'hover:bg-gray-600');
+                btnElement.classList.add('bg-emerald-700', 'border-emerald-500', 'text-white', 'shadow-lg');
+                feedback.className = 'mt-3 sm:mt-4 text-center font-bold text-emerald-400 text-sm sm:text-lg animate-pulse flex-shrink-0';
+                feedback.innerText = "✨ 攻破營壘！真理的光照進來了！";
+                
+                const modalContent = document.getElementById('modal-content');
+                modalContent.classList.remove('border-red-900');
+                modalContent.classList.add('border-emerald-500', 'shadow-[0_0_40px_rgba(52,211,153,0.4)]');
+
+                // 讓視窗自動往下滾動，以確保使用者能看到成功訊息
+                modalContent.scrollTop = modalContent.scrollHeight;
+
+                // 修正：鎖定當前節點 ID，避免動畫期間提早關閉視窗導致變數遺失
+                const targetNodeId = currentActiveNodeId;
+
+                setTimeout(() => {
+                    if (targetNodeId) {
+                        conquerNode(targetNodeId);
+                    }
+                    closeModal();
+                }, 1800);
+
+            } else {
+                btnElement.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                btnElement.classList.add('bg-red-900', 'border-red-500', 'opacity-60');
+                feedback.className = 'mt-3 sm:mt-4 text-center font-bold text-red-400 text-sm sm:text-lg flex-shrink-0';
+                feedback.innerText = "❌ 這句真理無法對付這個特定的謊言，請再試一次。";
+                
+                const modalContent = document.getElementById('modal-content');
+                modalContent.classList.add('shake-animation');
+                modalContent.scrollTop = modalContent.scrollHeight;
+                
+                setTimeout(() => {
+                    modalContent.classList.remove('shake-animation');
+                    allBtns.forEach(b => {
+                        if (!b.classList.contains('bg-red-900')) b.disabled = false;
+                    });
+                }, 600);
+            }
+        }
+
+        function conquerNode(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (!node) return; // 加入安全保護機制，如果找不到節點就直接返回
+            
+            node.state = 'conquered';
+
+            nodes.forEach(child => {
+                if (child.state === 'locked' && child.parents.includes(nodeId)) {
+                    child.state = 'unlocked';
+                }
+            });
+
+            renderTree();
+            updateProgress();
+            checkWinCondition();
+        }
+
+        function checkWinCondition() {
+            const allConquered = nodes.every(n => n.state === 'conquered');
+            if (allConquered) {
+                setTimeout(triggerVictory, 1500);
+            }
+        }
+
+        function triggerVictory() {
+            document.body.classList.remove('theme-dark');
+            document.body.classList.add('theme-light');
+            
+            document.getElementById('main-header').classList.add('text-emerald-900');
+            document.getElementById('subtitle').innerText = "恢復身分與使命，讓天上的旨意行在地上。";
+            
+            document.getElementById('progress-bar').classList.add('shadow-[0_0_20px_#34d399]');
+
+            setTimeout(() => {
+                const overlay = document.getElementById('victory-overlay');
+                overlay.classList.add('active');
+                document.getElementById('victory-content').classList.remove('scale-90');
+                document.getElementById('victory-content').classList.add('scale-100');
+            }, 1000);
+        }
+
+        // 顯示最後一頁：每日操練
+        function showDailyPractice() {
+            const victoryOverlay = document.getElementById('victory-overlay');
+            const dailyOverlay = document.getElementById('daily-practice-overlay');
+            
+            // 先淡出勝利頁面
+            victoryOverlay.classList.remove('active');
+            
+            // 等待淡出後，淡入每日操練頁面
+            setTimeout(() => {
+                dailyOverlay.classList.add('active');
+            }, 800);
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        window.onload = initGame;
+
+        // 電腦版滑鼠拖曳邏輯 (手機原生支援觸控滑動，這裡不干擾)
+        const slider = document.getElementById('scroll-wrapper');
+        let isDown = false;
+        let startX;
+        let startY;
+        let scrollLeft;
+        let scrollTop;
+
+        slider.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.node')) return;
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            startY = e.pageY - slider.offsetTop;
+            scrollLeft = slider.scrollLeft;
+            scrollTop = slider.scrollTop;
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.style.cursor = 'move';
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.style.cursor = 'move';
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const y = e.pageY - slider.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            slider.scrollLeft = scrollLeft - walkX;
+            slider.scrollTop = scrollTop - walkY;
+        });
+
+    </script>
+</body>
+</html>
